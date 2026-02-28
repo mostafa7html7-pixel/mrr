@@ -61,6 +61,16 @@
             height: 100%;
             object-fit: cover;
         }
+        .warning-box {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid var(--neon-red);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: #ffaaaa;
+            margin-bottom: 20px;
+            text-align: right;
+        }
     </style>
 </head>
 <body class="auth-body">
@@ -69,6 +79,11 @@
         <div class="auth-logo"><i class="fa-solid fa-user-check"></i></div>
         <h2 class="auth-title">خطوة أخيرة!</h2>
         <p class="auth-subtitle">يرجى إكمال بياناتك الشخصية للمتابعة</p>
+
+        <div class="warning-box">
+            <i class="fa-solid fa-triangle-exclamation"></i> <strong>تنبيه هام:</strong>
+            يجب استخدام <u>صورة وجه حقيقية</u> واسمك الثلاثي الصحيح. أي بيانات مزيفة أو صور غير لائقة ستؤدي إلى <strong>حظر حسابك وجهازك نهائياً</strong> من المنصة.
+        </div>
 
         <form id="completeProfileForm">
             <label for="avatarInput" class="avatar-upload" id="avatarPreview">
@@ -98,6 +113,11 @@
                 </label>
             </div>
 
+            <div style="text-align: right; margin-bottom: 15px; font-size: 0.85rem; color: #ccc;">
+                <input type="checkbox" id="policyCheck" required>
+                <label for="policyCheck">أقر بأن البيانات صحيحة والصورة شخصية وحقيقية.</label>
+            </div>
+
             <button type="submit" class="auth-btn">حفظ وبدء المتابعة</button>
         </form>
     </div>
@@ -105,14 +125,15 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
-        const storage = getStorage(app);
+
+        const CLOUD_NAME = "dzwrz9qzb";
+        const UPLOAD_PRESET = "my_chat_preset";
 
         let currentUserUid = null;
         let selectedFile = null;
@@ -146,18 +167,39 @@
             btn.disabled = true;
             btn.innerText = 'جاري الحفظ...';
 
-            const fileRef = storageRef(storage, `profile_pictures/${currentUserUid}`);
-            const uploadResult = await uploadBytes(fileRef, selectedFile);
-            const photoURL = await getDownloadURL(uploadResult.ref);
+            try {
+                let photoURL = "https://abqarieno.firebaseapp.com/212.png"; // صورة افتراضية
 
-            await update(ref(db, 'users/' + currentUserUid), {
-                username: document.getElementById('nameInput').value,
-                phone: document.getElementById('phoneInput').value,
-                gender: document.querySelector('input[name="gender"]:checked').value,
-                photoURL: photoURL
-            });
+                if (selectedFile) {
+                    const formData = new FormData();
+                    formData.append('file', selectedFile);
+                    formData.append('upload_preset', UPLOAD_PRESET);
 
-            window.location.href = "index.html";
+                    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) throw new Error('فشل رفع الصورة، يرجى المحاولة مرة أخرى');
+                    const data = await response.json();
+                    photoURL = data.secure_url;
+                }
+
+                await update(ref(db, 'users/' + currentUserUid), {
+                    username: document.getElementById('nameInput').value,
+                    phone: document.getElementById('phoneInput').value,
+                    gender: document.querySelector('input[name="gender"]:checked').value,
+                    photoURL: photoURL,
+                    role: 'student',
+                    joinedAt: new Date().toISOString()
+                });
+
+                window.location.href = "index.html";
+            } catch (error) {
+                alert("حدث خطأ: " + error.message);
+                btn.disabled = false;
+                btn.innerText = 'حفظ وبدء المتابعة';
+            }
         });
     </script>
 

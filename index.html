@@ -286,6 +286,13 @@
                 // User is logged in, check if profile is complete
                 get(ref(db, 'users/' + user.uid)).then((snapshot) => {
                     const userData = snapshot.val();
+                    
+                    if (userData && userData.banned) {
+                        alert("تم حظر حسابك من قبل الإدارة بسبب مخالفة السياسات.");
+                        signOut(auth).then(() => window.location.href = 'auth.html');
+                        return;
+                    }
+
                     // Check for a specific field that is only in the complete profile, like 'gender'
                     if (!userData || !userData.gender) { 
                         // If gender (or another mandatory field) is missing, redirect

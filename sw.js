@@ -1,7 +1,8 @@
-const CACHE_NAME = 'abqarieno-v5'; // Update: Removed update toast logic
+const CACHE_NAME = 'abqarieno-v7'; // Update: Admin UI & Strict Auth
 const ASSETS = [
     './',
     './index.html',
+    './offline.html',
     './manifest.json',
     './library.html',
     './videos.html',
@@ -54,8 +55,11 @@ self.addEventListener('fetch', (e) => {
                 caches.open(CACHE_NAME).then(cache => cache.put(e.request, networkResponse.clone()));
                 return networkResponse;
             }).catch(() => {
-                // If network fails, serve from cache
-                return caches.match(e.request);
+                // If network fails, try to serve from cache
+                return caches.match(e.request).then(response => {
+                    // If page is in cache, return it. If not, return offline page.
+                    return response || caches.match('./offline.html');
+                });
             })
         );
     } else { // Cache First for other assets (CSS, JS, images)

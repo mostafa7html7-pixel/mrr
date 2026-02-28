@@ -42,6 +42,13 @@
                 </div>
             </header>
 
+            <div class="admin-controls">
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="بحث عن طالب (الاسم أو الرقم)..." onkeyup="filterUsers()">
+                </div>
+            </header>
+
             <!-- User Cards Grid -->
             <div class="admin-users-grid" id="usersGridContainer">
                 <p style="color:#888; text-align:center;">جاري تحميل بيانات الطلاب...</p>
@@ -51,7 +58,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
@@ -108,6 +115,21 @@
             signOut(auth).then(() => window.location.href = "auth.html");
         }
 
+        // دوال التحكم (Global Scope)
+        window.toggleBan = function(uid, currentStatus) {
+            const newStatus = !currentStatus;
+            const action = newStatus ? "حظر" : "فك حظر";
+            if(confirm(`هل أنت متأكد من ${action} هذا الطالب؟`)) {
+                update(ref(db, 'users/' + uid), { banned: newStatus });
+            }
+        }
+
+        window.deleteUser = function(uid) {
+            if(confirm("تحذير: سيتم حذف بيانات الطالب نهائياً! هل أنت متأكد؟")) {
+                remove(ref(db, 'users/' + uid));
+            }
+        }
+
         function initDashboard() {
             // جلب المستخدمين وعرضهم على شكل بطاقات
             onValue(ref(db, 'users'), (snapshot) => {
@@ -116,6 +138,7 @@
                 let userCount = 0;
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
+                        const uid = childSnapshot.key;
                         const user = childSnapshot.val();
                         if(user.role === 'admin') return; // Don't show admin in the list
                         userCount++;
@@ -123,13 +146,19 @@
                         const genderIcon = user.gender === 'boy' 
                             ? '<i class="fa-solid fa-mars" style="color: #00d2ff;"></i>' 
                             : '<i class="fa-solid fa-venus" style="color: #ff69b4;"></i>';
+                        
+                        const isBanned = user.banned === true;
 
                         const cardHTML = `
-                            <div class="admin-user-card">
+                            <div class="admin-user-card ${isBanned ? 'banned' : ''}" data-name="${user.username}" data-phone="${user.phone}">
                                 <img src="${user.photoURL || '212.png'}" class="avatar" alt="صورة الطالب">
                                 <h3>${user.username || 'طالب جديد'}</h3>
                                 <p><i class="fa-solid fa-phone"></i> ${user.phone || 'غير مسجل'}</p>
                                 <p>${genderIcon} ${user.gender === 'boy' ? 'ولد' : 'بنت'}</p>
+                                <div class="card-actions">
+                                    <button onclick="toggleBan('${uid}', ${isBanned})" class="btn-action ${isBanned ? 'unban' : 'ban'}">${isBanned ? 'فك الحظر' : 'حظر'}</button>
+                                    <button onclick="deleteUser('${uid}')" class="btn-action delete"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                             </div>
                         `;
                         grid.innerHTML += cardHTML;
@@ -140,6 +169,23 @@
                     grid.innerHTML = '<p style="color:#888; text-align:center;">لا يوجد طلاب مسجلين حتى الآن.</p>';
                 }
                 document.getElementById('userCount').innerText = userCount;
+            });
+        }
+
+        // دالة البحث
+        window.filterUsers = function() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.admin-user-card');
+            
+            cards.forEach(card => {
+                const name = (card.getAttribute('data-name') || '').toLowerCase();
+                const phone = (card.getAttribute('data-phone') || '').toLowerCase();
+                
+                if (name.includes(input) || phone.includes(input)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
             });
         }
     </script>
