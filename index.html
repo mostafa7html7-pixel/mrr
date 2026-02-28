@@ -74,13 +74,6 @@
     </script>
 </head>
 <body>
-    <!-- Page Loader -->
-    <div id="page-loader">
-        <div class="loader-content">
-            <i class="fa-solid fa-heart-pulse loader-icon"></i>
-            <div class="loader-text">الدكتور <small>جاري التحميل...</small></div>
-        </div>
-    </div>
 
     <nav class="navbar">
         <div class="logo">
@@ -115,14 +108,19 @@
             <span></span>
             <span></span>
         </div>
+
         <div class="hero-content">
-            <div class="hero-text">
-                <p class="subtitle scroll-animate" style="transition-delay: 0.1s;">BIOLOGY LAB</p>
-                <h1 class="scroll-animate" style="transition-delay: 0.2s;">عالم الأحياء <br> <span class="neon-green-text">بمنظور مختلف</span></h1>
-                <p class="hero-desc scroll-animate" style="transition-delay: 0.3s;">استعد لرحلة فريدة في أعماق الخلية والتشريح مع دكتور عبدالله . تعليمنا ليس مجرد حفظ، بل هو تجربة بصرية وعلمية تفوق الخيال.</p>
-                <div class="hero-btns scroll-animate" style="transition-delay: 0.4s;">
-                    <a href="videos.html" class="btn-green">ابدأ المشاهدة الآن</a>
-                    <a href="library.html" class="btn-outline">تصفح المكتبة</a>
+            <div class="hero-text scroll-animate" style="transition-delay: 0.2s;">
+                <p class="subtitle">BIOLOGY LAB</p>
+                <h1>عالم الأحياء <br> <span class="neon-green-text">بمنظور مختلف</span></h1>
+                <p class="hero-desc">استعد لرحلة فريدة في أعماق الخلية والتشريح مع دكتور عبدالله . تعليمنا ليس مجرد حفظ، بل هو تجربة بصرية وعلمية تفوق الخيال.</p>
+                <div class="hero-btns">
+                    <a href="schedule.html" class="btn-green">الجدول</a>
+                    <a href="reviews.html" class="btn-outline">ورق الشرح</a>
+                </div>
+                <!-- Latest News Strip (Moved Here) -->
+                <div id="latest-news-strip" class="latest-news-strip">
+                    <!-- Populated by JS -->
                 </div>
             </div>
             
@@ -214,11 +212,93 @@
         const fireText = document.getElementById('fire-msg-text');
         const fireImg = document.getElementById('fire-msg-img');
         
+        // --- New Logic for Hero News Strip ---
+        const newsStripContainer = document.getElementById('latest-news-strip');
+        if (newsStripContainer) {
+            onValue(query(ref(db, 'broadcasts'), limitToLast(20)), (snapshot) => {
+                if (!snapshot.exists()) {
+                    newsStripContainer.style.display = 'none';
+                    newsStripContainer.innerHTML = '';
+                    return;
+                }
+                
+                newsStripContainer.style.display = 'flex';
+
+                const messages = [];
+                snapshot.forEach(childSnapshot => {
+                    messages.push(childSnapshot.val());
+                });
+
+                // Reverse to show latest first
+                messages.reverse();
+
+                newsStripContainer.innerHTML = ''; // Clear
+
+                messages.forEach(msg => {
+                    const date = new Date(msg.timestamp).toLocaleDateString('ar-EG');
+
+                    let mediaHtml = '';
+                    if (msg.mediaURL) {
+                        const downloadText = msg.fileName || 'تحميل';
+                        const downloadAttr = msg.fileName || '';
+                        const downloadBtnHtml = `<a href="${msg.mediaURL}" target="_blank" download="${downloadAttr}" class="mini-download-btn"><i class="fa-solid fa-download"></i><span>${downloadText}</span></a>`;
+
+                        if (msg.mediaType === 'image') {
+                            mediaHtml = `<div class="news-card-media">
+                                            <img src="${msg.mediaURL}" alt="مرفق" loading="lazy" onclick="openLightbox('${msg.mediaURL}', 'image')">
+                                            ${downloadBtnHtml}
+                                         </div>`;
+                        } else if (msg.mediaType === 'video') {
+                            mediaHtml = `<div class="news-card-media">
+                                            <video src="${msg.mediaURL}" controls preload="metadata"></video>
+                                            ${downloadBtnHtml}
+                                         </div>`;
+                        }
+                    }
+
+                    let textHtml = '';
+                    if (msg.text && msg.text.trim() !== '') {
+                        textHtml = `<div class="news-text-wrapper"><p>${msg.text}</p></div>`;
+                    }
+
+                    const cardHtml = `
+                        <div class="news-card scroll-animate">
+                            <i class="fa-solid fa-bullhorn news-card-icon"></i>
+                            <div class="news-card-content">
+                                ${textHtml}
+                                ${mediaHtml}
+                                <small>${date}</small>
+                            </div>
+                        </div>
+                    `;
+                    newsStripContainer.innerHTML += cardHtml;
+                });
+
+                // Trigger scroll animations for the newly added cards
+                const newAnimatedElements = newsStripContainer.querySelectorAll('.scroll-animate');
+                newAnimatedElements.forEach((el) => observer.observe(el));
+            });
+        }
+
         const auth = getAuth(app);
         onAuthStateChanged(auth, (user) => {
             if (!user) {
                 // If you want to protect the main page, uncomment the next line
                 // window.location.href = 'auth.html';
+            if (user) {
+                // User is logged in, check if profile is complete
+                get(ref(db, 'users/' + user.uid)).then((snapshot) => {
+                    const userData = snapshot.val();
+                    // Check for a specific field that is only in the complete profile, like 'gender'
+                    if (!userData || !userData.gender) { 
+                        // If gender (or another mandatory field) is missing, redirect
+                        window.location.href = 'complete-profile.html';
+                    }
+                    // else, user can stay on index.html
+                });
+            } else {
+                // User is not logged in, redirect to auth page
+                window.location.href = 'auth.html';
             }
         });
 
@@ -228,6 +308,17 @@
         const lastSeenTime = localStorage.getItem('biology_last_seen_news') || 0;
         const loadTime = Date.now(); // وقت فتح الموقع
         let latestMsgTimeInModal = 0; // لتحديث وقت القراءة عند الضغط على الزر
+
+        // The scroll observer from main.js might run before Firebase gets the data.
+        // We need an observer here too for the dynamically added cards.
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
 
         // --- 1. التحقق من وجود رسائل فائتة (مرة واحدة عند التحميل) ---
         // هذا هو المنطق المسؤول عن إظهار زر الأخبار عند فتح الموقع

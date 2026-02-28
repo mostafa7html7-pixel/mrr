@@ -107,13 +107,6 @@
     </style>
 </head>
 <body>
-    <!-- Page Loader -->
-    <div id="page-loader">
-        <div class="loader-content">
-            <i class="fa-solid fa-heart-pulse loader-icon"></i>
-            <div class="loader-text">الدكتور <small>جاري التحميل...</small></div>
-        </div>
-    </div>
 
     <nav class="navbar">
         <div class="logo">
@@ -211,12 +204,6 @@
         menuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('page-loader').classList.add('loader-hidden');
-            }, 1000);
         });
 
         // كود تثبيت التطبيق PWA

@@ -13,6 +13,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://drive.google.com">
+    <link rel="preconnect" href="https://content.googleapis.com">
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
     {
@@ -51,17 +53,15 @@
         :root {
             --bio-green: #00ff88;
             --bio-blue: #00d2ff;
-            --dark-bg: #050508;
-            --card-bg: rgba(15, 20, 25, 0.85);
-            --border-color: rgba(0, 255, 136, 0.2);
+            --dark-bg: #020202;
+            --card-bg: rgba(10, 12, 16, 0.9);
+            --border-color: rgba(0, 255, 136, 0.1);
         }
 
         body {
             background-color: var(--dark-bg);
-            /* خلفية هادئة تناسب التركيز في المذاكرة */
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(0, 210, 255, 0.03) 0%, transparent 50%);
+            /* خلفية داكنة تماماً لراحة العين */
+            background-image: none;
             color: #fff;
         }
 
@@ -90,62 +90,80 @@
         /* شبكة ورق الشرح */
         .cards-hub {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin-bottom: 50px;
         }
 
         .study-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
+            background: linear-gradient(145deg, #131820, #0b0e13);
+            border: 1px solid rgba(0, 255, 136, 0.1);
             border-radius: 16px;
-            padding: 25px;
+            padding: 15px;
             position: relative;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+        }
+
+        .study-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(0, 255, 136, 0.05), transparent 40%);
+            pointer-events: none;
+        }
+
+        /* تأثير الظهور المتتابع */
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .study-card:nth-child(1) { animation-delay: 0.1s; }
+        .study-card:nth-child(2) { animation-delay: 0.2s; }
+        .study-card:nth-child(3) { animation-delay: 0.3s; }
+        .study-card:nth-child(4) { animation-delay: 0.4s; }
+        .study-card:nth-child(5) { animation-delay: 0.5s; }
+        .study-card:nth-child(n+6) { animation-delay: 0.6s; }
+
+        .study-card:hover {
+            border-color: var(--bio-green);
         }
 
         .study-card:hover {
             border-color: var(--bio-green);
-            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);
-            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 255, 136, 0.2);
+            transform: translateY(-5px) scale(1.02);
         }
 
-        .card-icon {
-            font-size: 2.5rem;
-            color: var(--bio-green);
-            margin-bottom: 15px;
-            opacity: 0.8;
-        }
 
         .study-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 1.3rem;
+            margin: 5px 0 15px 0;
+            font-size: 1rem;
             color: #fff;
             font-weight: 700;
-        }
-
-        .study-card p {
-            font-size: 0.95rem;
-            color: #a0aec0;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            flex-grow: 1;
+            letter-spacing: -0.5px;
         }
 
         .controls-row {
             display: flex;
-            gap: 12px;
+            gap: 8px;
+            width: 100%;
+            z-index: 2;
         }
 
         .btn-view {
-            background: rgba(0, 255, 136, 0.1);
+            background: transparent;
             color: var(--bio-green);
             border: 1px solid var(--bio-green);
-            padding: 10px 15px;
+            padding: 6px 10px;
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
@@ -153,21 +171,37 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 5px;
+            font-size: 0.85rem;
             transition: 0.3s;
             font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-view::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 0%; height: 100%;
+            background: var(--bio-green);
+            transition: 0.3s;
+            z-index: -1;
+        }
+
+        .btn-view:hover::before {
+            width: 100%;
         }
 
         .btn-view:hover {
-            background: var(--bio-green);
             color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
         }
 
         .btn-download {
-            background: transparent;
-            color: #a0aec0;
-            border: 1px solid #4a5568;
-            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 10px;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -177,8 +211,36 @@
         }
 
         .btn-download:hover {
-            background: #4a5568;
-            color: #fff;
+            background: #fff;
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .btn-share {
+            background: rgba(0, 0, 0, 0.3);
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 35px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .btn-share:hover {
+            color: var(--bio-green);
+            border-color: var(--bio-green);
+        }
+
+        /* --- أوضاع القراءة (داخل الحاوية) --- */
+        .iframe-container iframe {
+            transition: filter 0.4s ease;
+        }
+        /* وضع الراحة (أصفر) */
+        .iframe-container.mode-sepia iframe {
+            filter: sepia(40%) contrast(95%) brightness(95%);
+        }
+        /* وضع ليلي (داكن) */
+        .iframe-container.mode-dark iframe {
+            filter: invert(92%) hue-rotate(180deg) contrast(90%);
         }
 
         /* --- منطقة عرض الملفات (السبورة الذكية) --- */
@@ -190,21 +252,21 @@
         }
 
         .file-window {
-            background: #111827;
-            border: 1px solid #374151;
+            background: #0f131a;
+            border: 1px solid var(--bio-green);
             border-radius: 16px;
             height: 80vh; /* طول مناسب للقراءة */
             min-height: 600px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.15);
             animation: fadeInUp 0.6s ease;
             overflow: hidden;
         }
 
         .window-header {
-            background: #1f2937;
-            padding: 15px 20px;
+            background: linear-gradient(90deg, #0a0d12, #151b24);
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -227,6 +289,17 @@
 
         iframe { width: 100%; height: 100%; border: none; }
 
+        .iframe-loader {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: #131820;
+            color: var(--bio-green);
+            z-index: 1;
+            font-size: 1.1rem;
+            gap: 15px;
+        }
         @media (max-width: 768px) {
             .file-window { height: 70vh; min-height: 500px; }
             .window-title { font-size: 0.9rem; }
@@ -234,13 +307,6 @@
     </style>
 </head>
 <body>
-    <!-- Page Loader -->
-    <div id="page-loader">
-        <div class="loader-content">
-            <i class="fa-solid fa-heart-pulse loader-icon"></i>
-            <div class="loader-text">الدكتور <small>جاري التحميل...</small></div>
-        </div>
-    </div>
 
     <nav class="navbar">
         <div class="logo">
@@ -271,52 +337,47 @@
         <div class="cards-hub">
             
             <div class="study-card">
-                <i class="fa-solid fa-microscope card-icon"></i>
                 <h3>ورقة الشرح الأولى</h3>
-                <p>ملخص شامل للدرس الأول مدعوم بالرسومات التوضيحية لتبسيط الفهم والتركيز على أهم النقاط الامتحانية.</p>
                 <div class="controls-row">
                     <button class="btn-view" onclick="openFile('https://drive.google.com/file/d/1SLou0Rf7FdyOkwd_zJtWxD7ma1VIELK_/preview', 'ورقة الشرح الأولى')"><i class="fa-regular fa-eye"></i> عرض داخل الموقع</button>
                     <a href="https://drive.google.com/uc?export=download&id=1SLou0Rf7FdyOkwd_zJtWxD7ma1VIELK_" title="تحميل الملف" class="btn-download" download><i class="fa-solid fa-download"></i></a>
+                    <button class="btn-share" onclick="shareLink('https://drive.google.com/file/d/1SLou0Rf7FdyOkwd_zJtWxD7ma1VIELK_/view', this)" title="نسخ الرابط"><i class="fa-solid fa-link"></i></button>
                 </div>
             </div>
 
             <div class="study-card">
-                <i class="fa-solid fa-dna card-icon"></i>
                 <h3>ورقة الشرح الثانية</h3>
-                <p>مخططات ذهنية ومقارنات هامة لربط المعلومات ببعضها، مصممة خصيصاً لتسهيل المراجعة السريعة.</p>
                 <div class="controls-row">
                     <button class="btn-view" onclick="openFile('https://drive.google.com/file/d/1RepnR_neZGppXj4xC0F3mbeiPN0upnps/preview', 'ورقة الشرح الثانية')"><i class="fa-regular fa-eye"></i> عرض داخل الموقع</button>
                     <a href="https://drive.google.com/uc?export=download&id=1RepnR_neZGppXj4xC0F3mbeiPN0upnps" title="تحميل الملف" class="btn-download" download><i class="fa-solid fa-download"></i></a>
+                    <button class="btn-share" onclick="shareLink('https://drive.google.com/file/d/1RepnR_neZGppXj4xC0F3mbeiPN0upnps/view', this)" title="نسخ الرابط"><i class="fa-solid fa-link"></i></button>
                 </div>
             </div>
 
             <div class="study-card">
-                <i class="fa-solid fa-leaf card-icon"></i>
                 <h3>ورقة الشرح الثالثة</h3>
-                <p>شرح تفصيلي للتراكيب الحيوية والعمليات الفسيولوجية بأسلوب مبسط ومباشر.</p>
                 <div class="controls-row">
                     <button class="btn-view" onclick="openFile('https://drive.google.com/file/d/1vJXNgHxZRNdl78rg3GZo9CBQFu8tJWfG/preview', 'ورقة الشرح الثالثة')"><i class="fa-regular fa-eye"></i> عرض داخل الموقع</button>
                     <a href="https://drive.google.com/uc?export=download&id=1vJXNgHxZRNdl78rg3GZo9CBQFu8tJWfG" title="تحميل الملف" class="btn-download" download><i class="fa-solid fa-download"></i></a>
+                    <button class="btn-share" onclick="shareLink('https://drive.google.com/file/d/1vJXNgHxZRNdl78rg3GZo9CBQFu8tJWfG/view', this)" title="نسخ الرابط"><i class="fa-solid fa-link"></i></button>
                 </div>
             </div>
 
             <div class="study-card">
-                <i class="fa-solid fa-disease card-icon"></i>
                 <h3>ورقة الشرح الرابعة</h3>
-                <p>أهم التطبيقات والأسئلة الشائعة التي تتكرر في الامتحانات مع تحليل وافٍ للإجابات النموذجية.</p>
                 <div class="controls-row">
                     <button class="btn-view" onclick="openFile('https://drive.google.com/file/d/1qVh0HtON6hT1plWTZAqudCuCxy1Xy0nE/preview', 'ورقة الشرح الرابعة')"><i class="fa-regular fa-eye"></i> عرض داخل الموقع</button>
                     <a href="https://drive.google.com/uc?export=download&id=1qVh0HtON6hT1plWTZAqudCuCxy1Xy0nE" title="تحميل الملف" class="btn-download" download><i class="fa-solid fa-download"></i></a>
+                    <button class="btn-share" onclick="shareLink('https://drive.google.com/file/d/1qVh0HtON6hT1plWTZAqudCuCxy1Xy0nE/view', this)" title="نسخ الرابط"><i class="fa-solid fa-link"></i></button>
                 </div>
             </div>
 
             <div class="study-card">
-                <i class="fa-solid fa-notes-medical card-icon"></i>
                 <h3>ورقة الشرح الخامسة</h3>
-                <p>المراجعة النهائية وتجميع القوانين والملاحظات الدقيقة التي تصنع الفارق للطالب المتفوق.</p>
                 <div class="controls-row">
                     <button class="btn-view" onclick="openFile('https://drive.google.com/file/d/1aVoDCLxMbLQ0X7w9tbwdwXfo4VRO9zIb/preview', 'ورقة الشرح الخامسة')"><i class="fa-regular fa-eye"></i> عرض داخل الموقع</button>
                     <a href="https://drive.google.com/uc?export=download&id=1aVoDCLxMbLQ0X7w9tbwdwXfo4VRO9zIb" title="تحميل الملف" class="btn-download" download><i class="fa-solid fa-download"></i></a>
+                    <button class="btn-share" onclick="shareLink('https://drive.google.com/file/d/1aVoDCLxMbLQ0X7w9tbwdwXfo4VRO9zIb/view', this)" title="نسخ الرابط"><i class="fa-solid fa-link"></i></button>
                 </div>
             </div>
 
@@ -338,6 +399,22 @@
     <script>
         let isFileOpen = false;
 
+        function shareLink(url, btn) {
+            navigator.clipboard.writeText(url).then(() => {
+                const originalIcon = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check" style="color:var(--bio-green)"></i>';
+                
+                // إنشاء إشعار صغير (Toast)
+                const toast = document.createElement('div');
+                toast.innerText = 'تم نسخ الرابط!';
+                toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--bio-green); color:#000; padding:8px 20px; border-radius:20px; font-weight:bold; z-index:9999; box-shadow:0 5px 15px rgba(0,0,0,0.3); font-size:0.9rem; animation: fadeInUp 0.3s ease;';
+                document.body.appendChild(toast);
+
+                setTimeout(() => { btn.innerHTML = originalIcon; }, 2000);
+                setTimeout(() => { toast.remove(); }, 3000);
+            });
+        }
+
         function openFile(path, title) {
             const workspace = document.getElementById('workspace');
             
@@ -351,12 +428,14 @@
                     <div class="window-header">
                         <span class="window-title"><i class="fa-solid fa-book-open"></i> يتم عرض: ${title}</span>
                         <div class="window-actions">
+                            <i class="win-btn fa-solid fa-low-vision" onclick="toggleNightReader(this)" title="وضع القراءة الليلية"></i>
                             <i class="win-btn fa-solid fa-expand" onclick="toggleFull('${windowId}')" title="ملء الشاشة للتركيز"></i>
                             <i class="win-btn close fa-solid fa-xmark" onclick="closeWin()" title="إغلاق الملف"></i>
                         </div>
                     </div>
                     <div class="iframe-container" id="cont-${windowId}">
-                        <iframe src="${path}" allow="autoplay"></iframe>
+                        <div class="iframe-loader"><i class="fa-solid fa-circle-notch fa-spin" style="font-size:2rem;"></i> جاري جلب الملف من السيرفر...</div>
+                        <iframe src="${path}" allow="autoplay" loading="eager" onload="this.previousElementSibling.style.display='none'"></iframe>
                     </div>
                 </div>
             `;
@@ -379,6 +458,30 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function toggleNightReader(btn) {
+            const fileWindow = btn.closest('.file-window');
+            const container = fileWindow.querySelector('.iframe-container');
+            let currentMode = container.dataset.mode || 'normal';
+
+            // إزالة الكلاس الحالي
+            if(currentMode !== 'normal') container.classList.remove('mode-' + currentMode);
+
+            // التبديل بين الأوضاع: عادي -> أصفر -> داكن -> عادي
+            if (currentMode === 'normal') {
+                currentMode = 'sepia';
+                btn.style.color = '#FFD700'; // ذهبي
+            } else if (currentMode === 'sepia') {
+                currentMode = 'dark';
+                btn.style.color = '#00d2ff'; // أزرق
+            } else {
+                currentMode = 'normal';
+                btn.style.color = ''; // استعادة اللون الأصلي
+            }
+
+            if(currentMode !== 'normal') container.classList.add('mode-' + currentMode);
+            container.dataset.mode = currentMode;
+        }
+
         function toggleFull(id) {
             const win = document.getElementById(id);
             if (!document.fullscreenElement) {
@@ -396,12 +499,6 @@
         menuBtn.addEventListener('click', () => {
             navLinks.classList.toggle('active');
             menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('page-loader').classList.add('loader-hidden');
-            }, 1000);
         });
 
         // كود تثبيت التطبيق PWA

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إكمال البيانات - الدكتور</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        .gender-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .gender-option {
+            flex: 1;
+            padding: 15px;
+            background: #050508;
+            border: 1px solid #333;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .gender-option i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .gender-option input {
+            display: none;
+        }
+        .gender-option.selected, .gender-option:hover {
+            border-color: var(--neon-green);
+            background: rgba(0, 255, 65, 0.1);
+        }
+        .avatar-upload {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border: 3px dashed #333;
+            border-radius: 50%;
+            background: #050508;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            overflow: hidden;
+        }
+        .avatar-upload:hover {
+            border-color: var(--neon-green);
+        }
+        .avatar-upload i {
+            font-size: 2.5rem;
+            color: #444;
+        }
+        .avatar-upload img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="auth-body">
+
+    <div class="auth-container" style="max-width: 500px;">
+        <div class="auth-logo"><i class="fa-solid fa-user-check"></i></div>
+        <h2 class="auth-title">خطوة أخيرة!</h2>
+        <p class="auth-subtitle">يرجى إكمال بياناتك الشخصية للمتابعة</p>
+
+        <form id="completeProfileForm">
+            <label for="avatarInput" class="avatar-upload" id="avatarPreview">
+                <i class="fa-solid fa-camera"></i>
+            </label>
+            <input type="file" id="avatarInput" accept="image/*" hidden required>
+
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="اسمك الثلاثي" required>
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="input-group">
+                <input type="tel" id="phoneInput" placeholder="رقم الهاتف" required>
+                <i class="fa-solid fa-phone"></i>
+            </div>
+
+            <div class="gender-selector">
+                <label class="gender-option" id="boy-label">
+                    <input type="radio" name="gender" value="boy" required>
+                    <i class="fa-solid fa-mars"></i>
+                    <div>ولد</div>
+                </label>
+                <label class="gender-option" id="girl-label">
+                    <input type="radio" name="gender" value="girl" required>
+                    <i class="fa-solid fa-venus"></i>
+                    <div>بنت</div>
+                </label>
+            </div>
+
+            <button type="submit" class="auth-btn">حفظ وبدء المتابعة</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        let currentUserUid = null;
+        let selectedFile = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "auth.html";
+            else currentUserUid = user.uid;
+        });
+
+        document.querySelectorAll('.gender-option input').forEach(radio => {
+            radio.addEventListener('change', () => {
+                document.querySelectorAll('.gender-option').forEach(label => label.classList.remove('selected'));
+                if(radio.checked) radio.parentElement.classList.add('selected');
+            });
+        });
+
+        document.getElementById('avatarInput').addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            if (selectedFile) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('avatarPreview').innerHTML = `<img src="${event.target.result}" alt="preview">`;
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        });
+
+        document.getElementById('completeProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = 'جاري الحفظ...';
+
+            const fileRef = storageRef(storage, `profile_pictures/${currentUserUid}`);
+            const uploadResult = await uploadBytes(fileRef, selectedFile);
+            const photoURL = await getDownloadURL(uploadResult.ref);
+
+            await update(ref(db, 'users/' + currentUserUid), {
+                username: document.getElementById('nameInput').value,
+                phone: document.getElementById('phoneInput').value,
+                gender: document.querySelector('input[name="gender"]:checked').value,
+                photoURL: photoURL
+            });
+
+            window.location.href = "index.html";
+        });
+    </script>
+
+</body>
+</html>

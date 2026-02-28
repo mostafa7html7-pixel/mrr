@@ -2,15 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // 1. Page Loader
-    const pageLoader = document.getElementById('page-loader');
-    if (pageLoader) {
-        setTimeout(() => {
-            pageLoader.classList.add('loader-hidden');
-        }, 500); // Faster fade out
-    }
-
-    // 2. Menu Toggle
+    // 1. Menu Toggle
     const menuBtn = document.querySelector('.menu-btn');
     const navLinks = document.querySelector('.nav-links');
     if (menuBtn && navLinks) {
@@ -28,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. PWA Install Button
+    // 2. PWA Install Button
     let deferredPrompt;
     const installBtn = document.getElementById('installAppBtn');
     if (installBtn) {
@@ -54,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Theme Toggle
+    // 3. Theme Toggle
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         const body = document.body;
@@ -78,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 5. Scroll Animations
+    // 4. Scroll Animations
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
