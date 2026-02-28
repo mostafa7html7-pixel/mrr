@@ -1112,19 +1112,14 @@ audio::-webkit-media-controls-play-button { background-color: #fff; border-radiu
 
 .admin-users-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-}
+    grid-template-columns: repeat(auto-fit, minmax(20
 
 .admin-user-card {
-    background: #0f0f13;
-    border: 1px solid #222;
-    border-radius: 15px;
-    padding: 20px;
-    text-align: center;
-    transition: 0.3s;
+    background: var(--card-bg);
+    border: 1px so
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .admin-user-card:hover {
     transform: translateY(-5px);
@@ -1137,39 +1132,35 @@ audio::-webkit-media-controls-play-button { background-color: #fff; border-radiu
 }
 
 .admin-user-card .avatar {
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: 3px solid var(--neon-green);
-    margin: 0 auto 15px;
+    margin: 0 auto 10px;
     object-fit: cover;
-    background: #222;
+    backc: ion: transform 0.3s;
 }
+.admin-user-card .avatar:hover { transform: scale(1.1); border-color: #fff; }
 
-.admin-user-card h3 { color: #fff; font-size: 1.2rem; margin-bottom: 8px; }
-.admin-user-card p {
-    color: #888; font-size: 0.9rem; margin-bottom: 5px;
+.admin-user-card h3 c
+    color: var(--text-gray); font-size: 0.8rem; margin-bottom: 4px;
     display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .admin-user-card p i { color: var(--neon-green); }
 
 .card-actions {
-    display: flex; gap: 10px; justify-content: center; margin-top: 15px;
+    display: flex; gap: 8px; justify-content: center; margin-top: 12px;
 }
-.btn-action {
-    padding: 6px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s;
-}
-.btn-action.ban { background: rgba(255, 0, 0, 0.1); color: var(--neon-red); border: 1px solid var(--neon-red); }
+    padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s;
+}.ban { background: rgba(255, 0, 0, 0.1); color: var(--neon-red); border: 1px solid var(--neon-red); }
 .btn-action.ban:hover { background: var(--neon-red); color: #fff; }
 
 .btn-action.unban { background: rgba(0, 255, 65, 0.1); color: var(--neon-green); border: 1px solid var(--neon-green); }
 .btn-action.unban:hover { background: var(--neon-green); color: #000; }
 
-.btn-action.delete { background: #222; color: #666; border: 1px solid #444; }
-.btn-action.delete:hover { background: #fff; color: #000; }
+.btn-action.delete { r # { background: #fff; color: #000; }
 
 
-.pricing-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 30px; }
 .pricing-card {
     background: #0f0f13; border: 1px solid #333; border-radius: 20px; padding: 30px;
     width: 300px; text-align: center; position: relative; overflow: hidden; transition: 0.3s;

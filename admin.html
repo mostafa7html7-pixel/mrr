@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="admin-body">
+<body>
 
     <!-- Gatekeeper Overlay -->
     <div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#020204; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column;">
@@ -19,43 +19,52 @@
         <button id="secretBtn" onclick="activateMaster()" style="display:none; margin-top:15px; padding:10px 30px; background:var(--neon-red); color:#fff; border:none; border-radius:30px; cursor:pointer; font-weight:bold;">تفعيل وضع المستر</button>
     </div>
 
-    <div class="admin-container" id="adminPanel" style="opacity:0; transition:1s;">
-        <!-- Main Content -->
-        <main class="admin-content">
-            <!-- Top Navigation for Quick Access -->
-            <nav class="admin-top-nav">
-                <div class="logo" style="margin-left: auto;">
-                    <i class="fa-solid fa-heart-pulse" style="color:var(--neon-red)"></i>
-                    <span style="font-weight:bold; color:#fff; margin-right:5px;">لوحة التحكم</span>
-                </div>
-                <a href="index.html" style="color:#888; font-size:0.9rem; font-weight:bold; transition:0.3s;"><i class="fa-solid fa-house"></i> العودة للرئيسية</a>
-            </nav>
+    <!-- Navbar (Standard) -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>ADMIN PANEL</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="contact.html">الشات</a></li>
+            <li><a href="admin.html" class="active">لوحة التحكم</a></li>
+            <li><a href="#" onclick="logout()">خروج</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
 
-            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                <div>
-                    <h1 style="font-size:1.8rem; font-weight:900;">الطلاب المسجلين</h1>
-                    <p style="color:#888;">أهلاً بك يا دكتور، هذه هي قائمة الطلاب المسجلين في المنصة.</p>
-                </div>
-                <div style="text-align:left;">
-                    <div id="userCount" style="color:var(--neon-green); font-weight:bold; font-size:1.5rem;">0</div>
-                    <div style="color:#666; font-size:0.9rem;">طالب مسجل</div>
-                </div>
-            </header>
-
-            <div class="admin-controls">
-                <div class="search-box">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="بحث عن طالب (الاسم أو الرقم)..." onkeyup="filterUsers()">
-                </div>
-            </header>
-
-            <!-- User Cards Grid -->
-            <div class="admin-users-grid" id="usersGridContainer">
-                <p style="color:#888; text-align:center;">جاري تحميل بيانات الطلاب...</p>
-            </div>
-        </main>
+    <!-- Lightbox -->
+    <div id="lightbox-overlay" class="lightbox-overlay">
+        <span class="close-lightbox">&times;</span>
+        <div class="lightbox-content" id="lightbox-content"></div>
     </div>
 
+    <div class="container" id="adminPanel" style="opacity:0; transition:1s; padding-top: 50px;">
+        
+        <div class="page-header">
+            <p class="subtitle">STUDENTS MANAGEMENT</p>
+            <h2 class="main-title">الطلاب <span style="color:var(--neon-green)">المسجلين</span></h2>
+            <p style="color:#888">إجمالي الطلاب: <span id="userCount" style="color:var(--neon-green); font-weight:bold;">0</span></p>
+        </div>
+
+        <div class="admin-controls" style="display: flex; justify-content: center; margin-bottom: 40px;">
+            <div class="search-box" style="width: 100%; max-width: 500px;">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchInput" placeholder="بحث عن طالب (الاسم أو الرقم)..." onkeyup="filterUsers()">
+            </div>
+        </div>
+
+        <!-- User Cards Grid -->
+        <div class="admin-users-grid" id="usersGridContainer">
+            <p style="color:#888; text-align:center;">جاري تحميل بيانات الطلاب...</p>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
@@ -151,7 +160,7 @@
 
                         const cardHTML = `
                             <div class="admin-user-card ${isBanned ? 'banned' : ''}" data-name="${user.username}" data-phone="${user.phone}">
-                                <img src="${user.photoURL || '212.png'}" class="avatar" alt="صورة الطالب">
+                                <img src="${user.photoURL || '212.png'}" class="avatar" alt="صورة الطالب" onclick="openLightbox('${user.photoURL || '212.png'}')">
                                 <h3>${user.username || 'طالب جديد'}</h3>
                                 <p><i class="fa-solid fa-phone"></i> ${user.phone || 'غير مسجل'}</p>
                                 <p>${genderIcon} ${user.gender === 'boy' ? 'ولد' : 'بنت'}</p>
@@ -188,6 +197,24 @@
                 }
             });
         }
+
+        // Lightbox Functions
+        window.openLightbox = function(src) {
+            const container = document.getElementById('lightbox-content');
+            const overlay = document.getElementById('lightbox-overlay');
+            container.innerHTML = `<img src="${src}" style="max-width:100%; max-height:90vh; border-radius:10px;">`;
+            overlay.classList.add('active');
+        };
+
+        window.closeLightbox = function() {
+            document.getElementById('lightbox-overlay').classList.remove('active');
+            setTimeout(() => document.getElementById('lightbox-content').innerHTML = '', 400);
+        };
+
+        document.querySelector('.close-lightbox').onclick = window.closeLightbox;
+        document.getElementById('lightbox-overlay').onclick = (e) => {
+            if(e.target.id === 'lightbox-overlay') window.closeLightbox();
+        };
     </script>
 </body>
 </html>
