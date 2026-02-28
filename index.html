@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="منصة الدكتور التعليمية للأحياء - شرح مبسط، فيديوهات عالية الجودة، كتب وملازم مجانية، ومتابعة مستمرة لطلاب الثانوية العامة.">
+    <meta name="keywords" content="أحياء, ثانوية عامة, دكتور عبدالله, منصة تعليمية, شرح أحياء, مراجعات, امتحانات, كتب pdf">
+    <title>الرئيسية - الدكتور</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preload" as="image" href="6.jpeg">
+    <style>
+        @media (max-width: 992px) {
+            .grid-container.grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .hero {
+                height: auto;
+                min-height: 100vh;
+                padding: 120px 20px 60px;
+            }
+            .hero h1 {
+                font-size: 2.5rem !important;
+                line-height: 1.3;
+            }
+            .hero-desc {
+                width: 100%;
+                font-size: 1rem;
+                margin: 0 auto 30px;
+            }
+            .hero-btns {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+            .grid-container.grid-3 {
+                gap: 25px;
+                padding-top: 30px !important;
+            }
+        }
+    </style>
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "منصة الدكتور التعليمية للأحياء",
+      "url": "https://abqarieno.firebaseapp.com/index.html",
+      "logo": "https://abqarieno.firebaseapp.com/212.png",
+      "description": "منصة الدكتور التعليمية للأحياء - شرح مبسط، فيديوهات عالية الجودة، كتب وملازم مجانية، ومتابعة مستمرة لطلاب الثانوية العامة.",
+      "founder": {
+        "@type": "Person",
+        "name": "دكتور عبدالله",
+        "jobTitle": "مدرس أحياء",
+        "image": "https://abqarieno.firebaseapp.com/212.png"
+      }
+    }
+    </script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-YOUR_MEASUREMENT_ID');
+    </script>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div id="page-loader">
+        <div class="loader-content">
+            <i class="fa-solid fa-heart-pulse loader-icon"></i>
+            <div class="loader-text">الدكتور <small>جاري التحميل...</small></div>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">الرئيسية</a></li>
+            <li><a href="library.html">الكتب</a></li>
+            <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="schedule.html">الجدول</a></li>
+            <li><a href="reviews.html">ورق الشرح</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="particles">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <p class="subtitle scroll-animate" style="transition-delay: 0.1s;">BIOLOGY LAB</p>
+                <h1 class="scroll-animate" style="transition-delay: 0.2s;">عالم الأحياء <br> <span class="neon-green-text">بمنظور مختلف</span></h1>
+                <p class="hero-desc scroll-animate" style="transition-delay: 0.3s;">استعد لرحلة فريدة في أعماق الخلية والتشريح مع دكتور عبدالله . تعليمنا ليس مجرد حفظ، بل هو تجربة بصرية وعلمية تفوق الخيال.</p>
+                <div class="hero-btns scroll-animate" style="transition-delay: 0.4s;">
+                    <a href="videos.html" class="btn-green">ابدأ المشاهدة الآن</a>
+                    <a href="library.html" class="btn-outline">تصفح المكتبة</a>
+                </div>
+            </div>
+            
+            <div class="hero-image scroll-animate" style="transition-delay: 0.5s;">
+                <img src="212.png" alt="دكتور عبدالله" class="doctor-img" fetchpriority="high">
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="grid-container grid-3" style="padding-top: 50px;">
+            <div class="feature-box scroll-animate" style="transition-delay: 0.1s;">
+                <i class="fa-solid fa-book-open" style="color:var(--neon-red)"></i>
+                <h3>محتوى حصري</h3>
+                <p style="color:#888; font-size:0.9rem">كتب ومذكرات أعدها الدكتور خصيصاً لتسهيل أصعب المفاهيم.</p>
+            </div>
+            <div class="feature-box green scroll-animate" style="transition-delay: 0.2s;">
+                <i class="fa-regular fa-circle-play"></i>
+                <h3>فيديوهات 4K</h3>
+                <p style="color:#888; font-size:0.9rem">شروحات تفصيلية بجودة عالية تركز على الفهم العميق للبيولوجيا.</p>
+            </div>
+            <div class="feature-box scroll-animate" style="transition-delay: 0.3s;">
+                <i class="fa-solid fa-shield-halved" style="color:var(--neon-red)"></i>
+                <h3>تقييم مستمر</h3>
+                <p style="color:#888; font-size:0.9rem">اختبارات دورية ومتابعة دقيقة لكل طالب لضمان التفوق.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="text-align: center;">جميع الحقوق محفوظة © 2026 | تم التطوير بواسطة فريق عبقرينو & كيمو <i class="fa-solid fa-heart"></i></p>
+    </footer>
+
+    <script src="main.js" defer></script>
+
+    <!-- زر الأخبار العائم -->
+    <div class="news-float-btn" onclick="openNewsModal()">
+        <div class="news-badge" id="newsBadge"></div>
+        <i class="fa-solid fa-bell"></i>
+        <span>الأخبار</span>
+    </div>
+
+    <!-- عارض الصور الاحترافي (Lightbox) -->
+    <div id="lightbox-overlay" class="lightbox-overlay">
+        <span class="close-lightbox">&times;</span>
+        <div class="lightbox-content" id="lightbox-content">
+            <!-- سيتم حقن المحتوى هنا (صورة أو فيديو) -->
+        </div>
+    </div>
+
+    <!-- نظام الإشعارات الناري (للمستخدم المتصل) -->
+    <div id="fire-notification" class="fire-toast">
+        <i class="fa-solid fa-fire-flame-curved"></i>
+        <img id="fire-msg-img" src="" alt="مرفق">
+        <div>
+            <h4>تنبيه عاجل من الدكتور</h4>
+            <small id="fire-msg-text">رسالة جديدة...</small>
+        </div>
+    </div>
+
+    <!-- نافذة الأخبار المنبثقة -->
+    <div class="news-modal-overlay" id="newsOverlay">
+        <div class="news-modal">
+            <div class="news-header">
+                <h3><i class="fa-solid fa-bullhorn"></i> آخر تعليمات الدكتور</h3>
+                <i class="fa-solid fa-xmark close-news" onclick="closeNewsModal()"></i>
+            </div>
+            <div class="news-list" id="newsList">
+                <p style="text-align:center; color:#666; padding:20px;">جاري تحميل الأخبار...</p>
+            </div>
+            <button onclick="markAsRead()" class="btn-mark-read"><i class="fa-solid fa-check"></i> تم القراءة بنجاح</button>
+            <button onclick="location.href='contact.html'" style="margin-top:15px; width:100%; padding:10px; background:var(--neon-green); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">الذهاب لغرفة الشات الكاملة</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getDatabase, ref, query, limitToLast, onValue, onChildAdded, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        const newsListEl = document.getElementById('newsList');
+        const badgeEl = document.getElementById('newsBadge');
+        const floatBtn = document.querySelector('.news-float-btn');
+        const fireToast = document.getElementById('fire-notification');
+        const fireText = document.getElementById('fire-msg-text');
+        const fireImg = document.getElementById('fire-msg-img');
+        
+        const auth = getAuth(app);
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // If you want to protect the main page, uncomment the next line
+                // window.location.href = 'auth.html';
+            }
+        });
+
+        window.logout = () => signOut(auth).then(() => window.location.href = 'auth.html');
+
+
+        const lastSeenTime = localStorage.getItem('biology_last_seen_news') || 0;
+        const loadTime = Date.now(); // وقت فتح الموقع
+        let latestMsgTimeInModal = 0; // لتحديث وقت القراءة عند الضغط على الزر
+
+        // --- 1. التحقق من وجود رسائل فائتة (مرة واحدة عند التحميل) ---
+        // هذا هو المنطق المسؤول عن إظهار زر الأخبار عند فتح الموقع
+        get(query(ref(db, 'broadcasts'), limitToLast(20))).then((snapshot) => {
+            if (!snapshot.exists()) return;
+
+            const msgs = Object.values(snapshot.val());
+            // هل هناك أي رسالة أحدث من آخر مرة شاهد فيها المستخدم الأخبار؟
+            const hasMissedMessages = msgs.some(msg => msg.timestamp > lastSeenTime);
+
+            if (hasMissedMessages) {
+                floatBtn.style.display = 'flex';
+                badgeEl.classList.add('active');
+                floatBtn.classList.add('glowing');
+            }
+        });
+
+        // --- 2. مراقب الرسائل الفورية (للرسائل التي تصل والمستخدم فاتح الموقع) ---
+        onChildAdded(query(ref(db, 'broadcasts'), limitToLast(1)), (snapshot) => {
+            const msg = snapshot.val();
+            // إذا كانت الرسالة وصلت بعد فتح الموقع (رسالة جديدة واليوزر فاتح)
+            if (msg.timestamp > loadTime) {
+                fireText.textContent = msg.text; // عرض نص الرسالة
+                
+                // عرض الصورة المصغرة إذا وجدت
+                if (msg.mediaURL && msg.mediaType === 'image') {
+                    fireImg.src = msg.mediaURL;
+                    fireImg.classList.add('show');
+                } else {
+                    fireImg.classList.remove('show');
+                }
+
+                fireToast.classList.add('show');
+                
+                // تحديث حالة القراءة فوراً لأن المستخدم شاهد التنبيه
+                localStorage.setItem('biology_last_seen_news', msg.timestamp);
+                
+                // تشغيل صوت تنبيه خفيف (اختياري)
+                // const audio = new Audio('notification.mp3'); audio.play().catch(()=>{});
+
+                setTimeout(() => {
+                    fireToast.classList.remove('show');
+                }, 8000); // يختفي بعد 8 ثواني
+            }
+        });
+
+        // عند الضغط على الإشعار: تسجيل الدخول كطالب والذهاب للشات
+        fireToast.onclick = () => {
+            localStorage.setItem('biology_user_role', 'student');
+            // التأكد من تحديث وقت القراءة عند الضغط
+            const now = Date.now();
+            const current = parseInt(localStorage.getItem('biology_last_seen_news') || '0');
+            if(now > current) localStorage.setItem('biology_last_seen_news', now);
+            window.location.href = 'contact.html';
+        };
+
+        // --- 3. مراقب قائمة الأخبار (لتعبئة النافذة المنبثقة عند فتحها) ---
+        onValue(query(ref(db, 'broadcasts'), limitToLast(20)), (snapshot) => {
+            const data = snapshot.val();
+            if (!data) {
+                newsListEl.innerHTML = '<p style="text-align:center; color:#666;">لا توجد أخبار حالياً</p>';
+                return;
+            }
+
+            // تحويل البيانات لمصفوفة وترتيبها من الأحدث للأقدم
+            const msgs = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+            
+            // تحديث القائمة
+            newsListEl.innerHTML = '';
+            let hasNew = false;
+            let currentBatchMaxTime = 0;
+
+            // نستخدم lastSeenTime الذي قرأناه في بداية تحميل الصفحة
+
+            msgs.forEach(msg => {
+                // لا نعرض الرسائل التي وصلت للتو (لأنها تظهر في التنبيه الناري)
+                if (msg.timestamp > loadTime) return; 
+
+                const isNew = msg.timestamp > lastSeenTime;
+                if (isNew) hasNew = true;
+                if (msg.timestamp > currentBatchMaxTime) currentBatchMaxTime = msg.timestamp;
+
+                const dateStr = new Date(msg.timestamp).toLocaleDateString('ar-EG') + ' ' + new Date(msg.timestamp).toLocaleTimeString('ar-EG');
+                let mediaHtml = '';
+                if (msg.mediaURL) {
+                    if (msg.mediaType === 'image') {
+                        mediaHtml = `<img src="${msg.mediaURL}" onclick="openLightbox('${msg.mediaURL}', 'image')" style="width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; margin-top: 8px; border: 1px solid #333; display:block; cursor: pointer; transition: 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" alt="مرفق - اضغط للتكبير">`;
+                    } else if (msg.mediaType === 'video') {
+                        mediaHtml = `<video src="${msg.mediaURL}" class="msg-video" controls preload="metadata"></video>`;
+                    } else if (msg.mediaType === 'audio') {
+                        mediaHtml = `<audio src="${msg.mediaURL}" controls class="msg-audio"></audio>`;
+                    } else {
+                        mediaHtml = `<a href="${msg.mediaURL}" target="_blank" class="news-link"><i class="fa-solid fa-paperclip"></i> تحميل المرفق</a>`;
+                    }
+                }
+
+                const html = `
+                    <div class="news-item ${isNew ? 'new' : ''}">
+                        <span class="news-date">${dateStr} ${isNew ? '<span style="color:red; font-weight:bold">(جديد)</span>' : ''}</span>
+                        <div class="news-text">${msg.text}</div>
+                        ${mediaHtml}
+                    </div>
+                `;
+                newsListEl.insertAdjacentHTML('beforeend', html);
+            });
+            
+            latestMsgTimeInModal = currentBatchMaxTime;
+        });
+
+        // --- 4. دوال التحكم في النافذة (Global Scope) ---
+        window.openNewsModal = function() {
+            document.getElementById('newsOverlay').classList.add('open');
+        };
+
+        window.markAsRead = function() {
+            if (latestMsgTimeInModal > 0) {
+                // تحديث وقت القراءة إلى وقت أحدث رسالة كانت في القائمة
+                localStorage.setItem('biology_last_seen_news', latestMsgTimeInModal);
+            }
+            badgeEl.classList.remove('active');
+            floatBtn.classList.remove('glowing'); // إيقاف الإضاءة
+            floatBtn.style.display = 'none'; // إخفاء الزر الرئيسي
+            newsListEl.innerHTML = ''; // تفريغ القائمة (حذف الرسائل بصرياً)
+            window.closeNewsModal();
+        };
+
+        window.closeNewsModal = function() {
+            document.getElementById('newsOverlay').classList.remove('open');
+        };
+
+        // إغلاق النافذة عند الضغط خارجها
+        document.getElementById('newsOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('newsOverlay')) {
+                window.closeNewsModal();
+            }
+        });
+
+        // دوال عارض الصور (Lightbox)
+        window.openLightbox = function(src, type) {
+            const container = document.getElementById('lightbox-content');
+            const overlay = document.getElementById('lightbox-overlay');
+            
+            container.innerHTML = ''; // تنظيف المحتوى السابق
+            
+            if (type === 'video') {
+                container.innerHTML = `<video src="${src}" controls autoplay style="max-width:100%; max-height:90vh; border-radius:10px; box-shadow:0 0 50px rgba(0,255,65,0.2);"></video>`;
+            } else {
+                const img = document.createElement('img');
+                img.src = src;
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '90vh';
+                img.style.borderRadius = '10px';
+                container.appendChild(img);
+            }
+            
+            overlay.classList.add('active');
+        };
+
+        window.closeLightbox = function() {
+            const overlay = document.getElementById('lightbox-overlay');
+            overlay.classList.remove('active');
+            // إيقاف الفيديو عند الإغلاق
+            setTimeout(() => {
+                document.getElementById('lightbox-content').innerHTML = '';
+            }, 400);
+        };
+        
+        // إغلاق عند الضغط على الخلفية أو زر الإغلاق
+        document.querySelector('.close-lightbox').onclick = closeLightbox;
+        document.getElementById('lightbox-overlay').onclick = (e) => {
+            if(e.target.id === 'lightbox-overlay') closeLightbox();
+        };
+
+    </script>
+</body>
+</html>
