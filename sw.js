@@ -37,31 +37,35 @@ self.addEventListener('activate', (e) => {
     );
 });
 
-// Stale-While-Revalidate Strategy
+// Network First, then Cache for HTML pages. Cache first for other assets.
 self.addEventListener('fetch', (e) => {
-    // Only handle GET requests and ignore external resources we don't want to cache.
-    if (e.request.method !== 'GET' || e.request.url.includes('firebase') || e.request.url.includes('googleapis')) {
+    const url = new URL(e.request.url);
+
+    // Ignore non-GET requests and requests to Firebase
+    if (e.request.method !== 'GET' || url.origin.includes('firebase')) {
         return;
     }
 
-    e.respondWith(
-        // Open the cache once for efficiency.
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.match(e.request).then((cachedResponse) => {
-                // Start fetching from the network to get the latest version.
-                const networkFetch = fetch(e.request).then((networkResponse) => {
-                    // If the fetch is successful, update the cache.
-                    // We need to clone the response as it can only be read once.
-                    cache.put(e.request, networkResponse.clone());
+    // Network First for HTML pages (to ensure auth logic runs)
+    if (e.request.destination === 'document') {
+        e.respondWith(
+            fetch(e.request).then(networkResponse => {
+                // Update cache with the new version
+                caches.open(CACHE_NAME).then(cache => cache.put(e.request, networkResponse.clone()));
+                return networkResponse;
+            }).catch(() => {
+                // If network fails, serve from cache
+                return caches.match(e.request);
+            })
+        );
+    } else { // Cache First for other assets (CSS, JS, images)
+        e.respondWith(
+            caches.match(e.request).then(response => {
+                return response || fetch(e.request).then(networkResponse => {
+                    caches.open(CACHE_NAME).then(cache => cache.put(e.request, networkResponse.clone()));
                     return networkResponse;
-                }).catch(err => {
-                    console.error('Service Worker fetch failed:', err);
-                    // This error will propagate to the browser if no cached response is available.
                 });
-
-                // Return the cached response immediately if it exists, otherwise, wait for the network.
-                return cachedResponse || networkFetch;
-            });
-        })
-    );
+            })
+        );
+    }
 });

@@ -282,9 +282,6 @@
 
         const auth = getAuth(app);
         onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                // If you want to protect the main page, uncomment the next line
-                // window.location.href = 'auth.html';
             if (user) {
                 // User is logged in, check if profile is complete
                 get(ref(db, 'users/' + user.uid)).then((snapshot) => {
@@ -303,7 +300,6 @@
         });
 
         window.logout = () => signOut(auth).then(() => window.location.href = 'auth.html');
-
 
         const lastSeenTime = localStorage.getItem('biology_last_seen_news') || 0;
         const loadTime = Date.now(); // وقت فتح الموقع
