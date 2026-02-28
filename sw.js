@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v7'; // Update: Admin UI & Strict Auth
+const CACHE_NAME = 'abqarieno-v8'; // Update: Force Refresh Auth UI
 const ASSETS = [
     './',
     './index.html',
@@ -20,6 +20,7 @@ const ASSETS = [
 
 // تثبيت Service Worker
 self.addEventListener('install', (e) => {
+    self.skipWaiting(); // إضافة: تفعيل التحديث فوراً دون انتظار إغلاق التبويب
     e.waitUntil(
         caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
     );

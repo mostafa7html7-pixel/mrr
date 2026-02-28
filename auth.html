@@ -1,4 +1,4 @@
-<!-- c:\Users\mosa\Desktop\Project3\df\auth.html -->
+<!-- c:\Users\mosa\Desktop\mra-main\mra-main\auth.html -->
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -37,13 +37,12 @@
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // تفعيل الحفظ المحلي للجلسة لحل مشاكل الخروج المفاجئ
+        // تفعيل الحفظ المحلي للجلسة
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
         // التحقق مما إذا كان المستخدم مسجلاً بالفعل
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // توجيه المستخدم حسب دوره
                 checkUserRole(user.uid);
             }
         });
@@ -55,14 +54,19 @@
             
             signInAnonymously(auth)
             .then(() => {
-                // سيتم التعامل مع التوجيه عبر onAuthStateChanged
+                // سيتم التوجيه تلقائياً عبر onAuthStateChanged
             })
             .catch((error) => {
                 console.error(error);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> دخول كزائر (Anonymous)';
                 errorBox.style.display = 'block';
-                errorBox.innerText = "حدث خطأ: " + error.message;
+                // رسالة خطأ واضحة إذا لم يتم تفعيل الخاصية في فايربيز
+                if(error.code === 'auth/admin-restricted-operation') {
+                    errorBox.innerText = "عذراً، يجب تفعيل خيار Anonymous في لوحة تحكم Firebase أولاً.";
+                } else {
+                    errorBox.innerText = "حدث خطأ: " + error.message;
+                }
             });
         }
 
@@ -70,19 +74,13 @@
             const snapshot = await get(ref(db, 'users/' + uid));
             if (snapshot.exists()) {
                 const userData = snapshot.val();
-                
                 if (userData.banned) {
-                    alert("تم حظر حسابك من قبل الإدارة. تواصل مع الدعم الفني.");
-                    return; // منع الدخول
+                    alert("تم حظر حسابك من قبل الإدارة.");
+                    return;
                 }
-
-                if (userData.role === 'admin') {
-                    window.location.href = "admin.html";
-                } else {
-                    window.location.href = "index.html";
-                }
+                if (userData.role === 'admin') window.location.href = "admin.html";
+                else window.location.href = "index.html";
             } else {
-                // في حالة عدم وجود بيانات (نادر الحدوث)
                 window.location.href = "index.html";
             }
         }
