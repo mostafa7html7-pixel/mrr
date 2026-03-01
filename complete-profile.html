@@ -16,8 +16,8 @@
         .gender-option {
             flex: 1;
             padding: 15px;
-            background: #050508;
-            border: 1px solid #333;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             cursor: pointer;
             text-align: center;
@@ -31,17 +31,19 @@
             display: none;
         }
         .gender-option.selected, .gender-option:hover {
-            border-color: var(--neon-green);
-            background: rgba(0, 255, 65, 0.1);
+            border-color: var(--neon-green); 
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
         }
         .avatar-upload {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             margin: 0 auto 20px;
-            border: 3px dashed #333;
+            border: 2px dashed var(--neon-green);
             border-radius: 50%;
-            background: #050508;
+            background: rgba(0, 255, 65, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -50,11 +52,12 @@
             overflow: hidden;
         }
         .avatar-upload:hover {
-            border-color: var(--neon-green);
+            background: rgba(0, 255, 65, 0.1);
+            transform: scale(1.05);
         }
         .avatar-upload i {
-            font-size: 2.5rem;
-            color: #444;
+            font-size: 3rem;
+            color: var(--neon-green);
         }
         .avatar-upload img {
             width: 100%;
@@ -62,14 +65,15 @@
             object-fit: cover;
         }
         .warning-box {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid var(--neon-red);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            color: #ffaaaa;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--neon-gold);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: var(--neon-gold);
             margin-bottom: 20px;
-            text-align: right;
+            text-align: center;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -81,8 +85,8 @@
         <p class="auth-subtitle">يرجى إكمال بياناتك الشخصية للمتابعة</p>
 
         <div class="warning-box">
-            <i class="fa-solid fa-triangle-exclamation"></i> <strong>تنبيه هام:</strong>
-            يجب استخدام <u>صورة وجه حقيقية</u> واسمك الثلاثي الصحيح. أي بيانات مزيفة أو صور غير لائقة ستؤدي إلى <strong>حظر حسابك وجهازك نهائياً</strong> من المنصة.
+            <i class="fa-solid fa-shield-halved"></i> <strong>تعليمات التسجيل:</strong><br>
+            يرجى استخدام <b>صورة شخصية حقيقية</b> واسمك الثلاثي الصحيح لضمان تفعيل الحساب وتجنب الحظر التلقائي.
         </div>
 
         <form id="completeProfileForm">
@@ -111,11 +115,6 @@
                     <i class="fa-solid fa-venus"></i>
                     <div>بنت</div>
                 </label>
-            </div>
-
-            <div style="text-align: right; margin-bottom: 15px; font-size: 0.85rem; color: #ccc;">
-                <input type="checkbox" id="policyCheck" required>
-                <label for="policyCheck">أقر بأن البيانات صحيحة والصورة شخصية وحقيقية.</label>
             </div>
 
             <button type="submit" class="auth-btn">حفظ وبدء المتابعة</button>

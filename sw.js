@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v8'; // Update: Force Refresh Auth UI
+const CACHE_NAME = 'abqarieno-v9'; // Update: Fix CSS Corruption
 const ASSETS = [
     './',
     './index.html',
