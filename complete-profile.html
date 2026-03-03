@@ -8,34 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        .gender-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .gender-option {
-            flex: 1;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.3s;
-        }
-        .gender-option i {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-        }
-        .gender-option input {
-            display: none;
-        }
-        .gender-option.selected, .gender-option:hover {
-            border-color: var(--neon-green); 
-            background: var(--neon-green);
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
-        }
         .avatar-upload {
             position: relative;
             width: 130px;
@@ -104,19 +76,6 @@
                 <i class="fa-solid fa-phone"></i>
             </div>
 
-            <div class="gender-selector">
-                <label class="gender-option" id="boy-label">
-                    <input type="radio" name="gender" value="boy" required>
-                    <i class="fa-solid fa-mars"></i>
-                    <div>ولد</div>
-                </label>
-                <label class="gender-option" id="girl-label">
-                    <input type="radio" name="gender" value="girl" required>
-                    <i class="fa-solid fa-venus"></i>
-                    <div>بنت</div>
-                </label>
-            </div>
-
             <button type="submit" class="auth-btn">حفظ وبدء المتابعة</button>
         </form>
     </div>
@@ -138,15 +97,8 @@
         let selectedFile = null;
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "auth.html";
+            if (!user) window.location.href = "index.html";
             else currentUserUid = user.uid;
-        });
-
-        document.querySelectorAll('.gender-option input').forEach(radio => {
-            radio.addEventListener('change', () => {
-                document.querySelectorAll('.gender-option').forEach(label => label.classList.remove('selected'));
-                if(radio.checked) radio.parentElement.classList.add('selected');
-            });
         });
 
         document.getElementById('avatarInput').addEventListener('change', (e) => {
@@ -187,7 +139,6 @@
                 await update(ref(db, 'users/' + currentUserUid), {
                     username: document.getElementById('nameInput').value,
                     phone: document.getElementById('phoneInput').value,
-                    gender: document.querySelector('input[name="gender"]:checked').value,
                     photoURL: photoURL,
                     role: 'student',
                     joinedAt: new Date().toISOString()

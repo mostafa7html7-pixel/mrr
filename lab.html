@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Vision Pro | معرض المجسمات المستقبلي</title>
+    
+    <!-- إعدادات الأمان (Security Headers) -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <!-- تم تعديل السياسة للسماح بتحميل الخامات (Textures) عبر blob: لمنع ظهور المجسمات باللون الأبيض -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://ajax.googleapis.com; connect-src 'self' blob: https://ajax.googleapis.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: blob:; object-src 'self' blob:; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com;">
+    
+    <!-- منع خطأ 404 للأيقونة -->
+    <link rel="icon" href="data:,">
+    
+    <!-- تحسين السرعة: الاتصال المسبق بخوادم جوجل لتحميل المكتبة بشكل أسرع -->
+    <link rel="preconnect" href="https://ajax.googleapis.com">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: rgba(20, 0, 0, 0.4);
+            --accent-color: #ff003c; /* أحمر نيون */
+            --gold-color: #ffd700;   /* ذهبي */
+            --text-color: #ffffff; 
+            --neon-green: #00ff41; /* إضافة المتغير الناقص ليتوافق مع الهيدر */
+            --text-gray: #b3b3b3;
+            --text-white: #ffffff;
+        }
+        
+        /* إعدادات الوضع النهاري (Light Mode) */
+        body.light-mode {
+            --bg-color: #f4f4f9;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --text-color: #1a1a1a;
+            --text-gray: #555555;
+            --text-white: #111111;
+            background: radial-gradient(circle at top center, #fff5f5, #e0e0e0);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Cairo', sans-serif; /* توحيد الخط مع باقي الصفحات */
+            margin: 0;
+            overflow-x: hidden;
+            background: radial-gradient(circle at top center, #1a0505, #000000);
+            min-height: 100vh;
+            /* تحسين التمرير الناعم */
+            scroll-behavior: smooth;
+            direction: rtl;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* تصميم الكارت الاحترافي */
+        .model-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 215, 0, 0.15); /* حدود ذهبية خفيفة */
+            border-radius: 24px;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            /* تحسين الأداء: عدم رسم العناصر خارج الشاشة */
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 500px;
+            /* تحسين الأداء: إخبار المتصفح بأن هذا العنصر سيتغير عند التحويم */
+            will-change: transform;
+        }
+
+        .model-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold-color);
+            box-shadow: 0 20px 40px rgba(255, 0, 60, 0.15); /* توهج أحمر */
+        }
+
+        model-viewer {
+            width: 100%;
+            height: 400px;
+            --poster-color: transparent;
+            cursor: grab;
+            /* منع الصفحة من التمرير أثناء تحريك المجسم، والسماح به عند السحب عمودياً */
+            touch-action: pan-y;
+        }
+
+        /* تفاصيل الموديل الأسفل */
+        .info-panel {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(128, 128, 128, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .model-name {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .ar-button {
+            background: transparent;
+            color: var(--gold-color);
+            border: 1px solid var(--gold-color);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ar-button:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        /* زر ملء الشاشة */
+        .fullscreen-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px; /* وضعناه يساراً ليتناسب مع العربية */
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--gold-color);
+            border-radius: 50%;
+            color: var(--gold-color);
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .fullscreen-btn:hover {
+            background: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+
+        .fullscreen-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* لمسة جمالية للخلفية */
+        .bg-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: var(--accent-color);
+            filter: blur(150px);
+            opacity: 0.05;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow" style="top: 10%; left: 5%;"></div>
+    <div class="bg-glow" style="bottom: 10%; right: 5%;"></div>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="library.html">الكتب</a></li>
+            <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="schedule.html">الجدول</a></li>
+            <li><a href="reviews.html">ورق الشرح</a></li>
+            <li><a href="lab.html" class="active">المعرض</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="model-card">
+            <button class="fullscreen-btn" title="ملء الشاشة">
+                <!-- أيقونة SVG احترافية وخفيفة -->
+                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+            <model-viewer data-src="1.glb" 
+                alt="Product 1" 
+                auto-rotate 
+                camera-controls 
+                ar 
+                environment-image="neutral"
+                shadow-intensity="1" 
+                interaction-prompt="none"
+                exposure="1"
+                loading="lazy">
+            </model-viewer>
+            <div class="info-panel">
+                <span class="model-name">Neo Structure 01</span>
+                <button class="ar-button">عرض AR</button>
+            </div>
+        </div>
+
+        <div class="model-card">
+            <button class="fullscreen-btn" title="ملء الشاشة">
+                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+            <model-viewer data-src="2.glb" 
+                alt="Product 2" 
+                auto-rotate 
+                camera-controls 
+                ar 
+                environment-image="neutral"
+                shadow-intensity="1" 
+                interaction-prompt="none"
+                loading="lazy">
+            </model-viewer>
+            <div class="info-panel">
+                <span class="model-name">Cyber Essence 02</span>
+                <button class="ar-button">عرض AR</button>
+            </div>
+        </div>
+
+        <div class="model-card">
+            <button class="fullscreen-btn" title="ملء الشاشة">
+                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+            <model-viewer data-src="3.glb" 
+                alt="Product 3" 
+                auto-rotate 
+                camera-controls 
+                ar 
+                environment-image="neutral"
+                shadow-intensity="1" 
+                interaction-prompt="none"
+                loading="lazy">
+            </model-viewer>
+            <div class="info-panel">
+                <span class="model-name">Quantum Mesh 03</span>
+                <button class="ar-button">عرض AR</button>
+            </div>
+        </div>
+
+        <div class="model-card">
+            <button class="fullscreen-btn" title="ملء الشاشة">
+                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+            <model-viewer data-src="4.glb" 
+                alt="Product 4" 
+                auto-rotate 
+                camera-controls 
+                ar 
+                environment-image="neutral"
+                shadow-intensity="1" 
+                interaction-prompt="none"
+                loading="lazy">
+            </model-viewer>
+            <div class="info-panel">
+                <span class="model-name">Void Object 04</span>
+                <button class="ar-button">عرض AR</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div style="text-align: center; padding: 20px;">
+            <p style="margin-bottom: 10px; color: #888;">جميع الحقوق محفوظة © 2026 | منصة الدكتور</p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="color: #555; font-size: 0.9rem;">برمجة: <strong style="color: var(--neon-green);">مصطفى ابوطالب</strong></span>
+                <a href="admin.html" style="color: #444; font-size: 0.8rem; text-decoration: none; border: 1px solid #333; padding: 4px 10px; border-radius: 15px; transition: 0.3s;">
+                    <i class="fa-solid fa-user-shield"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        window.logout = () => signOut(auth).then(() => window.location.href = 'auth.html');
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- التحميل الكسول الحقيقي للمجسمات لتحسين الأداء ---
+            // هذا الكود يضمن عدم تحميل أي مجسم إلا عند اقترابه من الشاشة
+            const models = document.querySelectorAll('model-viewer[data-src]');
+
+            const lazyLoadObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    // هل العنصر دخل نطاق الرؤية؟
+                    if (entry.isIntersecting) {
+                        const modelViewer = entry.target;
+                        
+                        // قم بوضع الرابط الحقيقي في خاصية src لبدء التحميل
+                        modelViewer.src = modelViewer.dataset.src;
+
+                        // أوقف المراقبة عن هذا العنصر لأنه تم تحميله
+                        observer.unobserve(modelViewer);
+                    }
+                });
+            }, { 
+                // ابدأ التحميل عندما يكون المجسم على بعد 300 بكسل من الشاشة
+                rootMargin: '300px' 
+            });
+
+            // ابدأ بمراقبة كل المجسمات
+            models.forEach(model => lazyLoadObserver.observe(model));
+
+            // --- تفعيل أزرار الواقع المعزز (AR) ---
+            document.querySelectorAll('.ar-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const modelViewer = button.closest('.model-card').querySelector('model-viewer');
+                    if (modelViewer) {
+                        modelViewer.activateAR();
+                    }
+                });
+            });
+
+            // --- تفعيل زر ملء الشاشة ---
+            document.querySelectorAll('.fullscreen-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modelViewer = btn.closest('.model-card').querySelector('model-viewer');
+                    if (modelViewer.requestFullscreen) {
+                        modelViewer.requestFullscreen();
+                    } else if (modelViewer.webkitRequestFullscreen) { /* Safari support */
+                        modelViewer.webkitRequestFullscreen();
+                    }
+                });
+            });
+
+            // --- Navbar Menu Logic ---
+            const menuBtn = document.querySelector('.menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+            menuBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+            });
+
+            // --- زر تغيير الإضاءة (Light/Dark Mode) ---
+            const themeToggle = document.getElementById('themeToggle');
+            const icon = themeToggle.querySelector('i');
+            
+            // Check saved theme
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+                icon.classList.replace('fa-moon', 'fa-sun');
+            }
+
+            themeToggle.addEventListener('click', (e) => {
+                document.body.classList.toggle('light-mode');
+                const isLight = document.body.classList.contains('light-mode');
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+            });
+        });
+    </script>
+</body>
+</html>
