@@ -4,10 +4,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم الطلاب - الدكتور</title>
+    <title>لوحة التحكم الاحترافية - الدكتور</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- Admin Dashboard V2 Styles --- */
+        :root {
+            --admin-bg: #020204;
+            --admin-surface: #0a0a0f;
+            --admin-surface-light: #101018;
+            --admin-border: #222;
+            --admin-text-primary: #e0e0e0;
+            --admin-text-secondary: #888;
+        }
+
+        body {
+            background-color: var(--admin-bg);
+            color: var(--admin-text-primary);
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            width: 250px;
+            background: var(--admin-surface);
+            border-left: 1px solid var(--admin-border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
+            z-index: 100;
+        }
+
+        .admin-logo { text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--admin-border); margin-bottom: 20px; }
+        .admin-logo i { font-size: 2.5rem; color: var(--neon-red); animation: heartBeat 2s infinite; }
+        .admin-logo h3 { margin: 10px 0 0; font-size: 1.2rem; }
+
+        .admin-menu a {
+            padding: 12px 15px; border-radius: 10px; color: var(--admin-text-secondary);
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center;
+            gap: 15px; font-weight: bold; margin-bottom: 10px; text-decoration: none;
+        }
+        .admin-menu a:hover, .admin-menu a.active { background: rgba(0, 255, 65, 0.1); color: var(--neon-green); }
+        .admin-menu a i { width: 25px; text-align: center; font-size: 1.1rem; }
+
+        .admin-content {
+            flex: 1;
+            margin-right: 250px;
+            padding: 30px;
+            background: radial-gradient(circle at 10% 10%, rgba(0, 255, 65, 0.03), transparent 40%);
+        }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--admin-surface-light); border: 1px solid var(--admin-border); padding: 20px; border-radius: 15px; position: relative; overflow: hidden; transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--neon-green); box-shadow: 0 10px 30px rgba(0, 255, 65, 0.08); }
+        .stat-card h3 { font-size: 0.9rem; color: var(--admin-text-secondary); margin-bottom: 10px; }
+        .stat-card .number { font-size: 2.5rem; font-weight: 900; color: #fff; }
+        .stat-card .icon-bg { position: absolute; top: 20px; left: 20px; font-size: 3rem; opacity: 0.05; color: #fff; }
+        .stat-card.red .number { color: var(--neon-red); }
+
+        .panel-section { background: var(--admin-surface-light); border: 1px solid var(--admin-border); border-radius: 15px; padding: 25px; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .panel-title { font-size: 1.3rem; font-weight: bold; color: #fff; }
+
+        .search-box { position: relative; max-width: 400px; }
+        .search-box input { width: 100%; background: var(--admin-surface); border: 1px solid var(--admin-border); padding: 12px 40px 12px 15px; border-radius: 30px; color: #fff; outline: none; transition: 0.3s; }
+        .search-box input:focus { border-color: var(--neon-green); }
+        .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; }
+
+        .admin-users-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .admin-user-card {
+            background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 12px;
+            padding: 20px; display: flex; flex-direction: column; gap: 15px;
+            transition: 0.3s; position: relative; overflow: hidden;
+        }
+        .admin-user-card:hover { transform: translateY(-5px); border-color: var(--neon-green); box-shadow: 0 10px 30px rgba(0, 255, 65, 0.08); }
+        .admin-user-card.banned { border-color: var(--neon-red); background: rgba(255, 0, 0, 0.05); }
+        .admin-user-card.banned .user-main-info .avatar { border-color: var(--neon-red); }
+
+        .user-main-info { display: flex; align-items: center; gap: 15px; }
+        .user-main-info .avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--neon-green); cursor: zoom-in; transition: 0.3s; }
+        .user-main-info .avatar:hover { transform: scale(1.1); }
+        .user-main-info h3 { margin: 0; font-size: 1.1rem; }
+        .user-main-info p { margin: 0; color: var(--admin-text-secondary); font-size: 0.85rem; }
+
+        .user-details { display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; border-top: 1px solid var(--admin-border); padding-top: 15px; }
+        .user-details span { display: flex; align-items: center; gap: 8px; color: var(--admin-text-secondary); }
+        .user-details span i { color: var(--neon-green); width: 16px; }
+        .user-details span strong { color: var(--admin-text-primary); font-weight: normal; }
+
+        .card-actions { display: flex; gap: 10px; margin-top: auto; }
+        .card-actions .btn-action { flex: 1; padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 0.8rem; transition: 0.3s; }
+        .card-actions .ban { background: rgba(255, 0, 0, 0.1); color: var(--neon-red); border: 1px solid var(--neon-red); }
+        .card-actions .ban:hover { background: var(--neon-red); color: #fff; }
+        .card-actions .unban { background: rgba(0, 255, 65, 0.1); color: var(--neon-green); border: 1px solid var(--neon-green); }
+        .card-actions .unban:hover { background: var(--neon-green); color: #000; }
+        .card-actions .delete { background: #222; color: #666; border: 1px solid #444; }
+        .card-actions .delete:hover { background: #fff; color: #000; }
+
+        /* --- Mobile Responsiveness --- */
+        .sidebar-toggle-btn {
+            display: none; /* Hidden on desktop */
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 102;
+            background: var(--admin-surface-light);
+            color: var(--admin-text-primary);
+            border: 1px solid var(--admin-border);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.3s;
+            align-items: center;
+            justify-content: center;
+        }
+        .sidebar-toggle-btn:hover { background: var(--neon-green); color: #000; border-color: var(--neon-green); }
+
+        .mobile-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 99;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar-toggle-btn { display: flex; }
+            .admin-sidebar {
+                transform: translateX(100%); /* Hide sidebar off-screen to the right */
+                transition: transform 0.3s ease-in-out;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            }
+            .admin-sidebar.open { transform: translateX(0); }
+            .mobile-overlay.open { display: block; }
+            .admin-content { margin-right: 0; } /* Content takes full width */
+        }
+        @media (max-width: 768px) {
+            .admin-content { padding: 15px; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .panel-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .search-box { max-width: 100%; }
+            .stat-card .number { font-size: 2.2rem; }
+            .admin-users-grid { grid-template-columns: 1fr; } /* Single column for user cards */
+        }
+    </style>
 </head>
 <body>
 
@@ -19,33 +170,67 @@
         <button id="secretBtn" onclick="activateMaster()" style="display:none; margin-top:15px; padding:10px 30px; background:var(--neon-red); color:#fff; border:none; border-radius:30px; cursor:pointer; font-weight:bold;">تفعيل وضع المستر</button>
     </div>
 
-    <!-- Navbar (Standard) -->
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fa-solid fa-heart-pulse"></i>
-            <div class="logo-text"><span>الدكتور</span><small>ADMIN PANEL</small></div>
-        </div>
-        <ul class="nav-links">
-            <li><a href="index.html">الرئيسية</a></li>
-            <li><a href="contact.html">الشات</a></li>
-            <li><a href="lab.html">المعرض</a></li>
-            <li><a href="admin.html" class="active">لوحة التحكم</a></li>
-            <li><a href="#" onclick="logout()">خروج</a></li>
-        </ul>
-        <div style="display:flex; align-items:center; gap:5px;">
-            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
-            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
-        </div>
-    </nav>
-
     <!-- Lightbox -->
     <div id="lightbox-overlay" class="lightbox-overlay">
         <span class="close-lightbox">&times;</span>
         <div class="lightbox-content" id="lightbox-content"></div>
     </div>
 
-    <div class="container" id="adminPanel" style="opacity:0; transition:1s; padding-top: 50px;">
-        
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <div class="admin-container" id="adminPanel" style="opacity:0; transition: opacity 0.5s;">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <i class="fa-solid fa-heart-pulse"></i>
+                <h3>لوحة التحكم</h3>
+            </div>
+            <nav class="admin-menu">
+                <a href="#" class="active"><i class="fa-solid fa-users"></i> <span>الطلاب</span></a>
+                <a href="index.html"><i class="fa-solid fa-house"></i> <span>العودة للموقع</span></a>
+                <a href="#" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> <span>خروج</span></a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <!-- Mobile Sidebar Toggle -->
+            <button class="sidebar-toggle-btn" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+
+            <!-- Stat Cards -->
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <h3>إجمالي الطلاب</h3>
+                    <div class="number" id="totalUsersStat">0</div>
+                    <i class="fa-solid fa-users icon-bg"></i>
+                </div>
+                <div class="stat-card red">
+                    <h3>الطلاب المحظورين</h3>
+                    <div class="number" id="bannedUsersStat">0</div>
+                    <i class="fa-solid fa-user-slash icon-bg"></i>
+                </div>
+            </div>
+
+            <!-- Users Panel -->
+            <div class="panel-section">
+                <div class="panel-header">
+                    <h2 class="panel-title">قائمة الطلاب المسجلين</h2>
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="بحث بالاسم أو الرقم..." onkeyup="filterUsers()">
+                    </div>
+                </div>
+                <div class="admin-users-grid" id="usersGridContainer">
+                    <p style="color:var(--admin-text-secondary); text-align:center;">جاري تحميل بيانات الطلاب...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- The old container is removed -->
+    <!-- 
+    <div class="container" id="adminPanel_old" style="opacity:0; transition:1s; padding-top: 50px;">
         <div class="page-header">
             <p class="subtitle">STUDENTS MANAGEMENT</p>
             <h2 class="main-title">الطلاب <span style="color:var(--neon-green)">المسجلين</span></h2>
@@ -60,12 +245,12 @@
         </div>
 
         <!-- User Cards Grid -->
-        <div class="admin-users-grid" id="usersGridContainer">
+        <div class="admin-users-grid" id="usersGridContainer_old">
             <p style="color:#888; text-align:center;">جاري تحميل بيانات الطلاب...</p>
         </div>
-    </div>
+    </div> 
+    -->
 
-    <script src="main.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
@@ -77,6 +262,28 @@
         const auth = getAuth(app);
 
         let currentUserUid = null;
+
+        // Helper function to calculate time ago
+        function timeAgo(isoDateString) {
+            if (!isoDateString) return 'غير معروف';
+            const date = new Date(isoDateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+
+            let interval = seconds / 31536000;
+            if (interval > 1) return `منذ ${Math.floor(interval)} سنة`;
+            interval = seconds / 2592000;
+            if (interval > 1) return `منذ ${Math.floor(interval)} شهر`;
+            interval = seconds / 86400;
+            if (interval > 1) return `منذ ${Math.floor(interval)} يوم`;
+            interval = seconds / 3600;
+            if (interval > 1) return `منذ ${Math.floor(interval)} ساعة`;
+            interval = seconds / 60;
+            if (interval > 1) return `منذ ${Math.floor(interval)} دقيقة`;
+            return 'الآن';
+        }
+
+
 
         // --- Admin Logic ---
         onAuthStateChanged(auth, async (user) => {
@@ -145,40 +352,49 @@
             onValue(ref(db, 'users'), (snapshot) => {
                 const grid = document.getElementById('usersGridContainer');
                 grid.innerHTML = '';
-                let userCount = 0;
+                let totalUsers = 0;
+                let bannedUsers = 0;
+
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
                         const uid = childSnapshot.key;
                         const user = childSnapshot.val();
                         if(user.role === 'admin') return; // Don't show admin in the list
-                        userCount++;
-
-                        const genderIcon = user.gender === 'boy' 
-                            ? '<i class="fa-solid fa-mars" style="color: #00d2ff;"></i>' 
-                            : '<i class="fa-solid fa-venus" style="color: #ff69b4;"></i>';
+                        totalUsers++;
                         
                         const isBanned = user.banned === true;
+                        if (isBanned) bannedUsers++;
 
                         const cardHTML = `
                             <div class="admin-user-card ${isBanned ? 'banned' : ''}" data-name="${user.username}" data-phone="${user.phone}">
-                                <img src="${user.photoURL || '212.png'}" class="avatar" alt="صورة الطالب" onclick="openLightbox('${user.photoURL || '212.png'}')">
-                                <h3>${user.username || 'طالب جديد'}</h3>
-                                <p><i class="fa-solid fa-phone"></i> ${user.phone || 'غير مسجل'}</p>
-                                <p>${genderIcon} ${user.gender === 'boy' ? 'ولد' : 'بنت'}</p>
+                                <div class="user-main-info">
+                                    <img src="${user.photoURL || '212.png'}" class="avatar" alt="صورة الطالب" onclick="openLightbox('${user.photoURL || '212.png'}')">
+                                    <div>
+                                        <h3>${user.username || 'طالب جديد'}</h3>
+                                        <p>${user.email || 'لا يوجد بريد'}</p>
+                                    </div>
+                                </div>
+                                <div class="user-details">
+                                    <span><i class="fa-solid fa-phone"></i> <strong>${user.phone || 'غير مسجل'}</strong></span>
+                                    <span><i class="fa-solid fa-calendar-plus"></i> <strong>انضم ${timeAgo(user.joinedAt)}</strong></span>
+                                </div>
                                 <div class="card-actions">
                                     <button onclick="toggleBan('${uid}', ${isBanned})" class="btn-action ${isBanned ? 'unban' : 'ban'}">${isBanned ? 'فك الحظر' : 'حظر'}</button>
-                                    <button onclick="deleteUser('${uid}')" class="btn-action delete"><i class="fa-solid fa-trash"></i></button>
+                                    <button onclick="deleteUser('${uid}')" class="btn-action delete"><i class="fa-solid fa-trash"></i> حذف</button>
                                 </div>
                             </div>
                         `;
                         grid.innerHTML += cardHTML;
                     });
                 }
+                
+                // Update stat cards
+                document.getElementById('totalUsersStat').innerText = totalUsers;
+                document.getElementById('bannedUsersStat').innerText = bannedUsers;
 
-                if(userCount === 0) {
-                    grid.innerHTML = '<p style="color:#888; text-align:center;">لا يوجد طلاب مسجلين حتى الآن.</p>';
+                if(totalUsers === 0) {
+                    grid.innerHTML = '<p style="color:var(--admin-text-secondary); text-align:center; grid-column: 1 / -1;">لا يوجد طلاب مسجلين حتى الآن.</p>';
                 }
-                document.getElementById('userCount').innerText = userCount;
             });
         }
 
@@ -216,6 +432,24 @@
         document.getElementById('lightbox-overlay').onclick = (e) => {
             if(e.target.id === 'lightbox-overlay') window.closeLightbox();
         };
+
+        // --- Mobile Sidebar Logic ---
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const sidebar = document.querySelector('.admin-sidebar');
+
+        if (sidebarToggle && sidebar && mobileOverlay) {
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.add('open');
+                mobileOverlay.classList.add('open');
+            });
+
+            mobileOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('open');
+                mobileOverlay.classList.remove('open');
+            });
+        }
     </script>
+
 </body>
 </html>

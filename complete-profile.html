@@ -8,76 +8,217 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        .avatar-upload {
-            position: relative;
-            width: 130px;
-            height: 130px;
-            margin: 0 auto 20px;
-            border: 2px dashed var(--neon-green);
-            border-radius: 50%;
-            background: rgba(0, 255, 65, 0.05);
+        :root {
+            --neon-green: #00ff41;
+            --neon-gold: #ffd700;
+            --neon-red: #ff003c;
+            --glass-bg: rgba(20, 20, 20, 0.6);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: 'Cairo', sans-serif;
             display: flex;
-            align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: 0.3s;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Flying Colors Background */
+        .flying-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            /* animation: fly 10s infinite alternate ease-in-out; -- Removed for JS control */
+            transition: transform 0.2s ease-out; /* Smooth transition for mouse follow */
+            will-change: transform; /* Performance optimization */
+            z-index: 0;
+        }
+        .orb-1 { width: 300px; height: 300px; background: var(--neon-green); top: 10%; left: 20%; }
+        .orb-2 { width: 250px; height: 250px; background: var(--neon-red); bottom: 10%; right: 20%; }
+        .orb-3 { width: 200px; height: 200px; background: var(--neon-gold); top: 40%; left: 60%; }
+
+        /* 1:1 Container */
+        .profile-card {
+            position: relative;
+            width: 400px;
+            height: 400px; /* 1:1 Aspect Ratio */
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
-        .avatar-upload:hover {
-            background: rgba(0, 255, 65, 0.1);
-            transform: scale(1.05);
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
         }
-        .avatar-upload i {
-            font-size: 3rem;
-            color: var(--neon-green);
+        .progress-bar {
+            height: 100%;
+            width: 33%;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-gold));
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--neon-green);
         }
-        .avatar-upload img {
+
+        .step-content {
+            position: absolute; /* Allow steps to overlap for transitions */
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-        }
-        .warning-box {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid var(--neon-gold);
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 0.85rem;
-            color: var(--neon-gold);
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
             text-align: center;
-            line-height: 1.6;
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            opacity: 1;
+        }
+
+        .step-content.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none; /* Disable interaction on hidden steps */
+        }
+
+        h2 { color: #fff; margin: 0 0 10px; font-size: 1.5rem; }
+        p { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
+
+        /* Avatar Step */
+        .avatar-upload {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            border: 2px dashed var(--neon-green);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; overflow: hidden; position: relative;
+            transition: 0.3s;
+            background: rgba(0,0,0,0.3);
+        }
+        .avatar-upload:hover {
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+        }
+        .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-upload i { font-size: 2.5rem; color: var(--neon-green); }
+
+        /* Input Steps */
+        .custom-input {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid #333;
+            color: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            width: 80%;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        .custom-input:focus {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+        }
+
+        /* Buttons */
+        .btn-action {
+            margin-top: 20px;
+            padding: 10px 30px;
+            border-radius: 25px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 1rem;
+        }
+        .btn-next {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+        .btn-next:hover { transform: scale(1.05); background: #fff; }
+        
+        .btn-back {
+            background: transparent;
+            color: #777;
+            border: 1px solid #333;
+            margin-left: 10px;
+        }
+        .btn-back:hover { color: #fff; border-color: #fff; }
+
+        .step-indicator {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            color: #555;
+            font-size: 0.8rem;
         }
     </style>
 </head>
-<body class="auth-body">
+<body>
 
-    <div class="auth-container" style="max-width: 500px;">
-        <div class="auth-logo"><i class="fa-solid fa-user-check"></i></div>
-        <h2 class="auth-title">خطوة أخيرة!</h2>
-        <p class="auth-subtitle">يرجى إكمال بياناتك الشخصية للمتابعة</p>
+    <!-- Background Animation -->
+    <div class="flying-orb orb-1"></div>
+    <div class="flying-orb orb-2"></div>
+    <div class="flying-orb orb-3"></div>
 
-        <div class="warning-box">
-            <i class="fa-solid fa-shield-halved"></i> <strong>تعليمات التسجيل:</strong><br>
-            يرجى استخدام <b>صورة شخصية حقيقية</b> واسمك الثلاثي الصحيح لضمان تفعيل الحساب وتجنب الحظر التلقائي.
-        </div>
+    <div class="profile-card">
+        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
 
-        <form id="completeProfileForm">
-            <label for="avatarInput" class="avatar-upload" id="avatarPreview">
-                <i class="fa-solid fa-camera"></i>
-            </label>
+        <!-- The form now acts as a relative container for the absolute-positioned steps -->
+        <form id="completeProfileForm" style="flex: 1; position: relative;">
             <input type="file" id="avatarInput" accept="image/*" hidden required>
 
-            <div class="input-group">
-                <input type="text" id="nameInput" placeholder="اسمك الثلاثي" required>
-                <i class="fa-solid fa-user"></i>
-            </div>
-            <div class="input-group">
-                <input type="tel" id="phoneInput" placeholder="رقم الهاتف" required>
-                <i class="fa-solid fa-phone"></i>
+            <!-- Step 1: Avatar -->
+            <div class="step-content" id="step1">
+                <h2>الصورة الشخصية</h2>
+                <p>اختر صورة واضحة لملفك الشخصي</p>
+                <label for="avatarInput" class="avatar-upload" id="avatarPreview">
+                    <i class="fa-solid fa-camera"></i>
+                </label>
+                <button type="button" class="btn-action btn-next" onclick="nextStep(2)">التالي <i class="fa-solid fa-arrow-left"></i></button>
             </div>
 
-            <button type="submit" class="auth-btn">حفظ وبدء المتابعة</button>
+            <!-- Step 2: Name -->
+            <div class="step-content hidden" id="step2">
+                <h2>الاسم الثلاثي</h2>
+                <p>يرجى كتابة اسمك الحقيقي كاملاً</p>
+                <input type="text" id="nameInput" class="custom-input" placeholder="مثال: أحمد محمد علي" required>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-action btn-back" onclick="prevStep(1)">رجوع</button>
+                    <button type="button" class="btn-action btn-next" onclick="nextStep(3)">التالي</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Phone & Save -->
+            <div class="step-content hidden" id="step3">
+                <h2>رقم الهاتف</h2>
+                <p>للتواصل وتأمين الحساب</p>
+                <input type="tel" id="phoneInput" class="custom-input" placeholder="01xxxxxxxxx" required>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-action btn-back" onclick="prevStep(2)">رجوع</button>
+                    <button type="submit" class="btn-action btn-next" id="submitBtn">حفظ وإنهاء <i class="fa-solid fa-check"></i></button>
+                </div>
+            </div>
         </form>
+        
+        <div class="step-indicator" id="stepIndicator">خطوة 1 من 3</div>
     </div>
 
     <script type="module">
@@ -95,6 +236,39 @@
 
         let currentUserUid = null;
         let selectedFile = null;
+        let currentStep = 1;
+
+        // Expose functions to window for HTML onclick attributes
+        window.nextStep = (step) => {
+            // Validation
+            if (step === 2 && !selectedFile) {
+                alert("يرجى اختيار صورة شخصية أولاً");
+                return;
+            }
+            if (step === 3) {
+                const name = document.getElementById('nameInput').value;
+                if (name.length < 5) {
+                    alert("يرجى كتابة الاسم الثلاثي بشكل صحيح");
+                    return;
+                }
+            }
+            showStep(step);
+        };
+
+        window.prevStep = (step) => {
+            showStep(step);
+        };
+
+        function showStep(step) {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            
+            // Update Progress
+            const progress = (step / 3) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            document.getElementById('stepIndicator').innerText = `خطوة ${step} من 3`;
+            currentStep = step;
+        }
 
         onAuthStateChanged(auth, (user) => {
             if (!user) window.location.href = "index.html";
@@ -106,7 +280,7 @@
             if (selectedFile) {
                 const reader = new FileReader();
                 reader.onload = (event) => {
-                    document.getElementById('avatarPreview').innerHTML = `<img src="${event.target.result}" alt="preview">`;
+                    document.getElementById('avatarPreview').innerHTML = `<img src="${event.target.result}" alt="preview" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
                 };
                 reader.readAsDataURL(selectedFile);
             }
@@ -114,9 +288,9 @@
 
         document.getElementById('completeProfileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
+            const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerText = 'جاري الحفظ...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
 
             try {
                 let photoURL = "https://abqarieno.firebaseapp.com/212.png"; // صورة افتراضية
@@ -148,8 +322,29 @@
             } catch (error) {
                 alert("حدث خطأ: " + error.message);
                 btn.disabled = false;
-                btn.innerText = 'حفظ وبدء المتابعة';
+                btn.innerText = 'حفظ وإنهاء';
             }
+        });
+
+        // --- Mouse-reactive background orbs ---
+        document.body.addEventListener('mousemove', (e) => {
+            // Use requestAnimationFrame for smooth, performant animations
+            requestAnimationFrame(() => {
+                const orbs = document.querySelectorAll('.flying-orb');
+                // Calculate mouse position as a value from -1 to 1
+                const mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+
+                orbs.forEach((orb, index) => {
+                    // Apply different movement factors for a parallax effect
+                    const moveFactor = (index + 1) * 15; // e.g., 15, 30, 45
+                    const moveX = mouseX * moveFactor;
+                    const moveY = mouseY * moveFactor;
+                    
+                    // Apply the transform. The CSS transition will smooth it out.
+                    orb.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                });
+            });
         });
     </script>
 
