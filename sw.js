@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v9'; // Update: Fix CSS Corruption
+const CACHE_NAME = 'abqarieno-v10'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
 const ASSETS = [
     './',
     './index.html',
