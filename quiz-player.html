@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الاختبار - منصة الدكتور</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --quiz-accent: #8e44ad;
+            --correct-answer: #27ae60;
+            --wrong-answer: #c0392b;
+        }
+        body { 
+            background: var(--bg-color); 
+            user-select: none; /* منع تحديد النص */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .quiz-container { 
+            max-width: 800px; margin: 40px auto; 
+            background: var(--card-bg); border: 1px solid var(--border-color); 
+            border-radius: 20px; padding: 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            overflow-wrap: break-word; /* منع خروج النص */
+        }
+        
+        .quiz-loader { text-align: center; padding: 50px; color: var(--text-gray); }
+        .quiz-loader i { font-size: 3rem; color: var(--quiz-accent); animation: fa-spin 2s infinite linear; }
+
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .quiz-header h2 { color: var(--text-white); font-size: 1.5rem; margin: 0; }
+        
+        /* Circular Timer Styles */
+        .timer-circle {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(var(--quiz-accent) 360deg, var(--border-color) 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            transition: background 0.2s linear;
+        }
+        .timer-circle::before {
+            content: ''; position: absolute; width: 50px; height: 50px;
+            background: var(--card-bg); border-radius: 50%; z-index: 1;
+        }
+        #timer { position: relative; z-index: 2; color: var(--text-white); font-weight: bold; font-size: 0.9rem; }
+        
+
+        .progress-container { width: 100%; background: #2c3e50; border-radius: 10px; height: 10px; margin-bottom: 25px; overflow: hidden; }
+        #progressBar { width: 0%; height: 100%; background: var(--quiz-accent); transition: width 0.4s ease; }
+
+        #questionArea { margin-bottom: 30px; }
+        #questionText { font-size: 1.4rem; font-weight: bold; color: var(--text-white); line-height: 1.6; margin-bottom: 25px; }
+        #questionText img { max-width: 100%; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border-color); }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .option-label {
+            display: block; background: rgba(255,255,255,0.05); border: 2px solid #34495e;
+            padding: 15px; border-radius: 12px; cursor: pointer; transition: 0.3s;
+            word-break: break-word;
+        }
+        .option-label:hover { border-color: var(--quiz-accent); background: rgba(142, 68, 173, 0.1); }
+        .option-label input { display: none; }
+        .option-label.selected { border-color: var(--quiz-accent); background: rgba(142, 68, 173, 0.2); font-weight: bold; }
+
+        .quiz-footer { 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        #prevBtn, #nextBtn, #finishBtn {
+            background: var(--quiz-accent); color: #fff; border: none; padding: 12px 30px;
+            border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+            flex: 1;
+        }
+        #prevBtn {
+            background: #34495e;
+        }
+        #prevBtn:hover:not(:disabled) { background: #4a637c; }
+        #prevBtn:disabled {
+            background: #2c3e50;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        #nextBtn:hover, #finishBtn:hover { background: #9b59b6; }
+        #finishBtn {
+            background: var(--correct-answer);
+        }
+        #finishBtn:hover { background: #2ecc71; }
+
+        /* Results Screen */
+        #resultsContainer { text-align: center; }
+
+        /* Review Screen */
+        #reviewContainer h2 { margin-bottom: 10px; }
+        #reviewGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .review-q-btn {
+            width: 50px; height: 50px; border-radius: 50%; border: 2px solid #34495e;
+            background: transparent; color: var(--text-gray); font-weight: bold;
+            font-size: 1.1rem; cursor: pointer; transition: 0.3s;
+        }
+        .review-q-btn.answered {
+            border-color: var(--quiz-accent); background: rgba(142, 68, 173, 0.1);
+            color: var(--text-white);
+        }
+        .review-q-btn:hover { transform: scale(1.1); border-color: var(--quiz-accent); }
+        .review-footer { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn-submit-final {
+            background: var(--correct-answer); color: #fff; border: none; padding: 12px 30px;
+            border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .btn-submit-final:hover { background: #2ecc71; }
+        .btn-back-to-quiz {
+            background: #34495e; color: #fff; border: none; padding: 12px 30px;
+            border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .btn-back-to-quiz:hover { background: #4a637c; }
+
+        .score-circle {
+            width: 180px; height: 180px; margin: 20px auto;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            position: relative; background: conic-gradient(var(--quiz-accent) 0deg, #34495e 0deg);
+        }
+        .score-circle::before {
+            content: ''; position: absolute; width: 150px; height: 150px;
+            background: var(--card-bg); border-radius: 50%;
+        }
+        #scoreText { font-size: 2.5rem; font-weight: 900; color: var(--text-white); z-index: 1; }
+        #scoreText small { font-size: 1rem; }
+
+        #resultsContainer h2 { font-size: 2rem; color: var(--quiz-accent); margin-bottom: 10px; }
+        #resultsContainer p { font-size: 1.2rem; color: var(--text-gray); margin-bottom: 30px; }
+        .back-link {
+            display: inline-block; background: var(--quiz-accent); color: #fff; padding: 12px 30px;
+            border-radius: 10px; text-decoration: none; font-weight: bold;
+        }
+
+        /* Light Mode */
+        body.light-mode .quiz-container { background: #fff; border-color: #e2e8f0; }
+        body.light-mode .quiz-header h2, body.light-mode #questionText, body.light-mode #scoreText { color: #1a202c; }
+        body.light-mode .option-label { background: #f8f9fa; border-color: #e2e8f0; }
+        body.light-mode .option-label:hover { background: #f1eaf5; border-color: var(--quiz-accent); }
+        body.light-mode .option-label.selected { background: #f1eaf5; }
+        body.light-mode .score-circle::before { background: #fff; }
+        body.light-mode .review-q-btn { border-color: #e2e8f0; color: #718096; }
+        body.light-mode .timer-circle::before { background: #fff; }
+        body.light-mode #timer { color: #1a202c; }
+        body.light-mode .review-q-btn.answered {
+            border-color: var(--quiz-accent);
+            background: #f1eaf5;
+            color: #1a202c;
+        }
+
+        /* Sepia Mode */
+        body.sepia-mode .quiz-container { background: #fffdf5; border-color: #dccfb6; }
+        body.sepia-mode .quiz-header h2, body.sepia-mode #questionText, body.sepia-mode #scoreText { color: #433422; }
+        body.sepia-mode .option-label { background: #efe3d0; border-color: #dccfb6; }
+        body.sepia-mode .option-label:hover { background: #e6d5b8; border-color: var(--quiz-accent); }
+        body.sepia-mode .option-label.selected { background: #e6d5b8; }
+        body.sepia-mode .score-circle::before { background: #fffdf5; }
+        body.sepia-mode .review-q-btn { border-color: #dccfb6; color: #7c6f5c; }
+        body.sepia-mode .timer-circle::before { background: #fffdf5; }
+        body.sepia-mode #timer { color: #433422; }
+        body.sepia-mode .review-q-btn.answered {
+            border-color: var(--quiz-accent);
+            background: #e6d5b8;
+            color: #433422;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                margin: 15px auto;
+                padding: 20px 15px;
+                width: 95%;
+            }
+            .quiz-header h2 { font-size: 1.2rem; }
+            .timer-circle { width: 50px; height: 50px; }
+            .timer-circle::before { width: 42px; height: 42px; }
+            #timer { font-size: 0.8rem; }
+            #questionText { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
+        </div>
+    </nav>
+
+    <div id="loader" class="quiz-loader">
+        <i class="fa-solid fa-dna"></i>
+        <p style="margin-top: 15px; font-size: 1.2rem;">جاري تجهيز الاختبار...</p>
+    </div>
+
+    <div id="quizContainer" class="quiz-container" style="display:none;">
+        <div class="quiz-header">
+            <h2 id="quizTitle"></h2>
+            <div id="timerCircle" class="timer-circle">
+                <div id="timer">00:00</div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div id="progressBar"></div>
+        </div>
+        <div id="questionArea">
+            <div id="questionText"></div>
+            <div id="optionsContainer" class="options-grid"></div>
+        </div>
+        <div class="quiz-footer">
+            <button id="prevBtn" onclick="handlePrev()">السابق</button>
+            <button id="nextBtn" onclick="handleNext()">التالي</button>
+            <button id="finishBtn" onclick="showReviewScreen()" style="display: none;">مراجعة وإنهاء</button>
+        </div>
+    </div>
+
+    <div id="reviewContainer" class="quiz-container" style="display:none;">
+        <h2>مراجعة الإجابات</h2>
+        <p style="color: var(--text-gray); margin-bottom: 25px;">تأكد من إجاباتك قبل تسليم الاختبار نهائياً. اضغط على رقم السؤال للعودة إليه.</p>
+        <div id="reviewGrid"></div>
+        <div class="review-footer">
+            <button onclick="showResults()" class="btn-submit-final">تسليم الاختبار الآن</button>
+            <button onclick="hideReviewScreen()" class="btn-back-to-quiz">العودة للأسئلة</button>
+        </div>
+    </div>
+
+    <div id="resultsContainer" class="quiz-container" style="display:none;">
+        <h2>النتيجة النهائية</h2>
+        <div class="score-circle" id="scoreCircle">
+            <span id="scoreText">0<small>%</small></span>
+        </div>
+        <p>لقد أجبت على <strong id="correctCount" style="color: var(--correct-answer)">0</strong> من <strong id="totalCount">0</strong> بشكل صحيح.</p>
+        <a href="quizzes.html" class="back-link">العودة إلى قائمة الاختبارات</a>
+    </div>
+
+    <script src="main.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
+        
+        // Check for file protocol
+        if (window.location.protocol === 'file:') {
+            document.getElementById('loader').innerHTML = `
+                <div style="color: var(--wrong-answer); padding: 20px; border: 1px solid var(--wrong-answer); border-radius: 10px;">
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i> تنبيه هام</h3>
+                    <p>لا يمكن تشغيل الاختبارات عند فتح الملف مباشرة (file://).</p>
+                    <p>يرجى استخدام خادم محلي (Local Server) أو رفع الموقع على استضافة لتعمل قاعدة البيانات والمصادقة بشكل صحيح.</p>
+                </div>`;
+            throw new Error("File protocol not supported for Firebase Auth");
+        }
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // DOM Elements
+        const loader = document.getElementById('loader');
+        const quizContainer = document.getElementById('quizContainer');
+        const reviewContainer = document.getElementById('reviewContainer');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const quizTitleEl = document.getElementById('quizTitle');
+        const timerEl = document.getElementById('timer');
+        const progressBar = document.getElementById('progressBar');
+        const questionTextEl = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const finishBtn = document.getElementById('finishBtn');
+
+        // Quiz State
+        let currentUser = null;
+        let quizData = null;
+        let quizId = null;
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let timeRemaining = 0;
+        let timerInterval;
+
+        async function startQuiz() {
+            const urlParams = new URLSearchParams(window.location.search);
+            quizId = urlParams.get('id');
+
+            if (!quizId) {
+                loader.innerHTML = '<p style="color: var(--wrong-answer);">خطأ: لم يتم تحديد اختبار.</p>';
+                return;
+            }
+
+            // Wait for user to be authenticated BEFORE fetching data
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    try {
+                        await loadQuizData(quizId);
+                    } catch (error) {
+                        console.error(error);
+                        loader.innerHTML = '<p style="color: var(--wrong-answer);">حدث خطأ أثناء تحميل الاختبار. تأكد من اتصالك بالإنترنت.</p>';
+                    }
+                } else {
+                    loader.innerHTML = '<p style="color: var(--wrong-answer);">يجب تسجيل الدخول أولاً لأداء الاختبار.</p><a href="auth.html" class="back-link" style="margin-top:10px;">تسجيل الدخول</a>';
+                }
+            });
+        }
+
+        async function loadQuizData(id) {
+            const snapshot = await get(ref(db, `quizzes/${id}`));
+            if (!snapshot.exists()) {
+                loader.innerHTML = '<p style="color: var(--wrong-answer);">خطأ: هذا الاختبار غير موجود.</p>';
+                return;
+            }
+
+            quizData = snapshot.val();
+            questions = quizData.questions ? Object.values(quizData.questions) : [];
+
+            // Sort questions by order if available
+            questions.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+            if (questions.length === 0) {
+                loader.innerHTML = '<p>هذا الاختبار لا يحتوي على أسئلة بعد.</p>';
+                return;
+            }
+
+            // Load progress from localStorage
+            loadProgress();
+
+            loader.style.display = 'none';
+            quizContainer.style.display = 'block';
+            quizTitleEl.innerText = quizData.title;
+
+            startTimer(timeRemaining > 0 ? timeRemaining : quizData.timeLimit * 60);
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const question = questions[currentQuestionIndex];
+            
+            // Render text and optional image
+            let contentHtml = question.text;
+            if (question.imageURL) {
+                contentHtml += `<br><img src="${question.imageURL}" alt="صورة توضيحية">`;
+            }
+            questionTextEl.innerHTML = contentHtml;
+            
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionId = `option${index}`;
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                label.htmlFor = optionId;
+                label.innerHTML = `
+                    <input type="radio" name="option" id="${optionId}" value="${index}">
+                    <span>${option}</span>
+                `;
+                label.addEventListener('click', () => {
+                    document.querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+                    label.classList.add('selected');
+                });
+                optionsContainer.appendChild(label);
+            });
+
+            // Restore previous answer if it exists
+            if (userAnswers[currentQuestionIndex] !== null) {
+                const previousAnswerIndex = userAnswers[currentQuestionIndex];
+                const optionToSelect = document.getElementById(`option${previousAnswerIndex}`);
+                if (optionToSelect) {
+                    optionToSelect.checked = true;
+                    optionToSelect.closest('.option-label').classList.add('selected');
+                }
+            }
+
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            
+            // Update button states
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+            } else {
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+            }
+        }
+
+        function storeAnswer() {
+            const selectedOption = document.querySelector('input[name="option"]:checked');
+            if (userAnswers[currentQuestionIndex] === (selectedOption ? parseInt(selectedOption.value) : null)) return; // No change
+            userAnswers[currentQuestionIndex] = selectedOption ? parseInt(selectedOption.value) : null;
+        }
+
+        window.handleNext = function() {
+            storeAnswer();
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            }
+        }
+
+        window.handlePrev = function() {
+            storeAnswer();
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+
+        window.showReviewScreen = function() {
+            storeAnswer(); // Save the last question's answer
+            quizContainer.style.display = 'none';
+            reviewContainer.style.display = 'block';
+
+            const reviewGrid = document.getElementById('reviewGrid');
+            reviewGrid.innerHTML = '';
+            questions.forEach((q, index) => {
+                const answered = userAnswers[index] !== null;
+                const btn = document.createElement('button');
+                btn.className = `review-q-btn ${answered ? 'answered' : ''}`;
+                btn.innerText = index + 1;
+                btn.onclick = () => jumpToQuestion(index);
+                reviewGrid.appendChild(btn);
+            });
+        }
+
+        window.hideReviewScreen = function() {
+            reviewContainer.style.display = 'none';
+            quizContainer.style.display = 'block';
+        }
+
+        window.jumpToQuestion = function(index) {
+            currentQuestionIndex = index;
+            hideReviewScreen();
+            renderQuestion();
+        }
+
+        function startTimer(duration) {
+            let time = duration;
+            const totalDuration = quizData.timeLimit * 60; // الوقت الكلي بالثواني لحساب النسبة
+            timeRemaining = time;
+            const timerCircle = document.getElementById('timerCircle');
+
+            timerInterval = setInterval(() => {
+                const minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timerEl.innerText = `${minutes}:${seconds}`;
+                
+                // تحديث الدائرة
+                if(timerCircle) {
+                    const degrees = (time / totalDuration) * 360;
+                    let color = 'var(--quiz-accent)';
+                    if(time < totalDuration * 0.2) color = 'var(--wrong-answer)'; // أحمر إذا قل عن 20%
+                    else if(time < totalDuration * 0.5) color = '#f39c12'; // برتقالي إذا قل عن 50%
+                    timerCircle.style.background = `conic-gradient(${color} ${degrees}deg, var(--border-color) 0deg)`;
+                }
+
+                time--;
+                timeRemaining = time;
+                if (time < 0) {
+                    showResults();
+                }
+            }, 1000);
+        }
+        window.addEventListener('beforeunload', saveProgress);
+
+        window.showResults = async function() { // Make function async and attach to window
+            clearInterval(timerInterval);
+
+            let score = 0;
+            questions.forEach((question, index) => {
+                if (userAnswers[index] === parseInt(question.correctAnswer)) {
+                    score++;
+                }
+            });
+
+            const totalQuestions = questions.length > 0 ? questions.length : 1; // Avoid division by zero
+            const percentage = Math.round((score / totalQuestions) * 100);
+
+            quizContainer.style.display = 'none';
+            reviewContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            clearProgress(); // Clear saved progress after submission
+
+            document.getElementById('correctCount').innerText = score;
+            document.getElementById('totalCount').innerText = totalQuestions;
+            document.getElementById('scoreText').innerHTML = `${percentage}<small>%</small>`;
+            
+            const scoreCircle = document.getElementById('scoreCircle');
+            scoreCircle.style.background = `conic-gradient(var(--quiz-accent) ${percentage * 3.6}deg, #34495e 0deg)`;
+
+            // Save result to Firebase
+            try {
+                // Await the save operation to ensure it completes
+                await saveResultToDB(score, totalQuestions, percentage);
+            } catch (error) {
+                console.error("Failed to save quiz result:", error);
+                // Optionally, inform the user that the result might not have been saved.
+                alert("حدث خطأ أثناء حفظ نتيجتك. يرجى التأكد من اتصالك بالإنترنت.");
+            }
+        }
+
+        async function saveResultToDB(score, total, percentage) {
+            if (!currentUser) return;
+            
+            // Fetch username from the database for accuracy
+            const userSnap = await get(ref(db, `users/${currentUser.uid}`));
+            const username = userSnap.exists() ? userSnap.val().username : 'طالب غير معروف';
+
+            const resultData = {
+                username: username,
+                score: score,
+                total: total,
+                percentage: percentage,
+                submittedAt: serverTimestamp()
+            };
+            // Await the set operation to ensure it completes before the function returns
+            await set(ref(db, `quiz_results/${quizId}/${currentUser.uid}`), resultData);
+        }
+
+        function getStorageKey() {
+            return `quiz_progress_${currentUser.uid}_${quizId}`;
+        }
+
+        function saveProgress() {
+            if (!currentUser || !quizId) return;
+            storeAnswer(); // Ensure the very last selection is stored
+            const state = { answers: userAnswers, timeLeft: timeRemaining };
+            localStorage.setItem(getStorageKey(), JSON.stringify(state));
+        }
+
+        function loadProgress() {
+            const savedState = localStorage.getItem(getStorageKey());
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                userAnswers = state.answers || new Array(questions.length).fill(null);
+                timeRemaining = state.timeLeft || 0;
+            } else {
+                userAnswers = new Array(questions.length).fill(null);
+            }
+        }
+
+        function clearProgress() {
+            localStorage.removeItem(getStorageKey());
+        }
+
+        // Start the process
+        startQuiz();
+
+        // --- منع النسخ والنقر بزر الماوس الأيمن ---
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('copy', event => event.preventDefault());
+        document.addEventListener('cut', event => event.preventDefault());
+        document.addEventListener('keydown', event => {
+            if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'p')) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

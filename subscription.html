@@ -25,6 +25,7 @@
         <ul class="nav-links">
             <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
             <li><a href="subscription.html" class="active" style="color:var(--neon-gold);">الاشتراك</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="lab.html">المعرض</a></li>
             <li><a href="contact.html">تواصل معنا</a></li>
         </ul>
@@ -147,8 +148,9 @@
                 status: 'pending',
                 timestamp: serverTimestamp()
             }).then(() => {
-                alert("تم إرسال طلبك بنجاح! سيتم مراجعة الدفع وتفعيل حسابك خلال ساعات.");
-                window.location.href = "index.html";
+                // Show success message instead of alert and redirect
+                document.getElementById('paymentForm').innerHTML = `
+                    <div style="text-align:center; color: var(--neon-green);"><i class="fa-solid fa-check-circle" style="font-size: 3rem; margin-bottom: 15px;"></i><h3>تم إرسال طلبك بنجاح!</h3><p style="color: #ccc;">سيتم مراجعة الدفع وتفعيل حسابك خلال ساعات. يمكنك متابعة باقي المنصة الآن.</p><a href="index.html" class="auth-btn" style="display:inline-block; width:auto; margin-top:20px;">العودة للرئيسية</a></div>`;
             }).catch(err => {
                 alert("حدث خطأ: " + err.message);
                 btn.disabled = false;
@@ -156,41 +158,8 @@
             });
         });
 
-        const menuBtn = document.querySelector('.menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        // PWA Install Logic
-        let deferredPrompt;
-        const installBtn = document.getElementById('installAppBtn');
-        if (!window.matchMedia('(display-mode: standalone)').matches) { installBtn.style.display = 'flex'; }
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'flex';
-        });
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            } else { alert('لتثبيت التطبيق، يرجى استخدام خيار "الإضافة إلى الشاشة الرئيسية" من إعدادات المتصفح.'); }
-        });
-
-        // Theme Toggle Logic
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
-        if (localStorage.getItem('theme') === 'light') { body.classList.add('light-mode'); icon.classList.replace('fa-moon', 'fa-sun'); }
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        });
     </script>
+    <script src="main.js"></script>
 </body>
 </html>
 ```

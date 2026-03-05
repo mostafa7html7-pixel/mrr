@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلبات الدفع - لوحة التحكم</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --admin-bg: #020204;
+            --admin-surface: #0a0a0f;
+            --admin-surface-light: #161b22;
+            --admin-border: #222;
+            --admin-text-primary: #e0e0e0;
+            --admin-text-secondary: #888;
+        }
+
+        body.light-mode {
+            --admin-bg: #f0f2f5;
+            --admin-surface: #ffffff;
+            --admin-surface-light: #f8f9fa;
+            --admin-border: #ddd;
+            --admin-text-primary: #333;
+            --admin-text-secondary: #666;
+        }
+
+        body.sepia-mode {
+            --admin-bg: #f5e6d3;
+            --admin-surface: #fffdf5;
+            --admin-surface-light: #efe3d0;
+            --admin-border: #dccfb6;
+            --admin-text-primary: #433422;
+            --admin-text-secondary: #7c6f5c;
+        }
+
+        body { background-color: var(--admin-bg); color: var(--admin-text-primary); }
+        .requests-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .req-card {
+            background: var(--admin-surface);
+            border: 1px solid var(--admin-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px 20px;
+            align-items: center;
+        }
+        .req-card.approved { border-left: 4px solid var(--neon-green); background: rgba(0, 255, 65, 0.05); }
+        .req-card.rejected { border-left: 4px solid var(--neon-red); background: rgba(255, 0, 0, 0.05); }
+
+        .req-info h4 { margin: 0 0 8px 0; color: var(--admin-text-primary); font-size: 1.1rem; }
+        .req-info p { margin: 0; color: var(--admin-text-secondary); font-size: 0.9rem; line-height: 1.6; }
+        .req-info p strong { color: var(--neon-gold); }
+
+        .req-actions { display: flex; flex-direction: column; gap: 10px; }
+        .btn-approve { background: var(--neon-green); color: #000; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-reject { background: var(--neon-red); color: #fff; border: none; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .status-text { font-weight: bold; text-align: center; }
+
+        .admin-container {
+            display: block;
+            min-height: 100vh;
+        }
+        
+        .admin-content {
+            margin-right: 0;
+            padding: 40px 5%;
+        }
+
+        @media (max-width: 768px) {
+            .admin-content { padding: 20px 15px; }
+            .req-card { grid-template-columns: 1fr; text-align: center; }
+            .req-actions { flex-direction: row; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>ADMIN DASHBOARD</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="admin.html">الطلاب</a></li>
+            <li><a href="admin-quizzes.html">الاختبارات</a></li>
+            <li><a href="admin-scores.html">النتائج</a></li>
+            <li><a href="admin-payments.html" class="active">المدفوعات</a></li>
+            <li><a href="index.html">الموقع</a></li>
+            <li><a href="#" onclick="logout()">خروج</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <main class="admin-content">
+            <div class="panel-section">
+                <div class="panel-header">
+                    <h2 class="panel-title">طلبات اشتراك الطلاب</h2>
+                </div>
+                <div class="requests-grid" id="requestsGrid">
+                    <p>جاري تحميل الطلبات...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="main.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        window.logout = () => {
+            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+                signOut(auth).then(() => window.location.href = "auth.html");
+            }
+        };
+
+        const requestsGrid = document.getElementById('requestsGrid');
+
+        onValue(ref(db, 'payment_requests'), (snapshot) => {
+            requestsGrid.innerHTML = '';
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    const reqId = child.key;
+                    const req = child.val();
+                    const date = new Date(req.timestamp).toLocaleString('ar-EG');
+
+                    let actionsHtml = '';
+                    if (req.status === 'pending') {
+                        actionsHtml = `
+                            <button class="btn-approve" onclick="handleRequest('${reqId}', '${req.userId}', true)">موافقة</button>
+                            <button class="btn-reject" onclick="handleRequest('${reqId}', '${req.userId}', false)">رفض</button>
+                        `;
+                    } else if (req.status === 'approved') {
+                        actionsHtml = `<span class="status-text" style="color: var(--neon-green);">تمت الموافقة</span>`;
+                    } else {
+                        actionsHtml = `<span class="status-text" style="color: var(--neon-red);">تم الرفض</span>`;
+                    }
+
+                    const cardClass = req.status === 'approved' ? 'approved' : req.status === 'rejected' ? 'rejected' : '';
+
+                    requestsGrid.insertAdjacentHTML('afterbegin', `
+                        <div class="req-card ${cardClass}">
+                            <div class="req-info">
+                                <h4>${req.userEmail}</h4>
+                                <p>
+                                    الخطة: <strong>${req.plan}</strong> | المبلغ: <strong>${req.price} ج.م</strong><br>
+                                    رقم المحول: <strong>${req.senderPhone}</strong><br>
+                                    رقم العملية: <strong>${req.transactionId}</strong><br>
+                                    تاريخ الطلب: ${date}
+                                </p>
+                            </div>
+                            <div class="req-actions">
+                                ${actionsHtml}
+                            </div>
+                        </div>
+                    `);
+                });
+            } else {
+                requestsGrid.innerHTML = '<p>لا توجد طلبات دفع حالياً.</p>';
+            }
+        });
+
+        window.handleRequest = (reqId, userId, isApproved) => {
+            const status = isApproved ? 'approved' : 'rejected';
+            const updates = {};
+            updates[`/payment_requests/${reqId}/status`] = status;
+            if (isApproved) {
+                // Here you can define what happens on approval
+                // For example, set a subscription expiry date for the user
+                const expiryDate = new Date();
+                // Assuming a monthly plan for simplicity
+                expiryDate.setMonth(expiryDate.getMonth() + 1);
+                updates[`/users/${userId}/subscription_active`] = true;
+                updates[`/users/${userId}/subscription_expiry`] = expiryDate.toISOString();
+            }
+            
+            update(ref(db), updates).then(() => {
+                alert(`تم ${isApproved ? 'الموافقة على' : 'رفض'} الطلب بنجاح.`);
+            }).catch(error => alert('حدث خطأ: ' + error.message));
+        };
+    </script>
+</body>
+</html>

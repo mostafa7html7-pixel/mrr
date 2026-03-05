@@ -87,6 +87,28 @@
         body.light-mode .win-btn { color: #666; }
         body.light-mode .win-btn:hover { color: #000; }
 
+        /* Sepia Mode Overrides */
+        body.sepia-mode {
+            background-color: #f5e6d3;
+            background-image: none;
+            color: #433422;
+        }
+        body.sepia-mode .study-card {
+            background: #fffdf5;
+            border-color: #dccfb6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        body.sepia-mode .study-card h3 { color: #433422; }
+        body.sepia-mode .study-card p { color: #7c6f5c; }
+        body.sepia-mode .file-window {
+            background: #fffdf5;
+            border-color: #dccfb6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        body.sepia-mode .window-header { background: #efe3d0; border-bottom: 1px solid #dccfb6; }
+        body.sepia-mode .win-btn { color: #7c6f5c; }
+        body.sepia-mode .win-btn:hover { color: #433422; }
+
         /* شبكة ورق الشرح */
         .cards-hub {
             display: grid;
@@ -317,6 +339,7 @@
             <li><a href="index.html">الرئيسية</a></li>
             <li><a href="library.html">الكتب</a></li>
             <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html" class="active">ورق الشرح</a></li> 
             <li><a href="lab.html">المعرض</a></li>
@@ -501,58 +524,8 @@
                 document.exitFullscreen();
             }
         }
-
-        // سكريبت القائمة المنسدلة
-        const menuBtn = document.querySelector('.menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        // كود تثبيت التطبيق PWA
-        let deferredPrompt;
-        const installBtn = document.getElementById('installAppBtn');
-
-        // إظهار الزر إذا لم يكن التطبيق مثبتاً
-        if (!window.matchMedia('(display-mode: standalone)').matches) {
-            installBtn.style.display = 'flex';
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'flex';
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            } else {
-                alert('لتثبيت التطبيق، يرجى استخدام خيار "الإضافة إلى الشاشة الرئيسية" من إعدادات المتصفح.');
-            }
-        });
-
-        // كود الوضع الليلي/النهاري
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
-
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        });
     </script>
+    <script src="main.js"></script>
 
     <div id="fire-notification" class="fire-toast">
         <i class="fa-solid fa-fire-flame-curved"></i>

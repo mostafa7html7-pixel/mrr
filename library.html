@@ -42,6 +42,17 @@
             "url": "https://drive.google.com/file/d/17jJErZF6tYNAlP948e21za5snV6Yjo-S/view?usp=sharing",
             "inLanguage": "ar"
           }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "Book",
+            "name": "كتاب جديد",
+            "bookFormat": "http://schema.org/EBook",
+            "url": "https://drive.google.com/file/d/1p7mWt3X1K8M_2dr4RhYbJG7FmhvMAVAs/view?usp=sharing",
+            "inLanguage": "ar"
+          }
         }
       ]
     }
@@ -116,6 +127,7 @@
         <ul class="nav-links">
             <li><a href="index.html">الرئيسية</a></li>
             <li><a href="library.html" class="active">الكتب</a></li> 
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="videos.html">الفيديوهات</a></li>
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li>
@@ -158,6 +170,24 @@
             <div class="book-card">
                 <div class="book-img">
                     <span class="badge">الصف الأول الثانوي</span>
+                    <!-- صورة افتراضية للكتاب الجديد -->
+                    <img src="232.png" alt="غلاف الكتاب" loading="lazy">
+                </div>
+                <div class="book-info">
+                    <span class="free-tag"><i class="fa-solid fa-check-circle"></i> متاح مجاناً</span>
+                    <h3> علوم متكاملة   </h3>
+                    <p style="color:#888; font-size:0.8rem">كتاب  التفوق للصف الأول الثانوي</p>
+                    <div class="download-footer">
+                        <a href="https://drive.google.com/file/d/1p7mWt3X1K8M_2dr4RhYbJG7FmhvMAVAs/view?usp=sharing" download class="btn-download-book">
+                            <i class="fa-solid fa-file-arrow-down"></i> تحميل الكتاب
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="book-card">
+                <div class="book-img">
+                    <span class="badge">الصف الأول الثانوي</span>
                     <!-- ضع رابط صورة الكتاب هنا في src -->
                     <img src="13.jpg" alt="غلاف الكتاب" loading="lazy">
                 </div>
@@ -182,7 +212,7 @@
                 <div class="book-info">
                     <span class="free-tag"><i class="fa-solid fa-check-circle"></i> متاح مجاناً</span>
                     <h3>   العلوم المتكاملة</h3>
-                    <p style="color:#888; font-size:0.8rem">كتاب التفوق علوم متكاملة اولى ثانوى 2026</p>
+                    <p style="color:#888; font-size:0.8rem">كتاب  المدرسة علوم متكاملة اولى ثانوى 2026</p>
                     <div class="download-footer">
                         <a href="https://drive.google.com/file/d/1uOuwOFtxNvrlsJ4nIWjVQ6X9x_75Sr7E/view?usp=sharing" download class="btn-download-book">
                             <i class="fa-solid fa-file-arrow-down"></i> تحميل الكتاب
@@ -207,57 +237,7 @@
         </div>
     </footer>
 
-    <script>
-        const menuBtn = document.querySelector('.menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        // كود تثبيت التطبيق PWA
-        let deferredPrompt;
-        const installBtn = document.getElementById('installAppBtn');
-
-        // إظهار الزر إذا لم يكن التطبيق مثبتاً
-        if (!window.matchMedia('(display-mode: standalone)').matches) {
-            installBtn.style.display = 'flex';
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'flex';
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            } else {
-                alert('لتثبيت التطبيق، يرجى استخدام خيار "الإضافة إلى الشاشة الرئيسية" من إعدادات المتصفح.');
-            }
-        });
-
-        // كود الوضع الليلي/النهاري
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
-
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        });
-    </script>
+    <script src="main.js"></script>
 
     <!-- نظام الإشعارات الذكي -->
     <div id="fire-notification" class="fire-toast">

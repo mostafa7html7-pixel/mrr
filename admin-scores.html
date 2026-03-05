@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائج الطلاب - لوحة التحكم</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Reusing admin styles from style.css */
+        :root {
+            --admin-bg: #020204;
+            --admin-surface: #0a0a0f;
+            --admin-surface-light: #161b22;
+            --admin-border: #222;
+            --admin-text-primary: #e0e0e0;
+            --admin-text-secondary: #888;
+        }
+
+        body.light-mode {
+            --admin-bg: #f0f2f5;
+            --admin-surface: #ffffff;
+            --admin-surface-light: #f8f9fa;
+            --admin-border: #ddd;
+            --admin-text-primary: #333;
+            --admin-text-secondary: #666;
+        }
+
+        body.sepia-mode {
+            --admin-bg: #f5e6d3;
+            --admin-surface: #fffdf5;
+            --admin-surface-light: #efe3d0;
+            --admin-border: #dccfb6;
+            --admin-text-primary: #433422;
+            --admin-text-secondary: #7c6f5c;
+        }
+
+        body { background-color: var(--admin-bg); color: var(--admin-text-primary); }
+        .filter-bar {
+            background: var(--admin-surface);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .filter-bar label { font-weight: bold; }
+        .filter-bar select {
+            flex-grow: 1;
+            background: var(--admin-surface-light);
+            border: 1px solid var(--admin-border);
+            color: var(--admin-text-primary);
+            padding: 10px;
+            border-radius: 8px;
+            outline: none;
+        }
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .results-table th, .results-table td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid var(--admin-border);
+        }
+        .results-table th {
+            color: var(--admin-text-secondary);
+            font-size: 0.9rem;
+        }
+        .results-table td {
+            color: var(--admin-text-primary);
+        }
+        .results-table tr:hover {
+            background: var(--admin-surface);
+        }
+        .score-percentage {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 6px;
+        }
+
+        .admin-container {
+            display: block;
+            min-height: 100vh;
+        }
+        
+        .admin-content {
+            margin-right: 0;
+            padding: 40px 5%;
+        }
+
+        @media (max-width: 768px) {
+            .admin-content { padding: 20px 15px; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+            .results-table {
+                border: none;
+            }
+            .results-table thead {
+                display: none;
+            }
+            .results-table tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 1px solid var(--admin-border);
+                border-radius: 10px;
+                padding: 15px;
+                background: var(--admin-surface);
+            }
+            .results-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+                padding: 8px 0;
+                border-bottom: 1px dashed var(--admin-border);
+            }
+            .results-table tr td:last-child { border-bottom: none; }
+            .results-table td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: var(--admin-text-secondary);
+                text-align: right;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>ADMIN DASHBOARD</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="admin.html">الطلاب</a></li>
+            <li><a href="admin-quizzes.html">الاختبارات</a></li>
+            <li><a href="admin-scores.html" class="active">النتائج</a></li>
+            <li><a href="admin-payments.html">المدفوعات</a></li>
+            <li><a href="index.html">الموقع</a></li>
+            <li><a href="#" onclick="logout()">خروج</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <!-- Main Content -->
+        <main class="admin-content">
+            <div class="panel-section">
+                <div class="panel-header">
+                    <h2 class="panel-title">نتائج الطلاب في الاختبارات</h2>
+                </div>
+                <div class="filter-bar">
+                    <label for="quizSelector">اختر اختباراً:</label>
+                    <select id="quizSelector">
+                        <option value="">-- يرجى الاختيار --</option>
+                    </select>
+                </div>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>اسم الطالب</th>
+                            <th>النتيجة</th>
+                            <th>النسبة المئوية</th>
+                            <th>تاريخ التسليم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr><td colspan="4" style="text-align: center; color: var(--admin-text-secondary);">اختر اختباراً من القائمة لعرض النتائج.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script src="main.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        window.logout = () => {
+            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+                signOut(auth).then(() => window.location.href = "auth.html");
+            }
+        };
+
+        const quizSelector = document.getElementById('quizSelector');
+        const resultsBody = document.getElementById('resultsBody');
+
+        // Populate quizzes dropdown
+        onValue(ref(db, 'quizzes'), (snapshot) => {
+            if (snapshot.exists()) {
+                snapshot.forEach(child => {
+                    const option = document.createElement('option');
+                    option.value = child.key;
+                    option.innerText = child.val().title;
+                    quizSelector.appendChild(option);
+                });
+            }
+        });
+
+        // Fetch results on selection
+        quizSelector.addEventListener('change', (e) => {
+            const quizId = e.target.value;
+            resultsBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">جاري تحميل النتائج...</td></tr>';
+            if (!quizId) {
+                resultsBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">اختر اختباراً من القائمة.</td></tr>';
+                return;
+            }
+
+            onValue(ref(db, `quiz_results/${quizId}`), (snapshot) => {
+                resultsBody.innerHTML = '';
+                if (snapshot.exists()) {
+                    snapshot.forEach(child => {
+                        const result = child.val();
+                        const percentageColor = result.percentage >= 80 ? 'var(--neon-green)' : result.percentage >= 50 ? 'var(--neon-gold)' : 'var(--neon-red)';
+                        const date = new Date(result.submittedAt).toLocaleString('ar-EG');
+                        resultsBody.innerHTML += `
+                            <tr>
+                                <td data-label="اسم الطالب">${result.username}</td>
+                                <td data-label="النتيجة">${result.score} / ${result.total}</td>
+                                <td data-label="النسبة المئوية"><span class="score-percentage" style="color: ${percentageColor}; background: ${percentageColor}20;">${result.percentage}%</span></td>
+                                <td data-label="تاريخ التسليم">${date}</td>
+                            </tr>`;
+                    });
+                } else {
+                    resultsBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">لا توجد نتائج لهذا الاختبار بعد.</td></tr>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

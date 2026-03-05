@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="بنك اختبارات الدكتور في الأحياء. اختبر نفسك في كل فصل واحصل على تقييم فوري لأدائك.">
+    <meta name="keywords" content="اختبارات أحياء, كويزات, امتحانات إلكترونية, بنك أسئلة, تقييم الطلاب, أحياء ثانوية عامة">
+    <title>الاختبارات - الدكتور</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --quiz-accent: #8e44ad; /* بنفسجي */
+            --quiz-accent-light: #9b59b6;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .quiz-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--quiz-accent);
+            box-shadow: 0 10px 30px rgba(142, 68, 173, 0.1);
+        }
+
+        .quiz-icon {
+            font-size: 2.5rem;
+            color: var(--quiz-accent);
+            margin-bottom: 15px;
+            width: 60px;
+            height: 60px;
+            background: rgba(142, 68, 173, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .quiz-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--text-white);
+        }
+
+        .quiz-details {
+            display: flex;
+            gap: 20px;
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .quiz-details span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-start-quiz {
+            margin-top: auto; /* يدفع الزر لأسفل الكارت */
+            background: var(--quiz-accent);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+            border: 1px solid var(--quiz-accent);
+        }
+
+        .btn-start-quiz:hover {
+            background: var(--quiz-accent-light);
+            box-shadow: 0 5px 15px rgba(142, 68, 173, 0.3);
+        }
+
+        .btn-start-quiz.locked {
+            background: var(--card-bg);
+            color: var(--text-gray);
+            border-color: var(--border-color);
+            cursor: not-allowed;
+        }
+        .btn-start-quiz.locked:hover {
+            background: var(--card-bg);
+            box-shadow: none;
+        }
+
+        /* Light Mode */
+        body.light-mode .quiz-card {
+            background: #fff;
+            border-color: #e2e8f0;
+        }
+        body.light-mode .quiz-card h3 { color: #1a202c; }
+        body.light-mode .quiz-details { color: #718096; }
+        body.light-mode .btn-start-quiz.locked { background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
+
+        @media (max-width: 768px) {
+            .quiz-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                margin-top: 20px;
+            }
+            .quiz-card {
+                padding: 15px;
+            }
+            .quiz-details {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .quiz-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            .quiz-card h3 {
+                font-size: 1.1rem;
+                margin-bottom: 8px;
+            }
+            .main-title {
+                font-size: 1.8rem;
+            }
+            .page-header { margin: 40px 0 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="library.html">الكتب</a></li>
+            <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html" class="active">الاختبارات</a></li>
+            <li><a href="schedule.html">الجدول</a></li>
+            <li><a href="reviews.html">ورق الشرح</a></li>
+            <li><a href="lab.html">المعرض</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <p class="subtitle">BIOLOGY QUIZ BANK</p>
+        <h2 class="main-title">بنك <span style="color:var(--quiz-accent)">الاختبارات</span></h2>
+        <p style="color:#888">اختبر فهمك، تحدى نفسك، وتفوق في المادة.</p>
+    </div>
+
+    <section class="container">
+        <div class="quiz-grid">
+            <p style="text-align: center; color: var(--text-gray);">جاري تحميل الاختبارات المتاحة...</p>
+        </div>
+    </section>
+
+    <footer>
+        <div style="text-align: center; padding: 20px;">
+            <p style="margin-bottom: 10px; color: #888;">جميع الحقوق محفوظة © 2026 | منصة الدكتور</p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="color: #555; font-size: 0.9rem;">برمجة: <strong style="color: var(--quiz-accent);">مصطفى ابوطالب</strong></span>
+                <a href="admin.html" style="color: #444; font-size: 0.8rem; text-decoration: none; border: 1px solid #333; padding: 4px 10px; border-radius: 15px; transition: 0.3s;">
+                    <i class="fa-solid fa-user-shield"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const quizGrid = document.querySelector('.quiz-grid');
+        const icons = ['fa-dna', 'fa-microscope', 'fa-puzzle-piece', 'fa-flask-vial', 'fa-seedling'];
+
+        onValue(ref(db, 'quizzes'), (snapshot) => {
+            quizGrid.innerHTML = '';
+            if (snapshot.exists()) {
+                let iconIndex = 0;
+                snapshot.forEach(childSnapshot => {
+                    const quizId = childSnapshot.key;
+                    const quiz = childSnapshot.val();
+                    
+                    // إخفاء الاختبار إذا لم يكن منشوراً
+                    if (quiz.published !== true) return;
+
+                    const questionCount = quiz.questions ? Object.keys(quiz.questions).length : 0;
+                    const iconClass = icons[iconIndex % icons.length];
+                    iconIndex++;
+
+                    const card = document.createElement('div');
+                    card.className = 'quiz-card';
+                    // The link will point to a future quiz player page
+                    card.innerHTML = `
+                        <div class="quiz-icon"><i class="fa-solid ${iconClass}"></i></div>
+                        <h3>${quiz.title}</h3>
+                        <div class="quiz-details">
+                            <span><i class="fa-solid fa-list-ol"></i> ${questionCount} سؤال</span>
+                            <span><i class="fa-regular fa-clock"></i> ${quiz.timeLimit} دقيقة</span>
+                        </div>
+                        <a href="quiz-player.html?id=${quizId}" class="btn-start-quiz">ابدأ الاختبار <i class="fa-solid fa-arrow-left"></i></a>
+                    `;
+                    quizGrid.appendChild(card);
+                });
+            } else {
+                quizGrid.innerHTML = '<p style="text-align: center; color: var(--text-gray); grid-column: 1 / -1;">لا توجد اختبارات متاحة حالياً. ترقبوا الجديد!</p>';
+            }
+        });
+    </script>
+</body>
+</html>

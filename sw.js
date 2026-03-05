@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v10'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
+const CACHE_NAME = 'abqarieno-v25'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
 const ASSETS = [
     './',
     './index.html',
@@ -13,6 +13,10 @@ const ASSETS = [
     './schedule.html',
     './reviews.html',
     './contact.html',
+    './admin-quizzes.html', // إضافة صفحة إدارة الاختبارات
+    './admin-scores.html', // إضافة صفحة نتائج الطلاب
+    './admin-payments.html', // إضافة صفحة طلبات الدفع
+    './quiz-player.html', // إضافة صفحة الاختبار
     './style.css',
     './main.js',
     './6.jpeg',

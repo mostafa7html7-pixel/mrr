@@ -55,17 +55,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (localStorage.getItem('theme') === 'light') {
             body.classList.add('light-mode');
             icon.classList.replace('fa-moon', 'fa-sun');
+        } else if (localStorage.getItem('theme') === 'sepia') {
+            body.classList.add('sepia-mode');
+            icon.classList.replace('fa-moon', 'fa-eye');
         }
 
         themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            // Use classList.replace for safer and more consistent class manipulation
-            if (isLight) {
-                icon.classList.replace('fa-moon', 'fa-sun');
+            // Cycle: Dark -> Light -> Sepia -> Dark
+            if (body.classList.contains('light-mode')) {
+                // Light -> Sepia
+                body.classList.remove('light-mode');
+                body.classList.add('sepia-mode');
+                icon.className = 'fa-solid fa-eye';
+                localStorage.setItem('theme', 'sepia');
+            } else if (body.classList.contains('sepia-mode')) {
+                // Sepia -> Dark
+                body.classList.remove('sepia-mode');
+                icon.className = 'fa-solid fa-moon';
+                localStorage.setItem('theme', 'dark');
             } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
+                // Dark -> Light
+                body.classList.add('light-mode');
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'light');
             }
         });
     }

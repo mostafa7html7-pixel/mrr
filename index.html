@@ -84,6 +84,7 @@
             <li><a href="index.html" class="active">الرئيسية</a></li>
             <li><a href="library.html">الكتب</a></li>
             <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li>
             <li><a href="lab.html">المعرض</a></li>
@@ -314,7 +315,11 @@
             }
         });
 
-        window.logout = () => signOut(auth).then(() => window.location.href = 'auth.html');
+        window.logout = () => {
+            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+                signOut(auth).then(() => window.location.href = 'auth.html');
+            }
+        };
 
         const lastSeenTime = localStorage.getItem('biology_last_seen_news') || 0;
         const loadTime = Date.now(); // وقت فتح الموقع

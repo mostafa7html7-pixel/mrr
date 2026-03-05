@@ -202,6 +202,7 @@
             <li><a href="index.html">الرئيسية</a></li>
             <li><a href="library.html">الكتب</a></li>
             <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li>
             <li><a href="lab.html">المعرض</a></li>
@@ -271,6 +272,50 @@
         </div>
     </footer>
 
+    <script src="main.js"></script>
+
+    <!-- سكربت التحكم في الواجهة (يعمل بدون سيرفر) -->
+    <script>
+        // --- نظام حفظ الهوية (Persistence System) ---
+        const sessionRole = sessionStorage.getItem('biology_user_role');
+        const localRole = localStorage.getItem('biology_user_role');
+        
+        const isMaster = sessionRole === 'master';
+        const isStudent = localRole === 'student';
+
+        // إخفاء شاشة الدخول إذا كان المستخدم مسجلاً
+        if (isMaster || isStudent) {
+            const overlay = document.getElementById('gate-overlay');
+            if(overlay) overlay.style.display = 'none';
+        }
+
+        if (isMaster) {
+            const panel = document.getElementById('master-panel');
+            if(panel) panel.style.display = 'block';
+        }
+
+        window.checkMaster = function() {
+            if(prompt("كود المستر:") === "222") {
+                sessionStorage.setItem('biology_user_role', 'master'); 
+                location.reload(); 
+            } else alert("خطأ!");
+        }
+
+        window.enterAs = function(role) {
+            if(role === 'student') localStorage.setItem('biology_user_role', 'student');
+            document.getElementById('gate-overlay').style.display = 'none';
+        }
+
+        window.switchRole = function() {
+            const code = prompt("أدخل كود المستر للتبديل:");
+            if(code === "222") {
+                localStorage.removeItem('biology_user_role'); 
+                sessionStorage.setItem('biology_user_role', 'master'); 
+                location.reload();
+            } else if(code !== null) alert("الكود غير صحيح");
+        }
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
@@ -288,44 +333,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const messagesRef = ref(db, 'broadcasts');
-
-        // --- نظام حفظ الهوية (Persistence System) ---
-        // التعديل: الطالب دائم (localStorage)، المستر مؤقت (sessionStorage)
-        const sessionRole = sessionStorage.getItem('biology_user_role');
-        const localRole = localStorage.getItem('biology_user_role');
-        
-        const isMaster = sessionRole === 'master';
-        const isStudent = localRole === 'student';
-
-        if (isMaster || isStudent) {
-            document.getElementById('gate-overlay').style.display = 'none';
-        }
-
-        if (isMaster) {
-            document.getElementById('master-panel').style.display = 'block';
-        }
-
-        // التحقق
-        window.checkMaster = function() {
-            if(prompt("كود المستر:") === "222") {
-                sessionStorage.setItem('biology_user_role', 'master'); // حفظ مؤقت للجلسة فقط
-                location.reload(); 
-            } else alert("خطأ!");
-        }
-
-        window.enterAs = function(role) {
-            if(role === 'student') localStorage.setItem('biology_user_role', 'student'); // حفظ دائم للطالب
-            document.getElementById('gate-overlay').style.display = 'none';
-        }
-
-        window.switchRole = function() {
-            const code = prompt("أدخل كود المستر للتبديل:");
-            if(code === "222") {
-                localStorage.removeItem('biology_user_role'); // إزالة تسجيل الطالب
-                sessionStorage.setItem('biology_user_role', 'master'); // تفعيل المستر
-                location.reload();
-            } else if(code !== null) alert("الكود غير صحيح");
-        }
 
         window.handleFileSelect = () => {
             const file = document.getElementById('fileInput').files[0];
@@ -614,60 +621,10 @@
     </script>
 
     <script>
-        const menuBtn = document.querySelector('.menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
         // تسجيل Service Worker
-        if ('serviceWorker' in navigator) {
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
             window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
         }
-
-        // كود تثبيت التطبيق PWA
-        let deferredPrompt;
-        const installBtn = document.getElementById('installAppBtn');
-
-        // إظهار الزر إذا لم يكن التطبيق مثبتاً
-        if (!window.matchMedia('(display-mode: standalone)').matches) {
-            installBtn.style.display = 'flex';
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'flex';
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            } else {
-                alert('لتثبيت التطبيق، يرجى استخدام خيار "الإضافة إلى الشاشة الرئيسية" من إعدادات المتصفح.');
-            }
-        });
-
-        // كود الوضع الليلي/النهاري
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
-
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        });
     </script>
 </body>
 </html>

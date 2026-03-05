@@ -89,6 +89,22 @@
         body.light-mode .group-info .name { color: #718096; }
         body.light-mode .group-item { background: #f7fafc; }
 
+        /* Sepia Mode Overrides */
+        body.sepia-mode {
+            --bg-dark: #f5e6d3;
+            --card-bg: #fffdf5;
+            color: #433422;
+        }
+        body.sepia-mode .schedule-card {
+            background: #fffdf5;
+            border-color: #dccfb6;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        body.sepia-mode .card-header h3 { color: #433422; }
+        body.sepia-mode .group-info .time { color: #5d4037; }
+        body.sepia-mode .group-info .name { color: #7c6f5c; }
+        body.sepia-mode .group-item { background: #efe3d0; }
+
         .schedule-card:hover {
             border-color: var(--accent-color);
             transform: translateY(-5px);
@@ -178,6 +194,7 @@
             <li><a href="index.html">الرئيسية</a></li>
             <li><a href="library.html">الكتب</a></li>
             <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="schedule.html" class="active">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li>
             <li><a href="lab.html">المعرض</a></li>
@@ -278,57 +295,7 @@
         </div>
     </footer>
 
-    <script>
-        const menuBtn = document.querySelector('.menu-btn');
-        const navLinks = document.querySelector('.nav-links');
-        menuBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-        });
-
-        // كود تثبيت التطبيق PWA
-        let deferredPrompt;
-        const installBtn = document.getElementById('installAppBtn');
-
-        // إظهار الزر إذا لم يكن التطبيق مثبتاً
-        if (!window.matchMedia('(display-mode: standalone)').matches) {
-            installBtn.style.display = 'flex';
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'flex';
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') installBtn.style.display = 'none';
-                deferredPrompt = null;
-            } else {
-                alert('لتثبيت التطبيق، يرجى استخدام خيار "الإضافة إلى الشاشة الرئيسية" من إعدادات المتصفح.');
-            }
-        });
-
-        // كود الوضع الليلي/النهاري
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
-
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
-        }
-
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        });
-    </script>
+    <script src="main.js"></script>
 
     <!-- نظام الإشعارات الذكي -->
     <div id="fire-notification" class="fire-toast">

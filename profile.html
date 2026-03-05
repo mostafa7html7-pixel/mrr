@@ -26,6 +26,7 @@
             <li><a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a></li>
             <li><a href="library.html">الكتب</a></li>
             <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li>
             <li><a href="lab.html">المعرض</a></li>
@@ -167,7 +168,11 @@
             }
         }
 
-        window.logout = () => signOut(auth);
+        window.logout = () => {
+            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+                signOut(auth);
+            }
+        };
 
         // Menu Toggle
         const menuBtn = document.querySelector('.menu-btn');
@@ -195,20 +200,6 @@
             } else { alert('لتثبيت التطبيق، يرجى استخدام خيار "الإضافة إلى الشاشة الرئيسية" من إعدادات المتصفح.'); }
         });
         
-        // Theme Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        const icon = themeToggle.querySelector('i');
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-mode');
-            icon.classList.replace('fa-moon', 'fa-sun');
-        }
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('light-mode');
-            const isLight = body.classList.contains('light-mode');
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-            icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        });
     </script>
 </body>
 </html>

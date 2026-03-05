@@ -25,6 +25,23 @@ body.light-mode {
     --border-color: #cccccc;
 }
 
+/* إعدادات وضع القراءة المريح (Sepia Mode) */
+body.sepia-mode {
+    --bg-color: #f5e6d3;
+    --card-bg: #fffdf5;
+    --text-white: #433422;
+    --text-gray: #7c6f5c;
+    --border-color: #dccfb6;
+    --neon-green: #2e8b57; /* أخضر داكن مريح */
+    --neon-red: #c0392b;
+    --neon-gold: #d35400;
+}
+body.sepia-mode .navbar { background-color: rgba(245, 230, 211, 0.95); border-bottom: 1px solid #dccfb6; }
+body.sepia-mode .admin-sidebar { background-color: #efe3d0; border-left: 1px solid #dccfb6; }
+body.sepia-mode .admin-content { background: #f5e6d3; }
+body.sepia-mode .question-item { background: #fffdf5; border-color: #dccfb6; }
+body.sepia-mode .q-textarea { background: #fffdf5; color: #433422; border-color: #dccfb6; }
+
 @keyframes kenburns-blur {
     0% {
         background-size: 110% 110%;

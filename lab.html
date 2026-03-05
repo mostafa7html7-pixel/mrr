@@ -43,6 +43,16 @@
             background: radial-gradient(circle at top center, #fff5f5, #e0e0e0);
         }
 
+        /* إعدادات وضع القراءة المريح (Sepia Mode) */
+        body.sepia-mode {
+            --bg-color: #f5e6d3;
+            --card-bg: rgba(255, 253, 245, 0.8);
+            --text-color: #433422;
+            --text-gray: #7c6f5c;
+            --text-white: #433422;
+            background: radial-gradient(circle at top center, #fffdf5, #efe3d0);
+        }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
@@ -194,6 +204,7 @@
         <ul class="nav-links">
             <li><a href="index.html">الرئيسية</a></li>
             <li><a href="library.html">الكتب</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="videos.html">الفيديوهات</a></li>
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li>
@@ -309,9 +320,14 @@
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        window.logout = () => signOut(auth).then(() => window.location.href = 'auth.html');
+        window.logout = () => {
+            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+                signOut(auth).then(() => window.location.href = 'auth.html');
+            }
+        };
     </script>
 
+    <script src="main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- التحميل الكسول الحقيقي للمجسمات لتحسين الأداء ---
@@ -359,31 +375,6 @@
                         modelViewer.webkitRequestFullscreen();
                     }
                 });
-            });
-
-            // --- Navbar Menu Logic ---
-            const menuBtn = document.querySelector('.menu-btn');
-            const navLinks = document.querySelector('.nav-links');
-            menuBtn.addEventListener('click', () => {
-                navLinks.classList.toggle('active');
-                menuBtn.innerHTML = navLinks.classList.contains('active') ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
-            });
-
-            // --- زر تغيير الإضاءة (Light/Dark Mode) ---
-            const themeToggle = document.getElementById('themeToggle');
-            const icon = themeToggle.querySelector('i');
-            
-            // Check saved theme
-            if (localStorage.getItem('theme') === 'light') {
-                document.body.classList.add('light-mode');
-                icon.classList.replace('fa-moon', 'fa-sun');
-            }
-
-            themeToggle.addEventListener('click', (e) => {
-                document.body.classList.toggle('light-mode');
-                const isLight = document.body.classList.contains('light-mode');
-                localStorage.setItem('theme', isLight ? 'light' : 'dark');
-                icon.className = isLight ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
             });
         });
     </script>
