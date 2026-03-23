@@ -81,11 +81,11 @@ a:focus, button:focus, input:focus, textarea:focus {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 5%;
-    background-color: rgba(10, 10, 15, 0.75);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+    padding: 12px 5%; /* زيادة بسيطة في الحشو للثبات */
+    background-color: rgba(5, 5, 8, 0.95); /* خلفية داكنة وأقوى */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* حد سفلي أدق وأرقى */
     position: sticky;
     top: 0;
     z-index: 1000;
