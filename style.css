@@ -293,37 +293,57 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
     gap: 15px;
     max-height: 350px; /* ارتفاع ثابت */
     overflow-y: auto; /* تفعيل السكرول */
-    background: rgba(10, 12, 16, 0.7); /* خلفية زجاجية أكثر احترافية */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 25px; /* حواف دائرية بالكامل */
+    
+    /* --- تصميم احترافي جديد للحاوية --- */
+    background: linear-gradient(180deg, rgba(16, 20, 28, 0.95) 0%, rgba(5, 5, 8, 0.98) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 2px solid var(--neon-green); /* خط علوي مضيء */
+    border-radius: 16px; /* حواف ناعمة ودقيقة */
     padding: 20px;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 20px 50px rgba(0,0,0,0.6), 
+        0 -1px 15px rgba(0, 255, 65, 0.15); /* توهج علوي خفيف */
 }
 
 /* Custom Scrollbar for News Strip */
 .latest-news-strip::-webkit-scrollbar { width: 6px; }
-.latest-news-strip::-webkit-scrollbar-thumb { background: var(--neon-green); border-radius: 20px; }
-.latest-news-strip::-webkit-scrollbar-track { background: transparent; margin: 15px 0; /* مسافة للأعلى والأسفل لعدم ملامسة الحواف الدائرية */ }
+.latest-news-strip::-webkit-scrollbar-thumb { background: #333; border-radius: 20px; }
+.latest-news-strip::-webkit-scrollbar-thumb:hover { background: var(--neon-green); }
+.latest-news-strip::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); margin: 5px 0; }
 
 .news-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 12px;
+    /* --- تصميم البطاقة لتكون كسطر بيانات --- */
+    background: linear-gradient(90deg, rgba(255,255,255,0.01) 0%, transparent 100%);
+    border: none;
+    border-right: 3px solid rgba(255, 255, 255, 0.1); /* مؤشر جانبي */
+    border-radius: 4px;
+    padding: 15px;
     flex-shrink: 0;
     display: flex;
     gap: 12px;
     align-items: flex-start;
-    transition: 0.3s;
+    transition: all 0.3s ease;
+    margin-bottom: 5px;
 }
-.news-card:hover { background: rgba(255, 255, 255, 0.06); border-color: var(--neon-green); }
+
+.news-card:hover { 
+    background: linear-gradient(90deg, rgba(0, 255, 65, 0.05) 0%, transparent 100%);
+    border-right-color: var(--neon-green);
+    transform: translateX(-5px); /* حركة انزلاق بسيطة لليسار */
+}
 
 .news-card-icon {
     font-size: 1.3rem;
-    color: var(--neon-green);
+    color: #444; /* لون محايد في الوضع العادي */
     margin-top: 3px;
     flex-shrink: 0;
+    transition: 0.3s;
+}
+
+.news-card:hover .news-card-icon {
+    color: var(--neon-green);
+    transform: scale(1.1);
 }
 
 .news-card-content {
@@ -332,39 +352,47 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 }
 
 .news-text-wrapper {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 12px;
-    border-radius: 15px;
-    border-left: 3px solid rgba(0, 255, 65, 0.4);
-    margin-bottom: 12px;
+    /* إزالة الخلفيات المزدحمة للنص لجعله أنظف */
+    background: transparent;
+    padding: 0;
+    border: none;
+    margin-bottom: 8px;
 }
 
 .news-card-content p {
     margin: 0 0 8px 0;
     margin: 0;
-    font-size: 0.9rem;
-    color: #e0e0e0;
+    font-size: 0.95rem;
+    color: #ccc;
     line-height: 1.6;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;  
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 43px; /* Approx 2 lines height */
+    min-height: auto;
+    transition: 0.3s;
+}
+
+.news-card:hover .news-card-content p {
+    color: #fff;
 }
 
 .news-card-content small {
-    font-size: 0.7rem;
-    color: #777;
+    font-size: 0.75rem;
+    color: #666;
+    display: block;
+    margin-top: 5px;
+    font-family: monospace; /* خط رقمي */
 }
 
 .news-card-media {
-    margin-top: 12px;
+    margin-top: 10px;
     border-radius: 10px;
     overflow: hidden;
-    background-color: rgba(0, 0, 0, 0.2); /* الحاوية الداخلية للصورة */
+    background-color: rgba(0, 0, 0, 0.3); /* الحاوية الداخلية للصورة */
     border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 2px; /* مسافة صغيرة بين الصورة والحدود */
+    padding: 0; /* إزالة الحشو الزائد */
 }
 
 .news-card-media img,
@@ -761,83 +789,102 @@ footer {
     justify-content: center;
     align-items: center;
     position: relative;
-    /* Ensure column layout for image + news strip */
     flex-direction: column;
     gap: 0;
     z-index: 1;
+    
+    /* --- New Container Styles --- */
+    padding: 3px; /* سمك الشعاع الدوار */
+    border-radius: 30px; /* حواف ناعمة بدلاً من الشكل العشوائي للحفاظ على الصورة */
+    transition: all 0.5s ease;
+    overflow: hidden; /* لإخفاء أجزاء الشعاع الدوار */
+    background: rgba(255, 255, 255, 0.02); /* خلفية خفيفة جداً */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
+.hero-image:hover {
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+    transform: translateY(-5px);
+}
+
+/* الشعاع الدوار (الذيل المضيء القصير) */
 .hero-image::before {
     content: '';
     position: absolute;
     top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 140%; height: 140%;
-    background: radial-gradient(circle, rgba(0, 255, 65, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
-    filter: blur(40px);
-    z-index: -1;
-    opacity: 0.6; /* إزالة الأنيميشن الثقيل واستبداله بشفافية ثابتة للسرعة */
+    width: 150%; /* أكبر من الحاوية ليدور حولها */
+    height: 150%;
+    background: conic-gradient(
+        transparent 270deg, /* جزء شفاف كبير لجعل الشعاع قصيراً */
+        transparent 290deg,
+        var(--neon-green) 340deg, /* ذيل الشعاع */
+        #fff 360deg /* رأس الشعاع المضيء */
+    );
+    animation: rotate-glow 4s linear infinite;
+    z-index: -2; /* خلف كل شيء */
+    transform: translate(-50%, -50%); /* التوسيط */
 }
 
+/* الطبقة الداخلية السوداء لإظهار الحواف فقط */
 .hero-image::after {
     content: '';
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%; height: 100%;
-    background: radial-gradient(circle, rgba(0, 210, 255, 0.1) 0%, transparent 60%);
-    filter: blur(30px);
+    inset: 3px; /* يجب أن تطابق الـ padding للأب لترك مسافة للشعاع */
+    background: var(--bg-color); /* لون مطابق لخلفية الموقع */
+    border-radius: 28px; /* أقل قليلاً من الأب */
     z-index: -1;
-    opacity: 0.5;
+    display: block; /* التأكد من ظهوره */
 }
 
 .doctor-img {
     max-width: 100%;
     height: auto;
-    max-height: 100%; /* Fill the container's height */
-    object-fit: contain; /* Changed to contain to avoid cropping */
+    max-height: 80vh; /* زيادة الارتفاع قليلاً */
+    object-fit: contain;
     
-    /* Removing all card-like styles as they are now on the parent .hero-image */
-    background: none;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
-    backdrop-filter: none;
-    animation: none;
-    will-change: auto;
-    transition: none;
-}
-.hero-image:hover { 
-    transform: translateY(-5px) scale(1.01); 
-    border-color: rgba(0, 255, 65, 0.3); 
-    box-shadow: 0 0 80px rgba(0, 255, 65, 0.2), 0 0 150px rgba(0,0,0,0.9); 
+    /* تأثيرات بسيطة للصورة */
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+    
+    /* إزالة التلاشي السفلي لأن الحاوية تقوم بالمهمة */
+    -webkit-mask-image: none;
+    mask-image: none;
+    
+    transition: transform 0.4s ease, filter 0.4s ease;
+    z-index: 2; /* فوق طبقة الحافة */
+    border-radius: 28px; /* ليتخذ شكل الحاوية الداخلية */
 }
 
-@keyframes floatDoctor {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+/* تم إزالة أنيميشن الطفو للصورة نفسها لثبات أفضل داخل الإطار، الحاوية هي التي ستطفو إذا أردنا */
+
+@keyframes pulse-glow {
+    from { opacity: 0.5; transform: translate(-50%, -50%) scale(0.9); }
+    to { opacity: 0.9; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes rotate-glow {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 @media (max-width: 768px) {
     .hero-content {
         flex-direction: column-reverse;
         text-align: center;
-        margin-top: 0;
+        margin-top: 20px;
         width: 100%;
     }
 
     .hero-text {
         align-items: center;
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
     }
     
     .doctor-img {
-        max-height: 55vh; /* تكبير الصورة في الموبايل أيضاً */
-        margin-bottom: 20px;
-        border-radius: 20px;
-        padding: 10px;
+        max-height: 60vh;
+        margin-bottom: 10px;
+        padding: 0;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 65, 0.2));
     }
 }
 
