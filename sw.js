@@ -1,4 +1,5 @@
-const CACHE_NAME = 'abqarieno-v2
+const CACHE_NAME = 'abqarieno-v29';
+const ASSETS = [
     './',
     './index.html',
     './offline.html',
