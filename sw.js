@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v25'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
+const CACHE_NAME = 'abqarieno-v26'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
 const ASSETS = [
     './',
     './index.html',
@@ -11,14 +11,20 @@ const ASSETS = [
     './subscription.html',
     './auth.html',
     './schedule.html',
+    './quizzes.html', // إضافة صفحة الاختبارات الرئيسية
     './reviews.html',
     './contact.html',
+    './admin.html', // إضافة صفحة الأدمن الرئيسية
     './admin-quizzes.html', // إضافة صفحة إدارة الاختبارات
     './admin-scores.html', // إضافة صفحة نتائج الطلاب
     './admin-payments.html', // إضافة صفحة طلبات الدفع
     './quiz-player.html', // إضافة صفحة الاختبار
     './style.css',
     './main.js',
+    './12.jpg', // صورة كتاب
+    './13.jpg', // صورة كتاب
+    './14.png', // صورة كتاب
+    './232.png', // صورة كتاب
     './6.jpeg',
     './212.png'
 ];
@@ -36,7 +42,7 @@ self.addEventListener('activate', (e) => {
     e.waitUntil(
         caches.keys().then((keyList) => {
             return Promise.all(keyList.map((key) => {
-            if (key !== CACHE_NAME) {
+            if (key !== CACHE_NAME) { 
                     return caches.delete(key);
                 }
             }));
