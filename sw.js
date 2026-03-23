@@ -1,5 +1,4 @@
-const CACHE_NAME = 'abqarieno-v27'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
-const ASSETS = [
+const CACHE_NAME = 'abqarieno-v2
     './',
     './index.html',
     './offline.html',

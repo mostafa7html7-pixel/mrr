@@ -94,32 +94,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('.scroll-animate');
     animatedElements.forEach((el) => observer.observe(el));
 
-    // 5. Page Transitions Logic (Smooth Navigation)
-    // التعامل مع زر الرجوع (Back Button) لإزالة تأثير الاختفاء
-    window.addEventListener('pageshow', (event) => {
-        if (event.persisted) {
-            document.body.classList.remove('page-exit');
-        }
-    });
-
-    // اعتراض الروابط
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', e => {
-            const href = link.getAttribute('href');
-            const target = link.getAttribute('target');
-
-            // التأكد من أن الرابط داخلي وليس رابط خارجي أو تنزيل
-            if (href && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:') && !href.startsWith('javascript:') && target !== '_blank') {
-                e.preventDefault(); // منع الانتقال الفوري
-                
-                // تفعيل أنيميشن الخروج
-                document.body.classList.add('page-exit');
-
-                // الانتظار حتى ينتهي الأنيميشن ثم الانتقال
-                setTimeout(() => {
-                    window.location.href = href;
-                }, 400); // 400ms = 0.4s (نفس وقت الـ CSS)
-            }
-        });
-    });
 });
