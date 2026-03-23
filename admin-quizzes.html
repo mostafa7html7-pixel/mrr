@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة الاختبارات - لوحة التحكم</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         /* Reusing admin styles from style.css */
@@ -15,7 +15,7 @@
             --admin-surface-light: #161b22;
             --admin-border: #222;
             --admin-text-primary: #e0e0e0;
-            --admin-text-secondary: #888;
+            --admin-text-secondary: #888; 
         }
 
         body.light-mode {
@@ -336,6 +336,10 @@
         }
 
         /* Image Preview Styles */
+        .q-img-preview {
+            max-width: 100%; max-height: 200px; border-radius: 8px; 
+            border: 1px solid var(--admin-border); margin-top: 10px;
+        }
         .img-preview-box {
             display: none;
             align-items: center;
@@ -373,11 +377,20 @@
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
             <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
         </div>
     </nav>
 
-    <div class="admin-container">
+    <!-- Loading Screen for Auth Check -->
+    <div id="authLoader" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:10000; display:flex; justify-content:center; align-items:center;">
+        <div style="text-align:center;">
+            <i class="fa-solid fa-shield-cat fa-bounce" style="font-size:3rem; color:var(--neon-green); margin-bottom:20px;"></i>
+            <h3 style="color:#fff;">جاري التحقق من الصلاحيات...</h3>
+        </div>
+    </div>
+
+    <div class="admin-container" id="adminContainer" style="display:none;">
         <!-- Main Content -->
         <main class="admin-content">
             <div class="panel-section">
@@ -432,7 +445,9 @@
                 <!-- Form Panel (Right) -->
                 <div class="q-form-panel">
                     <div class="question-form-container" style="padding: 20px; flex: 1; overflow-y: auto;">
-                <h3 style="margin-bottom: 15px; color:var(--admin-text-primary);" id="questionFormTitle"><i class="fa-solid fa-circle-plus"></i> إضافة سؤال جديد</h3>
+                <h3 style="margin-bottom: 15px; color:var(--admin-text-primary);" id="questionFormTitle">
+                    <i class="fa-solid fa-circle-plus"></i> إضافة سؤال جديد
+                </h3>
                 <input type="hidden" id="editingQuestionId">
                 
                 <!-- Image Section (Compact) -->
@@ -523,16 +538,32 @@
     <script src="main.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, push, remove, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
-        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, push, remove, update, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
+        const storage = getStorage(app);
 
-        const CLOUD_NAME = "dzwrz9qzb";
-        const UPLOAD_PRESET = "my_chat_preset";
+        // Auth Check (Security)
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Check if admin
+                const snap = await get(ref(db, `users/${user.uid}`));
+                if (snap.exists() && snap.val().role === 'admin') {
+                    document.getElementById('authLoader').style.display = 'none';
+                    document.getElementById('adminContainer').style.display = 'block';
+                } else {
+                    alert("غير مصرح لك بالدخول!");
+                    window.location.href = "index.html";
+                }
+            } else {
+                window.location.href = "auth.html";
+            }
+        });
 
         window.logout = () => {
             if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
@@ -836,21 +867,29 @@
             }
 
             let imageURL = null;
+            let storagePath = null;
+
             // Keep existing image if editing and not removed
             if (qId && questionsData[qId] && questionsData[qId].imageURL && document.getElementById('imagePreviewContainer').style.display !== 'none') {
                 imageURL = questionsData[qId].imageURL;
+                storagePath = questionsData[qId].storagePath || null;
             }
 
             // Upload new image if selected
             const fileInput = document.getElementById('questionImageInput');
             if (fileInput.files[0]) {
-                const formData = new FormData();
-                formData.append('file', fileInput.files[0]);
-                formData.append('upload_preset', UPLOAD_PRESET);
+                // Delete old image if exists during edit
+                if (qId && questionsData[qId] && questionsData[qId].storagePath) {
+                    try { await deleteObject(storageRef(storage, questionsData[qId].storagePath)); } catch(e) { console.warn("Failed to delete old image", e); }
+                }
+
                 try {
-                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
-                    const data = await res.json();
-                    imageURL = data.secure_url;
+                    const file = fileInput.files[0];
+                    const path = `quiz_images/${currentEditingQuizId}/${Date.now()}_${file.name}`;
+                    const imgRef = storageRef(storage, path);
+                    await uploadBytes(imgRef, file);
+                    imageURL = await getDownloadURL(imgRef);
+                    storagePath = path;
                 } catch (e) {
                     console.error(e);
                     alert('فشل رفع الصورة، يرجى المحاولة مرة أخرى.');
@@ -860,9 +899,13 @@
                 }
             } else if (document.getElementById('imagePreviewContainer').style.display === 'none') {
                 imageURL = null; // Image was removed manually
+                // Delete old image from storage if removed
+                if (qId && questionsData[qId] && questionsData[qId].storagePath) {
+                    try { await deleteObject(storageRef(storage, questionsData[qId].storagePath)); } catch(e) { console.warn("Failed to delete removed image", e); }
+                }
             }
 
-            const questionData = { text, options, correctAnswer: parseInt(correctAnswer), imageURL: imageURL };
+            const questionData = { text, options, correctAnswer: parseInt(correctAnswer), imageURL, storagePath };
             const promise = qId 
                 ? update(ref(db, `quizzes/${currentEditingQuizId}/questions/${qId}`), questionData)
                 : push(ref(db, `quizzes/${currentEditingQuizId}/questions`), {
@@ -899,8 +942,13 @@
             push(ref(db, `quizzes/${currentEditingQuizId}/questions`), newQ);
         };
 
-        window.deleteQuestion = (qId) => {
+        window.deleteQuestion = async (qId) => {
             if (confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
+                const q = questionsData[qId];
+                // Storage Cleanup: Delete image if exists
+                if (q.storagePath) {
+                    try { await deleteObject(storageRef(storage, q.storagePath)); } catch(e) { console.error("Error deleting image", e); }
+                }
                 remove(ref(db, `quizzes/${currentEditingQuizId}/questions/${qId}`));
             }
         };
@@ -974,7 +1022,7 @@
                         .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
                         .header h1 { margin: 0 0 10px 0; font-size: 22px; }
                         .header p { margin: 0; font-size: 14px; color: #333; }
-                        .q-item { margin-bottom: 25px; page-break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
+                        .q-item { margin-bottom: 25px; page-break-inside: avoid; break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
                         .q-text { font-weight: bold; font-size: 16px; margin-bottom: 12px; }
                         .q-img { max-width: 100%; max-height: 250px; display: block; margin: 10px auto; border: 1px solid #eee; border-radius: 5px; }
                         .options { list-style-type: none; padding-right: 0; margin: 0; }
@@ -1013,13 +1061,19 @@
                 i++;
             });
 
+            // إغلاق علامات الـ html النصية وإضافة مفتاح الإجابة
             html += keyHtml + `</div></body></html>`;
             
             printWindow.document.write(html);
             printWindow.document.close();
             printWindow.focus();
-            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-        };
+
+            // الانتظار للتحميل ثم الطباعة
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        }; // إغلاق دالة printQuiz (هذا القوس كان مفقوداً)
     </script>
 </body>
 </html>
