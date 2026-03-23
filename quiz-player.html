@@ -26,7 +26,7 @@
             border-radius: 20px; padding: 30px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
             overflow-wrap: break-word; /* منع خروج النص */
-        }
+        } 
         
         .quiz-loader { text-align: center; padding: 50px; color: var(--text-gray); }
         .quiz-loader i { font-size: 3rem; color: var(--quiz-accent); animation: fa-spin 2s infinite linear; }
@@ -201,6 +201,21 @@
         <div class="logo">
             <i class="fa-solid fa-heart-pulse"></i>
             <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="library.html">الكتب</a></li>
+            <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
+            <li><a href="schedule.html">الجدول</a></li>
+            <li><a href="reviews.html">ورق الشرح</a></li>
+            <li><a href="lab.html">المعرض</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
         </div>
     </nav>
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v26'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
+const CACHE_NAME = 'abqarieno-v27'; // تحديث الإصدار لإجبار المتصفح على تحميل الملفات الجديدة
 const ASSETS = [
     './',
     './index.html',
@@ -10,6 +10,8 @@ const ASSETS = [
     './lab.html',
     './subscription.html',
     './auth.html',
+    './complete-profile.html', // إضافة صفحة إكمال البيانات
+    './scientific-books.html', // إضافة صفحة الكتب العلمية
     './schedule.html',
     './quizzes.html', // إضافة صفحة الاختبارات الرئيسية
     './reviews.html',
