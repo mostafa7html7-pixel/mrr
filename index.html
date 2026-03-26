@@ -23,8 +23,8 @@
         @media (max-width: 768px) {
             .hero {
                 height: auto;
-                min-height: 100vh;
-                padding: 120px 20px 60px;
+                min-height: 100vh; 
+                padding: 55px 20px 60px;
             }
             .hero h1 {
                 font-size: 2.5rem !important;
@@ -112,7 +112,11 @@
         </div>
 
         <div class="hero-content">
-            <div class="hero-text scroll-animate" style="transition-delay: 0.2s;">
+            <div class="hero-image scroll-animate" style="transition-delay: 0.2s;">
+                <img src="212.png" alt="دكتور عبدالله" class="doctor-img" fetchpriority="high">
+            </div>
+
+            <div class="hero-text scroll-animate" style="transition-delay: 0.5s;">
                 <p class="subtitle">BIOLOGY LAB</p>
                 <h1>عالم الأحياء <br> <span class="neon-green-text">بمنظور مختلف</span></h1>
                 <p class="hero-desc">استعد لرحلة فريدة في أعماق الخلية والتشريح مع دكتور عبدالله . تعليمنا ليس مجرد حفظ، بل هو تجربة بصرية وعلمية تفوق الخيال.</p>
@@ -120,14 +124,6 @@
                     <a href="schedule.html" class="btn-green">الجدول</a>
                     <a href="reviews.html" class="btn-outline">ورق الشرح</a>
                 </div>
-                <!-- Latest News Strip (Moved Here) -->
-                <div id="latest-news-strip" class="latest-news-strip">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-            
-            <div class="hero-image scroll-animate" style="transition-delay: 0.5s;">
-                <img src="212.png" alt="دكتور عبدالله" class="doctor-img" fetchpriority="high">
             </div>
         </div>
     </section>
@@ -173,21 +169,13 @@
         <span>الأخبار</span>
     </div>
 
-    <!-- عارض الصور الاحترافي (Lightbox) -->
-    <div id="lightbox-overlay" class="lightbox-overlay">
-        <span class="close-lightbox">&times;</span>
-        <div class="lightbox-content" id="lightbox-content">
-            <!-- سيتم حقن المحتوى هنا (صورة أو فيديو) -->
-        </div>
-    </div>
-
-    <!-- نظام الإشعارات الناري (للمستخدم المتصل) -->
+    <!-- نظام الإشعارات الناري -->
     <div id="fire-notification" class="fire-toast">
         <i class="fa-solid fa-fire-flame-curved"></i>
         <img id="fire-msg-img" src="" alt="مرفق">
         <div>
             <h4>تنبيه عاجل من الدكتور</h4>
-            <small id="fire-msg-text">رسالة جديدة...</small>
+            <small id="fire-msg-text">رسالة جديدة وصلت الآن...</small>
         </div>
     </div>
 
@@ -198,316 +186,141 @@
                 <h3><i class="fa-solid fa-bullhorn"></i> آخر تعليمات الدكتور</h3>
                 <i class="fa-solid fa-xmark close-news" onclick="closeNewsModal()"></i>
             </div>
-            <div class="news-list" id="newsList">
-                <p style="text-align:center; color:#666; padding:20px;">جاري تحميل الأخبار...</p>
-            </div>
+            <div class="news-list" id="newsList"></div>
             <button onclick="markAsRead()" class="btn-mark-read"><i class="fa-solid fa-check"></i> تم القراءة بنجاح</button>
-            <button onclick="location.href='contact.html'" style="margin-top:15px; width:100%; padding:10px; background:var(--neon-green); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">الذهاب لغرفة الشات الكاملة</button>
         </div>
+    </div>
+
+    <!-- عارض الصور الاحترافي (Lightbox) - مفقود وتمت إعادته -->
+    <div id="lightbox-overlay" class="lightbox-overlay">
+        <span class="close-lightbox">&times;</span>
+        <div class="lightbox-content" id="lightbox-content"></div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getDatabase, ref, query, limitToLast, onValue, onChildAdded, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, query, limitToLast, onValue, get, onChildAdded } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
-        const newsListEl = document.getElementById('newsList');
-        const badgeEl = document.getElementById('newsBadge');
-        const floatBtn = document.querySelector('.news-float-btn');
-        const fireToast = document.getElementById('fire-notification');
-        const fireText = document.getElementById('fire-msg-text');
-        const fireImg = document.getElementById('fire-msg-img');
-        
-        // --- New Logic for Hero News Strip ---
-        const newsStripContainer = document.getElementById('latest-news-strip');
-        if (newsStripContainer) {
-            onValue(query(ref(db, 'broadcasts'), limitToLast(20)), (snapshot) => {
-                if (!snapshot.exists()) {
-                    newsStripContainer.style.display = 'none';
-                    newsStripContainer.innerHTML = '';
-                    return;
-                }
-                
-                newsStripContainer.style.display = 'flex';
-
-                const messages = [];
-                snapshot.forEach(childSnapshot => {
-                    messages.push(childSnapshot.val());
-                });
-
-                // Reverse to show latest first
-                messages.reverse();
-
-                newsStripContainer.innerHTML = ''; // Clear
-
-                messages.forEach(msg => {
-                    const date = new Date(msg.timestamp).toLocaleDateString('ar-EG');
-
-                    let mediaHtml = '';
-                    if (msg.mediaURL) {
-                        const downloadText = msg.fileName || 'تحميل';
-                        const downloadAttr = msg.fileName || '';
-                        const downloadBtnHtml = `<a href="${msg.mediaURL}" target="_blank" download="${downloadAttr}" class="mini-download-btn"><i class="fa-solid fa-download"></i><span>${downloadText}</span></a>`;
-
-                        if (msg.mediaType === 'image') {
-                            mediaHtml = `<div class="news-card-media">
-                                            <img src="${msg.mediaURL}" alt="مرفق" loading="lazy" onclick="openLightbox('${msg.mediaURL}', 'image')">
-                                            ${downloadBtnHtml}
-                                         </div>`;
-                        } else if (msg.mediaType === 'video') {
-                            mediaHtml = `<div class="news-card-media">
-                                            <video src="${msg.mediaURL}" controls preload="metadata"></video>
-                                            ${downloadBtnHtml}
-                                         </div>`;
-                        }
-                    }
-
-                    let textHtml = '';
-                    if (msg.text && msg.text.trim() !== '') {
-                        textHtml = `<div class="news-text-wrapper"><p>${msg.text}</p></div>`;
-                    }
-
-                    const cardHtml = `
-                        <div class="news-card scroll-animate">
-                            <i class="fa-solid fa-bullhorn news-card-icon"></i>
-                            <div class="news-card-content">
-                                ${textHtml}
-                                ${mediaHtml}
-                                <small>${date}</small>
-                            </div>
-                        </div>
-                    `;
-                    newsStripContainer.innerHTML += cardHtml;
-                });
-
-                // Trigger scroll animations for the newly added cards
-                const newAnimatedElements = newsStripContainer.querySelectorAll('.scroll-animate');
-                newAnimatedElements.forEach((el) => observer.observe(el));
-            });
-        }
-
         const auth = getAuth(app);
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // User is logged in, check if profile is complete
-                get(ref(db, 'users/' + user.uid)).then((snapshot) => {
-                    const userData = snapshot.val();
-                    
-                    if (userData && userData.banned) {
-                        alert("تم حظر حسابك من قبل الإدارة بسبب مخالفة السياسات.");
-                        signOut(auth).then(() => window.location.href = 'auth.html');
-                        return;
-                    }
 
-                    // Check for a specific field that is only in the complete profile, like 'username'
-                    if (!userData || !userData.username) { 
-                        window.location.href = 'complete-profile.html';
-                    }
-                    // else, user can stay on index.html
-                });
-            } else {
-                // User is not logged in, redirect to auth page
-                window.location.href = 'auth.html';
-            }
-        });
-
-        window.logout = () => {
-            if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-                signOut(auth).then(() => window.location.href = 'auth.html');
-            }
-        };
-
-        const lastSeenTime = localStorage.getItem('biology_last_seen_news') || 0;
-        const loadTime = Date.now(); // وقت فتح الموقع
-        let latestMsgTimeInModal = 0; // لتحديث وقت القراءة عند الضغط على الزر
-
-        // The scroll observer from main.js might run before Firebase gets the data.
-        // We need an observer here too for the dynamically added cards.
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-
-        // --- 1. التحقق من وجود رسائل فائتة (مرة واحدة عند التحميل) ---
-        // هذا هو المنطق المسؤول عن إظهار زر الأخبار عند فتح الموقع
-        get(query(ref(db, 'broadcasts'), limitToLast(20))).then((snapshot) => {
-            if (!snapshot.exists()) return;
-
-            const msgs = Object.values(snapshot.val());
-            // هل هناك أي رسالة أحدث من آخر مرة شاهد فيها المستخدم الأخبار؟
-            const hasMissedMessages = msgs.some(msg => msg.timestamp > lastSeenTime);
-
-            if (hasMissedMessages) {
-                floatBtn.style.display = 'flex';
-                badgeEl.classList.add('active');
-                floatBtn.classList.add('glowing');
-            }
-        });
-
-        // --- 2. مراقب الرسائل الفورية (للرسائل التي تصل والمستخدم فاتح الموقع) ---
-        onChildAdded(query(ref(db, 'broadcasts'), limitToLast(1)), (snapshot) => {
-            const msg = snapshot.val();
-            // إذا كانت الرسالة وصلت بعد فتح الموقع (رسالة جديدة واليوزر فاتح)
-            if (msg.timestamp > loadTime) {
-                fireText.textContent = msg.text; // عرض نص الرسالة
-                
-                // عرض الصورة المصغرة إذا وجدت
-                if (msg.mediaURL && msg.mediaType === 'image') {
-                    fireImg.src = msg.mediaURL;
-                    fireImg.classList.add('show');
-                } else {
-                    fireImg.classList.remove('show');
-                }
-
-                fireToast.classList.add('show');
-                
-                // تحديث حالة القراءة فوراً لأن المستخدم شاهد التنبيه
-                localStorage.setItem('biology_last_seen_news', msg.timestamp);
-                
-                // تشغيل صوت تنبيه خفيف (اختياري)
-                // const audio = new Audio('notification.mp3'); audio.play().catch(()=>{});
-
-                setTimeout(() => {
-                    fireToast.classList.remove('show');
-                }, 8000); // يختفي بعد 8 ثواني
-            }
-        });
-
-        // عند الضغط على الإشعار: تسجيل الدخول كطالب والذهاب للشات
-        fireToast.onclick = () => {
-            localStorage.setItem('biology_user_role', 'student');
-            // التأكد من تحديث وقت القراءة عند الضغط
-            const now = Date.now();
-            const current = parseInt(localStorage.getItem('biology_last_seen_news') || '0');
-            if(now > current) localStorage.setItem('biology_last_seen_news', now);
-            window.location.href = 'contact.html';
-        };
-
-        // --- 3. مراقب قائمة الأخبار (لتعبئة النافذة المنبثقة عند فتحها) ---
-        onValue(query(ref(db, 'broadcasts'), limitToLast(20)), (snapshot) => {
-            const data = snapshot.val();
-            if (!data) {
-                newsListEl.innerHTML = '<p style="text-align:center; color:#666;">لا توجد أخبار حالياً</p>';
-                return;
-            }
-
-            // تحويل البيانات لمصفوفة وترتيبها من الأحدث للأقدم
-            const msgs = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
-            
-            // تحديث القائمة
-            newsListEl.innerHTML = '';
-            let hasNew = false;
-            let currentBatchMaxTime = 0;
-
-            // نستخدم lastSeenTime الذي قرأناه في بداية تحميل الصفحة
-
-            msgs.forEach(msg => {
-                // لا نعرض الرسائل التي وصلت للتو (لأنها تظهر في التنبيه الناري)
-                if (msg.timestamp > loadTime) return; 
-
-                const isNew = msg.timestamp > lastSeenTime;
-                if (isNew) hasNew = true;
-                if (msg.timestamp > currentBatchMaxTime) currentBatchMaxTime = msg.timestamp;
-
-                const dateStr = new Date(msg.timestamp).toLocaleDateString('ar-EG') + ' ' + new Date(msg.timestamp).toLocaleTimeString('ar-EG');
-                let mediaHtml = '';
-                if (msg.mediaURL) {
-                    if (msg.mediaType === 'image') {
-                        mediaHtml = `<img src="${msg.mediaURL}" onclick="openLightbox('${msg.mediaURL}', 'image')" style="width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; margin-top: 8px; border: 1px solid #333; display:block; cursor: pointer; transition: 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" alt="مرفق - اضغط للتكبير">`;
-                    } else if (msg.mediaType === 'video') {
-                        mediaHtml = `<video src="${msg.mediaURL}" class="msg-video" controls preload="metadata"></video>`;
-                    } else if (msg.mediaType === 'audio') {
-                        mediaHtml = `<audio src="${msg.mediaURL}" controls class="msg-audio"></audio>`;
-                    } else {
-                        mediaHtml = `<a href="${msg.mediaURL}" target="_blank" class="news-link"><i class="fa-solid fa-paperclip"></i> تحميل المرفق</a>`;
-                    }
-                }
-
-                const html = `
-                    <div class="news-item ${isNew ? 'new' : ''}">
-                        <span class="news-date">${dateStr} ${isNew ? '<span style="color:red; font-weight:bold">(جديد)</span>' : ''}</span>
-                        <div class="news-text">${msg.text}</div>
-                        ${mediaHtml}
-                    </div>
-                `;
-                newsListEl.insertAdjacentHTML('beforeend', html);
-            });
-            
-            latestMsgTimeInModal = currentBatchMaxTime;
-        });
-
-        // --- 4. دوال التحكم في النافذة (Global Scope) ---
-        window.openNewsModal = function() {
-            document.getElementById('newsOverlay').classList.add('open');
-        };
-
-        window.markAsRead = function() {
-            if (latestMsgTimeInModal > 0) {
-                // تحديث وقت القراءة إلى وقت أحدث رسالة كانت في القائمة
-                localStorage.setItem('biology_last_seen_news', latestMsgTimeInModal);
-            }
-            badgeEl.classList.remove('active');
-            floatBtn.classList.remove('glowing'); // إيقاف الإضاءة
-            floatBtn.style.display = 'none'; // إخفاء الزر الرئيسي
-            newsListEl.innerHTML = ''; // تفريغ القائمة (حذف الرسائل بصرياً)
-            window.closeNewsModal();
-        };
-
-        window.closeNewsModal = function() {
-            document.getElementById('newsOverlay').classList.remove('open');
-        };
-
-        // إغلاق النافذة عند الضغط خارجها
-        document.getElementById('newsOverlay').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('newsOverlay')) {
-                window.closeNewsModal();
-            }
-        });
-
-        // دوال عارض الصور (Lightbox)
+        // --- 1. الدوال الأساسية ---
         window.openLightbox = function(src, type) {
-            const container = document.getElementById('lightbox-content');
             const overlay = document.getElementById('lightbox-overlay');
+            const content = document.getElementById('lightbox-content');
+            if(!overlay || !content) return;
             
-            container.innerHTML = ''; // تنظيف المحتوى السابق
-            
-            if (type === 'video') {
-                container.innerHTML = `<video src="${src}" controls autoplay style="max-width:100%; max-height:90vh; border-radius:10px; box-shadow:0 0 50px rgba(0,255,65,0.2);"></video>`;
-            } else {
-                const img = document.createElement('img');
-                img.src = src;
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '90vh';
-                img.style.borderRadius = '10px';
-                container.appendChild(img);
-            }
+            content.innerHTML = type === 'video' ? 
+                `<video src="${src}" controls autoplay style="max-width:100%; max-height:90vh; border-radius:10px;"></video>` :
+                `<img src="${src}" style="max-width:100%; max-height:90vh; border-radius:10px; object-fit:contain;">`;
             
             overlay.classList.add('active');
         };
 
         window.closeLightbox = function() {
             const overlay = document.getElementById('lightbox-overlay');
-            overlay.classList.remove('active');
-            // إيقاف الفيديو عند الإغلاق
-            setTimeout(() => {
-                document.getElementById('lightbox-content').innerHTML = '';
-            }, 400);
-        };
-        
-        // إغلاق عند الضغط على الخلفية أو زر الإغلاق
-        document.querySelector('.close-lightbox').onclick = closeLightbox;
-        document.getElementById('lightbox-overlay').onclick = (e) => {
-            if(e.target.id === 'lightbox-overlay') closeLightbox();
+            if(overlay) {
+                overlay.classList.remove('active');
+                setTimeout(() => { document.getElementById('lightbox-content').innerHTML = ''; }, 400);
+            }
         };
 
+        const closeBtn = document.querySelector('.close-lightbox');
+        if(closeBtn) closeBtn.onclick = window.closeLightbox;
+        const overlayEl = document.getElementById('lightbox-overlay');
+        if(overlayEl) overlayEl.onclick = (e) => { if(e.target.id === 'lightbox-overlay') window.closeLightbox(); };
+
+        // --- 2. نظام الأخبار الذكي (الأخبار فقط) ---
+        const newsListEl = document.getElementById('newsList');
+        const badgeEl = document.getElementById('newsBadge');
+        const floatBtn = document.querySelector('.news-float-btn');
+        const fireToast = document.getElementById('fire-notification');
+        const lastSeenTime = localStorage.getItem('biology_last_seen_news') || 0;
+        const loadTime = Date.now();
+        let latestMsgTimeInModal = 0;
+
+        // مراقب الرسائل الجديدة للفترة الحالية
+        onChildAdded(query(ref(db, 'broadcasts'), limitToLast(1)), (snapshot) => {
+            const msg = snapshot.val();
+            if (msg.timestamp > loadTime) {
+                document.getElementById('fire-msg-text').textContent = msg.text || "أرفق الدكتور ملفاً جديداً";
+                if (msg.mediaURL && msg.mediaType === 'image') {
+                    document.getElementById('fire-msg-img').src = msg.mediaURL;
+                    document.getElementById('fire-msg-img').style.display = 'block';
+                } else { document.getElementById('fire-msg-img').style.display = 'none'; }
+                fireToast.classList.add('show');
+                badgeEl.classList.add('active');
+                floatBtn.style.display = 'flex';
+                setTimeout(() => fireToast.classList.remove('show'), 8000);
+            }
+        });
+
+        // جلب قائمة الأخبار للنافذة
+        onValue(query(ref(db, 'broadcasts'), limitToLast(10)), (snapshot) => {
+            if (!snapshot.exists()) {
+                floatBtn.style.display = 'none';
+                return;
+            }
+            const data = snapshot.val();
+            const msgs = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
+            
+            newsListEl.innerHTML = '';
+            let hasUnread = false;
+            
+            msgs.forEach(msg => {
+                if (msg.timestamp > lastSeenTime) hasUnread = true;
+                if (msg.timestamp > latestMsgTimeInModal) latestMsgTimeInModal = msg.timestamp;
+
+                const dateStr = new Date(msg.timestamp).toLocaleString('ar-EG');
+                let media = '';
+                if(msg.mediaURL) {
+                    if(msg.mediaType==='image') media = `<img src="${msg.mediaURL}" onclick="openLightbox('${msg.mediaURL}', 'image')" style="width:100%; border-radius:8px; margin-top:10px; cursor:pointer;">`;
+                    else media = `<a href="${msg.mediaURL}" target="_blank" style="color:var(--neon-green); display:block; margin-top:5px; font-size:0.8rem;"><i class="fa-solid fa-download"></i> تحميل المرفق</a>`;
+                }
+
+                newsListEl.innerHTML += `
+                    <div class="news-item ${msg.timestamp > lastSeenTime ? 'new' : ''}">
+                        <span style="font-size:0.7rem; color:#666;">${dateStr}</span>
+                        <p style="margin:5px 0; font-size:0.9rem; color:#eee;">${msg.text || ''}</p>
+                        ${media}
+                    </div>
+                `;
+            });
+            if (hasUnread) {
+                floatBtn.style.display = 'flex';
+                badgeEl.classList.add('active');
+            }
+        });
+
+        window.openNewsModal = () => document.getElementById('newsOverlay').classList.add('open');
+        window.closeNewsModal = () => document.getElementById('newsOverlay').classList.remove('open');
+        window.markAsRead = () => {
+            localStorage.setItem('biology_last_seen_news', latestMsgTimeInModal);
+            badgeEl.classList.remove('active');
+            closeNewsModal();
+        };
+
+        fireToast.onclick = () => { window.location.href = 'contact.html'; };
+
+        // --- 3. نظام الصلاحيات والتوجيه ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                get(ref(db, 'users/' + user.uid)).then((snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData && userData.banned) {
+                        alert("تم حظر حسابك من قبل الإدارة بسبب مخالفة السياسات.");
+                        signOut(auth).then(() => window.location.href = 'auth.html');
+                        return;
+                    }
+                    if (!userData || !userData.username) { 
+                        window.location.href = 'complete-profile.html';
+                    }
+                });
+            } else { window.location.href = 'auth.html'; }
+        });
     </script>
 </body>
 </html>
