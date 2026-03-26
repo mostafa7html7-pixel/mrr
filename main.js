@@ -105,3 +105,21 @@ window.toggleFeaturesModal = function() {
         overlay.onclick = (e) => { if(e.target === overlay) overlay.classList.remove('open'); };
     }
 };
+
+// --- نظام التحديث التلقائي للتطبيق (PWA Auto-Update) ---
+if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            // مراقبة التحديثات
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // إذا تم تثبيت كود جديد، سيتم عمل ريفرش تلقائي لتطبيق التعديلات
+                        window.location.reload();
+                    }
+                });
+            });
+        });
+    });
+}
