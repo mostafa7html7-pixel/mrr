@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const installBtn = document.getElementById('installAppBtn');
     if (installBtn) {
         if (!window.matchMedia('(display-mode: standalone)').matches) {
-            installBtn.style.display = 'flex';
+            installBtn.style.display = 'flex'; 
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
