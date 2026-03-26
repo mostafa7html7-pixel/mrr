@@ -1,5 +1,5 @@
-const CACHE_NAME = 'abqarieno-v29';
-const ASSETS = [
+const CACHE_NAME = 'abqarieno-v30'; // قم بزيادة رقم الإصدار مع كل تحديث كبير
+const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل جميع الملفات الجديدة أو المعدلة
     './',
     './index.html',
     './offline.html',
@@ -33,10 +33,9 @@ const ASSETS = [
 
 // تثبيت Service Worker
 self.addEventListener('install', (e) => {
-    self.skipWaiting(); // إضافة: تفعيل التحديث فوراً دون انتظار إغلاق التبويب
     e.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-    );
+        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)) 
+    ).then(() => self.skipWaiting()); // تفعيل التحديث فوراً بعد التثبيت
 });
 
 // تفعيل Service Worker وحذف الكاش القديم
@@ -44,11 +43,11 @@ self.addEventListener('activate', (e) => {
     e.waitUntil(
         caches.keys().then((keyList) => {
             return Promise.all(keyList.map((key) => {
-            if (key !== CACHE_NAME) { 
+            if (key !== CACHE_NAME) {
                     return caches.delete(key);
                 }
             }));
-        }).then(() => self.clients.claim()) // السيطرة على الصفحات المفتوحة فوراً
+        }).then(() => self.clients.claim()) // السيطرة على الصفحات المفتوحة فوراً بعد حذف الكاش القديم
     );
 });
 
@@ -56,27 +55,29 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
     const url = new URL(e.request.url);
 
-    // Ignore non-GET requests and requests to Firebase
-    if (e.request.method !== 'GET' || url.origin.includes('firebase')) {
+    // تجاهل طلبات POST وطلبات Firebase و Google Analytics
+    if (e.request.method !== 'GET' || url.origin.includes('firebase') || url.hostname === 'www.googletagmanager.com' || url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com' || url.hostname === 'cdnjs.cloudflare.com') {
         return;
     }
 
-    // Network First for HTML pages (to ensure auth logic runs)
+    // استراتيجية Network First للصفحات (لضمان الحصول على أحدث HTML)
     if (e.request.destination === 'document') {
         e.respondWith(
             fetch(e.request).then(networkResponse => {
-                // Update cache with the new version
-                caches.open(CACHE_NAME).then(cache => cache.put(e.request, networkResponse.clone()));
+                // تحديث الكاش بالنسخة الجديدة
+                if (networkResponse.ok) { // تأكد أن الاستجابة صالحة قبل التخزين
+                    caches.open(CACHE_NAME).then(cache => cache.put(e.request, networkResponse.clone()));
+                }
                 return networkResponse;
             }).catch(() => {
-                // If network fails, try to serve from cache
+                // إذا فشلت الشبكة، حاول الخدمة من الكاش
                 return caches.match(e.request).then(response => {
-                    // If page is in cache, return it. If not, return offline page.
+                    // إذا كانت الصفحة في الكاش، أعدها. وإلا، أعد صفحة عدم الاتصال.
                     return response || caches.match('./offline.html');
                 });
             })
         );
-    } else { // Cache First for other assets (CSS, JS, images)
+    } else { // استراتيجية Cache First للموارد الأخرى (CSS, JS, صور)
         e.respondWith(
             caches.match(e.request).then(response => {
                 return response || fetch(e.request).then(networkResponse => {
