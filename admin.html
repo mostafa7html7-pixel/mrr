@@ -18,7 +18,7 @@
             --admin-text-primary: #c9d1d9; 
             --admin-text-secondary: #9ca3af;
             --admin-accent: #00ff88;
-        } 
+        }  
 
         body.light-mode { 
             --admin-bg: #f0f2f5;
@@ -132,6 +132,51 @@
         .card-actions .delete { background: transparent; color: #8b949e; border-color: #8b949e; }
         .card-actions .delete:hover { background: rgba(139, 148, 158, 0.1); color: #c9d1d9; }
 
+        /* تحسينات المودال للموبايل */
+        .schedule-modal-content {
+            max-width: 800px;
+            margin: 5vh auto;
+            background: var(--admin-surface);
+            border: 1px solid var(--admin-accent);
+            padding: 30px;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            width: 95%;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .group-edit-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1.2fr 100px;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.02);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--admin-border);
+        }
+
+        .sch-in {
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .sch-in:focus { border-color: var(--admin-accent); }
+
+        @media (max-width: 768px) {
+            .schedule-modal-content { padding: 25px 15px; }
+            .group-edit-row { grid-template-columns: 1fr; gap: 8px; }
+            .modal-footer-btns { flex-direction: column; }
+        }
+
         @media (max-width: 768px) {
             .admin-content { padding: 20px 15px; }
             .stat-grid { grid-template-columns: 1fr; }
@@ -165,6 +210,7 @@
         </div>
         <ul class="nav-links">
             <li><a href="admin.html" class="active">الطلاب</a></li>
+            <li><a href="#" onclick="openScheduleEditor()">إدارة المواعيد</a></li>
             <li><a href="admin-quizzes.html">الاختبارات</a></li>
             <li><a href="admin-scores.html">النتائج</a></li>
             <li><a href="admin-payments.html">المدفوعات</a></li>
@@ -333,6 +379,76 @@
                 remove(ref(db, 'users/' + uid));
             }
         }
+
+        // --- Schedule Management Logic ---
+        window.openScheduleEditor = async function() {
+            document.getElementById('scheduleModal').style.display = 'block';
+            const content = document.getElementById('scheduleEditorContent');
+            
+            const snapshot = await get(ref(db, 'schedule'));
+            let data = snapshot.exists() ? snapshot.val() : {
+                card1: { days: "الأحد والأربعاء", grade: "أولى ثانوي", groups: { g1: { name: "المجموعة الأولى (أ)", time: "02:00 PM", status: "متاح" }, g2: { name: "المجموعة الثانية (ب)", time: "03:30 PM", status: "متاح" }, g3: { name: "المجموعة الثالثة (ج)", time: "06:30 PM", status: "متاح" } } },
+                card2: { days: "الاثنين والخميس", grade: "أولى ثانوي", groups: { g4: { name: "المجموعة الرابعة (د)", time: "02:00 PM", status: "متاح" }, g5: { name: "المجموعة الخامسة (هـ)", time: "03:30 PM", status: "متاح" }, g6: { name: "المجموعة السادسة (و)", time: "06:30 PM", status: "متاح" } } }
+            };
+
+            content.innerHTML = '';
+            Object.keys(data).forEach(cardKey => {
+                const card = data[cardKey];
+                let groupsInputs = '';
+                
+                Object.keys(card.groups).forEach(gKey => {
+                    const group = card.groups[gKey];
+                    groupsInputs += `
+                        <div class="group-edit-row">
+                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="name" value="${group.name}" placeholder="اسم المجموعة">
+                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="time" value="${group.time}" placeholder="الوقت">
+                            <select class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="status">
+                                <option value="متاح" ${group.status === 'متاح' ? 'selected' : ''}>متاح</option>
+                                <option value="مكتمل" ${group.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
+                            </select>
+                        </div>
+                    `;
+                });
+
+                content.innerHTML += `
+                    <div style="margin-bottom: 30px; border: 1px solid #333; padding: 15px; border-radius: 12px;">
+                        <h4 style="margin-bottom: 15px; color: var(--admin-accent);">${card.days}</h4>
+                        ${groupsInputs}
+                    </div>
+                `;
+            });
+        };
+
+        window.saveScheduleChanges = async function() {
+            const inputs = document.querySelectorAll('.sch-in');
+            const snapshot = await get(ref(db, 'schedule'));
+            let scheduleData = snapshot.val() || {};
+
+            inputs.forEach(input => {
+                const card = input.getAttribute('data-card');
+                const group = input.getAttribute('data-group');
+                const field = input.getAttribute('data-field');
+                
+                if (!scheduleData[card]) scheduleData[card] = { days: card === 'card1' ? "الأحد والأربعاء" : "الاثنين والخميس", groups: {} };
+                if (!scheduleData[card].groups[group]) scheduleData[card].groups[group] = {};
+                
+                scheduleData[card].groups[group][field] = input.value;
+            });
+
+            await set(ref(db, 'schedule'), scheduleData);
+            
+            await push(ref(db, 'broadcasts'), {
+                text: "📢 تنبيه: تم تحديث جدول المواعيد والمجموعات المتاحة. يرجى مراجعة صفحة الجدول الآن.",
+                timestamp: serverTimestamp()
+            });
+
+            alert("تم حفظ التعديلات ونشر الخبر للطلاب بنجاح!");
+            closeModal('scheduleModal');
+        };
+
+        window.closeModal = function(id) {
+            document.getElementById(id).style.display = 'none';
+        };
 
         function initDashboard() {
             // جلب المستخدمين وعرضهم على شكل بطاقات

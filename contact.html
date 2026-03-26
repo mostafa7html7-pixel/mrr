@@ -18,7 +18,7 @@
     {
       "@context": "https://schema.org",
       "@type": "ContactPage",
-      "name": "تواصل مع الدكتور",
+      "name": "تواصل مع الدكتور", 
       "description": "مركز الرسائل والدعم الفني لطلاب الدكتور في مادة الأحياء.",
       "url": "https://abqarieno.firebaseapp.com/contact.html" 
     }
@@ -226,6 +226,51 @@
         .btn-mini-action.delete { background: rgba(255, 51, 102, 0.2); border-color: #ff3366; }
         .btn-mini-action.delete:hover { background: #ff3366; color: #fff; }
 
+        /* تحسينات المودال للموبايل */
+        .schedule-modal-content {
+            max-width: 800px;
+            margin: 5vh auto;
+            background: #0f131a;
+            border: 1px solid var(--master-neon);
+            padding: 30px;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            width: 95%;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .group-edit-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1.2fr 100px;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.02);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #222;
+        }
+
+        .sch-in {
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .sch-in:focus { border-color: var(--master-neon); }
+
+        @media (max-width: 768px) {
+            .schedule-modal-content { padding: 25px 15px; }
+            .group-edit-row { grid-template-columns: 1fr; gap: 8px; }
+            .modal-footer-btns { flex-direction: column; }
+        }
+
         /* التاريخ على الصور */
         .media-date-overlay {
             position: absolute; bottom: 8px; right: 8px;
@@ -316,11 +361,29 @@
                     <div id="previewsContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
                     <span id="fileName" style="font-size: 0.7rem; color: #888; display:none;"></span>
                     <button onclick="pushMessage()" style="margin-right:auto; padding:8px 20px; background:var(--master-neon); border:none; border-radius:6px; font-weight:bold; cursor:pointer;">نشر</button>
+                    <button onclick="openScheduleEditorShortcut()" style="padding:8px 15px; background:transparent; border:1px solid var(--master-neon); color:var(--master-neon); border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.8rem;">تعديل المواعيد</button>
                     <button id="cancelUploadBtn" class="btn-cancel-upload" style="display:none;" onclick="cancelCurrentAction()">إلغاء</button>
                 </div>
             </div>
 
             <div id="messages-flow">
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Editor Modal -->
+    <div id="scheduleModal" class="modal" style="display: none;">
+        <div class="modal-content schedule-modal-content">
+            <span class="close-modal" onclick="closeModal('scheduleModal')" style="cursor:pointer; float:left; font-size:2rem;">&times;</span>
+            <h2 style="margin-bottom: 20px; color: var(--master-neon);">تعديل جدول المواعيد</h2>
+            
+            <div id="scheduleEditorContent" style="text-align:right;">
+                <p style="text-align: center;">جاري تحميل بيانات الجدول...</p>
+            </div>
+
+            <div class="modal-footer-btns" style="margin-top: 25px; display: flex; gap: 10px;">
+                <button class="btn-green" style="flex: 2; padding:15px; border-radius:10px; cursor:pointer;" onclick="saveScheduleChanges()">حفظ التعديلات ونشر خبر</button>
+                <button style="flex: 1; background:transparent; border:1px solid #444; color:#888; border-radius:10px; cursor:pointer;" onclick="closeModal('scheduleModal')">إلغاء</button>
             </div>
         </div>
     </div>
@@ -382,6 +445,10 @@
         }
 
         if(!localRole && !isMaster) localStorage.setItem('biology_user_role', 'student');
+
+        window.closeModal = function(id) {
+            document.getElementById(id).style.display = 'none';
+        };
     </script>
 
     <style>
@@ -431,7 +498,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8",
@@ -628,6 +695,72 @@
              }
             }, 50); // تأخير بسيط للسماح للواجهة بالتحديث
          }
+
+        // --- Schedule Management Logic ---
+        window.openScheduleEditorShortcut = async function() {
+            document.getElementById('scheduleModal').style.display = 'flex';
+            const content = document.getElementById('scheduleEditorContent');
+            
+            const snapshot = await get(ref(db, 'schedule'));
+            let data = snapshot.exists() ? snapshot.val() : {
+                card1: { days: "الأحد والأربعاء", grade: "أولى ثانوي", groups: { g1: { name: "المجموعة الأولى (أ)", time: "02:00 PM", status: "متاح" }, g2: { name: "المجموعة الثانية (ب)", time: "03:30 PM", status: "متاح" }, g3: { name: "المجموعة الثالثة (ج)", time: "06:30 PM", status: "متاح" } } },
+                card2: { days: "الاثنين والخميس", grade: "أولى ثانوي", groups: { g4: { name: "المجموعة الرابعة (د)", time: "02:00 PM", status: "متاح" }, g5: { name: "المجموعة الخامسة (هـ)", time: "03:30 PM", status: "متاح" }, g6: { name: "المجموعة السادسة (و)", time: "06:30 PM", status: "متاح" } } }
+            };
+
+            content.innerHTML = '';
+            Object.keys(data).forEach(cardKey => {
+                const card = data[cardKey];
+                let groupsInputs = '';
+                
+                Object.keys(card.groups).forEach(gKey => {
+                    const group = card.groups[gKey];
+                    groupsInputs += `
+                        <div class="group-edit-row">
+                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="name" value="${group.name}" placeholder="اسم المجموعة">
+                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="time" value="${group.time}" placeholder="الوقت">
+                            <select class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="status">
+                                <option value="متاح" ${group.status === 'متاح' ? 'selected' : ''}>متاح</option>
+                                <option value="مكتمل" ${group.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
+                            </select>
+                        </div>
+                    `;
+                });
+
+                content.innerHTML += `
+                    <div style="margin-bottom: 30px; border: 1px solid #333; padding: 15px; border-radius: 12px;">
+                        <h4 style="margin-bottom: 15px; color: var(--master-neon);">${card.days}</h4>
+                        ${groupsInputs}
+                    </div>
+                `;
+            });
+        };
+
+        window.saveScheduleChanges = async function() {
+            const inputs = document.querySelectorAll('.sch-in');
+            const snapshot = await get(ref(db, 'schedule'));
+            let scheduleData = snapshot.val() || {};
+
+            inputs.forEach(input => {
+                const card = input.getAttribute('data-card');
+                const group = input.getAttribute('data-group');
+                const field = input.getAttribute('data-field');
+                
+                if (!scheduleData[card]) scheduleData[card] = { days: card === 'card1' ? "الأحد والأربعاء" : "الاثنين والخميس", groups: {} };
+                if (!scheduleData[card].groups[group]) scheduleData[card].groups[group] = {};
+                
+                scheduleData[card].groups[group][field] = input.value;
+            });
+
+            await set(ref(db, 'schedule'), scheduleData);
+            
+            await push(ref(db, 'broadcasts'), {
+                text: "📢 تنبيه: تم تحديث جدول المواعيد والمجموعات المتاحة. يرجى مراجعة صفحة الجدول الآن.",
+                timestamp: serverTimestamp()
+            });
+
+            alert("تم حفظ التعديلات ونشر الخبر للطلاب بنجاح!");
+            closeModal('scheduleModal');
+        };
 
         // عرض الرسائل (نظام سريع جداً)
         const flow = document.getElementById('messages-flow');

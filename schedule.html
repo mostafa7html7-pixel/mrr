@@ -118,6 +118,7 @@
             margin-bottom: 1.5rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 1rem;
+            padding-left: 100px; /* مساحة لزر التعديل في اليسار لضمان عدم التداخل */
         }
 
         .card-header i {
@@ -134,14 +135,20 @@
         .grade-badge {
             position: absolute;
             top: 15px;
-            left: -30px;
+            right: -30px; /* نقل الشارة لليمين */
             background: var(--accent-color);
             color: #000;
             padding: 5px 40px;
-            transform: rotate(-45deg);
+            transform: rotate(45deg); /* تدوير عكسي يتناسب مع جهة اليمين */
             font-weight: bold;
             font-size: 0.8rem;
             box-shadow: 0 0 10px var(--accent-color);
+            display: none; /* مخفي افتراضياً ويظهر برمجياً للطلاب فقط */
+        }
+
+        .status-pill.full {
+            background: rgba(255, 69, 0, 0.1);
+            color: #ff4500;
         }
 
         .group-item {
@@ -180,6 +187,79 @@
             .schedule-grid {
                 grid-template-columns: 1fr;
             }
+            .page-header { margin: 30px 0 20px; }
+            .subtitle { font-size: 0.75rem; letter-spacing: 1px; }
+            .main-title { font-size: 1.6rem; line-height: 1.3; }
+            .page-header p:not(.subtitle) { font-size: 0.85rem; padding: 0 15px; margin-top: 5px !important; }
+        }
+
+        /* زر تعديل المجموعات للمستر */
+        .btn-edit-schedule {
+            position: absolute; 
+            top: 15px; 
+            left: 15px; /* نقل الزر لليسار */
+            background: var(--accent-color); 
+            color: #000;
+            border: none; 
+            padding: 6px 15px; 
+            border-radius: 50px;
+            font-size: 0.8rem; 
+            font-weight: 900; 
+            cursor: pointer;
+            display: none; 
+            z-index: 10; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.4);
+        }
+        .btn-edit-schedule:hover { 
+            background: #fff; 
+            transform: scale(1.1) translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+        }
+
+        /* تحسينات المودال للموبايل */
+        .schedule-modal-content {
+            max-width: 800px;
+            margin: 5vh auto;
+            background: #0f131a;
+            border: 1px solid var(--accent-color);
+            padding: 30px;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            width: 95%;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .group-edit-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1.2fr 100px;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.02);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #222;
+        }
+
+        .sch-in {
+            background: #000;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .sch-in:focus { border-color: var(--accent-color); }
+
+        @media (max-width: 768px) {
+            .schedule-modal-content { padding: 25px 15px; }
+            .group-edit-row { grid-template-columns: 1fr; gap: 8px; }
+            .modal-footer-btns { flex-direction: column; }
         }
     </style>
 </head>
@@ -216,72 +296,125 @@
     <section class="container">
         <div class="schedule-grid">
             
-            <div class="schedule-card">
+            <!-- الجدول الأول -->
+            <div class="schedule-card" id="card1">
+                <button class="btn-edit-schedule master-only" onclick="openScheduleEditorShortcut()"><i class="fa-solid fa-pen"></i> تعديل</button>
                 <div class="grade-badge">أولى ثانوي</div>
                 <div class="card-header">
                     <i class="fa-solid fa-calendar-days"></i>
-                    <h3>الأحد والأربعاء</h3>
+                    <h3 id="days1">السبت والثلاثاء</h3>
                 </div>
                 
                 <div class="group-item">
                     <div class="group-info">
-                        <span class="time">02:00 PM</span>
-                        <span class="name">المجموعة الأولى (أ)</span>
+                        <span class="time" id="g1-time">02:00 PM</span>
+                        <span class="name" id="g1-name">المجموعة الأولى (أ)</span>
                     </div>
-                    <span class="status-pill">متاح</span>
+                    <span class="status-pill" id="g1-status">متاح</span>
                 </div>
 
                 <div class="group-item">
                     <div class="group-info">
-                        <span class="time">03:30 PM</span>
-                        <span class="name">المجموعة الثانية (ب)</span>
+                        <span class="time" id="g2-time">03:30 PM</span>
+                        <span class="name" id="g2-name">المجموعة الثانية (ب)</span>
                     </div>
-                    <span class="status-pill">متاح</span>
+                    <span class="status-pill" id="g2-status">متاح</span>
                 </div>
 
                 <div class="group-item">
                     <div class="group-info">
-                        <span class="time">07:30 PM</span>
-                        <span class="name">المجموعة الثالثة (ج)</span>
+                        <span class="time" id="g3-time">06:30 PM</span>
+                        <span class="name" id="g3-name">المجموعة الثالثة (ج)</span>
                     </div>
-                    <span class="status-pill">متاح</span>
+                    <span class="status-pill" id="g3-status">متاح</span>
                 </div>
             </div>
 
-            <div class="schedule-card">
+            <!-- الجدول الثاني (جديد: الأحد والأربعاء) -->
+            <div class="schedule-card" id="card2">
+                <button class="btn-edit-schedule master-only" onclick="openScheduleEditorShortcut()"><i class="fa-solid fa-pen"></i> تعديل</button>
                 <div class="grade-badge">أولى ثانوي</div>
                 <div class="card-header">
-                    <i class="fa-solid fa-calendar-check"></i>
-                    <h3>الاثنين والخميس</h3>
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <h3 id="days2">الأحد والأربعاء</h3>
                 </div>
                 
                 <div class="group-item">
                     <div class="group-info">
-                        <span class="time">02:00 PM</span>
-                        <span class="name">المجموعة الرابعة (د)</span>
+                        <span class="time" id="g4-time">02:00 PM</span>
+                        <span class="name" id="g4-name">المجموعة الرابعة (د)</span>
                     </div>
-                    <span class="status-pill">متاح</span>
+                    <span class="status-pill" id="g4-status">متاح</span>
                 </div>
 
                 <div class="group-item">
                     <div class="group-info">
-                        <span class="time">03:30 PM</span>
-                        <span class="name">المجموعة الخامسة (هـ)</span>
+                        <span class="time" id="g5-time">03:30 PM</span>
+                        <span class="name" id="g5-name">المجموعة الخامسة (هـ)</span>
                     </div>
-                    <span class="status-pill">متاح</span>
+                    <span class="status-pill" id="g5-status">متاح</span>
                 </div>
 
                 <div class="group-item">
                     <div class="group-info">
-                        <span class="time">07:30 PM</span>
-                        <span class="name">المجموعة السادسة (و)</span>
+                        <span class="time" id="g6-time">06:30 PM</span>
+                        <span class="name" id="g6-name">المجموعة السادسة (و)</span>
                     </div>
-                    <span class="status-pill">متاح</span>
+                    <span class="status-pill" id="g6-status">متاح</span>
+                </div>
+            </div>
+
+            <!-- الجدول الثالث (الاثنين والخميس) -->
+            <div class="schedule-card" id="card3">
+                <button class="btn-edit-schedule master-only" onclick="openScheduleEditorShortcut()"><i class="fa-solid fa-pen"></i> تعديل</button>
+                <div class="grade-badge">أولى ثانوي</div>
+                <div class="card-header">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <h3 id="days3">الاثنين والخميس</h3>
+                </div>
+                
+                <div class="group-item">
+                    <div class="group-info">
+                        <span class="time" id="g7-time">02:00 PM</span>
+                        <span class="name" id="g7-name">المجموعة السابعة (ز)</span>
+                    </div>
+                    <span class="status-pill" id="g7-status">متاح</span>
+                </div>
+
+                <div class="group-item">
+                    <div class="group-info">
+                        <span class="time" id="g8-time">03:30 PM</span>
+                        <span class="name" id="g8-name">المجموعة الثامنة (ح)</span>
+                    </div>
+                    <span class="status-pill" id="g8-status">متاح</span>
+                </div>
+
+                <div class="group-item">
+                    <div class="group-info">
+                        <span class="time" id="g9-time">06:30 PM</span>
+                        <span class="name" id="g9-name">المجموعة التاسعة (ط)</span>
+                    </div>
+                    <span class="status-pill" id="g9-status">متاح</span>
                 </div>
             </div>
 
         </div>
     </section>
+
+    <!-- مودال تعديل المواعيد (يظهر فقط للمستر) -->
+    <div id="scheduleModal" class="modal" style="display: none;">
+        <div class="modal-content schedule-modal-content">
+            <span class="close-modal" onclick="closeModal('scheduleModal')" style="cursor:pointer; float:left; font-size:2rem;">&times;</span>
+            <h2 style="margin-bottom: 20px; color: var(--accent-color);">تعديل جدول المواعيد</h2>
+            <div id="scheduleEditorContent" style="text-align:right;">
+                <p style="text-align: center;">جاري تحميل بيانات الجدول...</p>
+            </div>
+            <div class="modal-footer-btns" style="margin-top: 25px; display: flex; gap: 10px;">
+                <button class="auth-btn" style="flex: 2; padding:15px; border-radius:10px; cursor:pointer;" onclick="saveScheduleChanges()">حفظ ونشر خبر</button>
+                <button style="flex: 1; background:transparent; border:1px solid #444; color:#888; border-radius:10px; cursor:pointer;" onclick="closeModal('scheduleModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div style="text-align: center; padding: 20px;">
@@ -291,11 +424,27 @@
                 <a href="admin.html" style="color: #444; font-size: 0.8rem; text-decoration: none; border: 1px solid #333; padding: 4px 10px; border-radius: 15px; transition: 0.3s;">
                     <i class="fa-solid fa-user-shield"></i>
                 </a>
+                <!-- زر تبديل الهوية للمستر -->
+                <button onclick="switchRole()" style="background: transparent; border: 1px solid #333; color: #444; padding: 4px 10px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; transition: 0.3s; display: flex; align-items: center; gap: 5px;">
+                    <i class="fa-solid fa-user-gear"></i> تبديل كمستر
+                </button>
             </div>
         </div>
     </footer>
 
     <script src="main.js"></script>
+    <script>
+        window.switchRole = function() {
+            const code = prompt("أدخل كود المستر للتبديل:");
+            if(code === "222") {
+                localStorage.removeItem('biology_user_role'); 
+                sessionStorage.setItem('biology_user_role', 'master'); 
+                location.reload();
+            } else if(code !== null) {
+                alert("الكود غير صحيح!");
+            }
+        }
+    </script>
 
     <!-- نظام الإشعارات الذكي -->
     <div id="fire-notification" class="fire-toast">
@@ -307,11 +456,140 @@
     </div>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, onValue, onChildAdded, query, limitToLast, get, set, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        // --- التحقق من هوية المستر لإظهار أزرار التعديل ---
+        onAuthStateChanged(auth, async (user) => {
+            const sessionRole = sessionStorage.getItem('biology_user_role');
+            let isMaster = sessionRole === 'master';
+
+            if (user && !isMaster) {
+                const snap = await get(ref(db, 'users/' + user.uid));
+                if (snap.exists() && snap.val().role === 'admin') isMaster = true;
+            }
+
+            if (isMaster) {
+                document.querySelectorAll('.master-only').forEach(btn => btn.style.display = 'block');
+                document.querySelectorAll('.grade-badge').forEach(badge => badge.style.display = 'none');
+            } else {
+                document.querySelectorAll('.grade-badge').forEach(badge => badge.style.display = 'block');
+            }
+        });
+
+        // --- تحديث الجدول لحظياً من قاعدة البيانات (Hydration) ---
+        onValue(ref(db, 'schedule'), (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                if(data.card1) {
+                    document.getElementById('days1').innerText = data.card1.days;
+                    Object.keys(data.card1.groups).forEach((gKey, idx) => {
+                        const g = data.card1.groups[gKey];
+                        const idPrefix = `g${idx + 1}`;
+                        if(document.getElementById(`${idPrefix}-time`)) {
+                            document.getElementById(`${idPrefix}-time`).innerText = g.time;
+                            document.getElementById(`${idPrefix}-name`).innerText = g.name;
+                            const statusEl = document.getElementById(`${idPrefix}-status`);
+                            statusEl.innerText = g.status;
+                            if(g.status === 'مكتمل') statusEl.classList.add('full');
+                            else statusEl.classList.remove('full');
+                        }
+                    });
+                }
+                if(data.card2) {
+                    if(document.getElementById('days2')) document.getElementById('days2').innerText = data.card2.days;
+                    Object.keys(data.card2.groups).forEach((gKey, idx) => {
+                        const g = data.card2.groups[gKey];
+                        const idPrefix = `g${idx + 4}`;
+                        if(document.getElementById(`${idPrefix}-time`)) {
+                            document.getElementById(`${idPrefix}-time`).innerText = g.time;
+                            document.getElementById(`${idPrefix}-name`).innerText = g.name;
+                            const statusEl = document.getElementById(`${idPrefix}-status`);
+                            statusEl.innerText = g.status;
+                            if(g.status === 'مكتمل') statusEl.classList.add('full');
+                            else statusEl.classList.remove('full');
+                        }
+                    });
+                }
+                if(data.card3) {
+                    if(document.getElementById('days3')) document.getElementById('days3').innerText = data.card3.days;
+                    Object.keys(data.card3.groups).forEach((gKey, idx) => {
+                        const g = data.card3.groups[gKey];
+                        const idPrefix = `g${idx + 7}`;
+                        if(document.getElementById(`${idPrefix}-time`)) {
+                            document.getElementById(`${idPrefix}-time`).innerText = g.time;
+                            document.getElementById(`${idPrefix}-name`).innerText = g.name;
+                            const statusEl = document.getElementById(`${idPrefix}-status`);
+                            statusEl.innerText = g.status;
+                            if(g.status === 'مكتمل') statusEl.classList.add('full');
+                            else statusEl.classList.remove('full');
+                        }
+                    });
+                }
+            }
+        });
+
+        // --- منطق المحرر (Modal Logic) ---
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+        window.openScheduleEditorShortcut = async function() {
+            document.getElementById('scheduleModal').style.display = 'flex';
+            const content = document.getElementById('scheduleEditorContent');
+            const snapshot = await get(ref(db, 'schedule'));
+            let data = snapshot.exists() ? snapshot.val() : {
+                card1: { days: "السبت والثلاثاء", groups: { g1: { name: "المجموعة الأولى (أ)", time: "02:00 PM", status: "متاح" }, g2: { name: "المجموعة الثانية (ب)", time: "03:30 PM", status: "متاح" }, g3: { name: "المجموعة الثالثة (ج)", time: "06:30 PM", status: "متاح" } } },
+                card2: { days: "الأحد والأربعاء", groups: { g4: { name: "المجموعة الرابعة (د)", time: "02:00 PM", status: "متاح" }, g5: { name: "المجموعة الخامسة (هـ)", time: "03:30 PM", status: "متاح" }, g6: { name: "المجموعة السادسة (و)", time: "06:30 PM", status: "متاح" } } },
+                card3: { days: "الاثنين والخميس", groups: { g7: { name: "المجموعة السابعة (ز)", time: "02:00 PM", status: "متاح" }, g8: { name: "المجموعة الثامنة (ح)", time: "03:30 PM", status: "متاح" }, g9: { name: "المجموعة التاسعة (ط)", time: "06:30 PM", status: "متاح" } } }
+            };
+
+            content.innerHTML = '';
+            Object.keys(data).forEach(cardKey => {
+                const card = data[cardKey];
+                let groupsInputs = '';
+                Object.keys(card.groups).forEach(gKey => {
+                    const group = card.groups[gKey];
+                    groupsInputs += `
+                        <div class="group-edit-row">
+                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="name" value="${group.name}" placeholder="اسم المجموعة">
+                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="time" value="${group.time}" placeholder="وقت الحصة">
+                            <select class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="status">
+                                <option value="متاح" ${group.status==='متاح'?'selected':''}>متاح</option>
+                                <option value="مكتمل" ${group.status==='مكتمل'?'selected':''}>مكتمل</option>
+                            </select>
+                        </div>`;
+                });
+                content.innerHTML += `<div style="margin-bottom:20px; border:1px solid #333; padding:15px; border-radius:10px;"><h4 style="color:var(--accent-color); margin-bottom:10px;">${card.days}</h4>${groupsInputs}</div>`;
+            });
+        };
+
+        window.saveScheduleChanges = async function() {
+            const inputs = document.querySelectorAll('.sch-in');
+            const snapshot = await get(ref(db, 'schedule'));
+            let scheduleData = snapshot.val() || {};
+
+            inputs.forEach(input => {
+                const card = input.dataset.card;
+                const group = input.dataset.group;
+                const field = input.dataset.field;
+                if (!scheduleData[card]) scheduleData[card] = { days: card === 'card1' ? "السبت والثلاثاء" : (card === 'card2' ? "الأحد والأربعاء" : "الاثنين والخميس"), groups: {} };
+                if (!scheduleData[card].groups[group]) scheduleData[card].groups[group] = {};
+                scheduleData[card].groups[group][field] = input.value;
+            });
+
+            await set(ref(db, 'schedule'), scheduleData);
+            await push(ref(db, 'broadcasts'), {
+                text: "📢 تم تحديث مواعيد المجموعات في السنتر. يرجى مراجعة صفحة الجدول.",
+                timestamp: serverTimestamp()
+            });
+
+            alert("تم حفظ المواعيد ونشر التنبيه بنجاح!");
+            closeModal('scheduleModal');
+        };
         
         const notif = document.getElementById('fire-notification');
         const contactLink = document.querySelector('a[href="contact.html"]');

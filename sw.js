@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v32'; // تحديث جديد لإظهار التعديلات على الموبايل
+const CACHE_NAME = 'abqarieno-v33'; // تحديث جديد لإظهار التعديلات على الموبايل
 const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل جميع الملفات الجديدة أو المعدلة
     './',
     './index.html',
@@ -30,7 +30,7 @@ const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل ج
     './6.jpeg',
     './212.png' 
 ];
-
+ 
 // تثبيت Service Worker
 self.addEventListener('install', (e) => {
     e.waitUntil(

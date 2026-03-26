@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. PWA Install Button
     let deferredPrompt;
     const installBtn = document.getElementById('installAppBtn');
-    if (installBtn) {
+    if (installBtn) { 
         if (!window.matchMedia('(display-mode: standalone)').matches) {
             installBtn.style.display = 'flex'; 
         }
