@@ -24,7 +24,7 @@
             max-width: 800px; margin: 40px auto; 
             background: var(--card-bg); border: 1px solid var(--border-color); 
             border-radius: 20px; padding: 30px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);  
             overflow-wrap: break-word; /* منع خروج النص */
         } 
         
@@ -58,9 +58,14 @@
         #progressBar { width: 0%; height: 100%; background: var(--quiz-accent); transition: width 0.4s ease; }
 
         #questionArea { margin-bottom: 30px; }
-        #questionText { font-size: 1.4rem; font-weight: bold; color: var(--text-white); line-height: 1.6; margin-bottom: 25px; }
-        #questionText img { max-width: 100%; border-radius: 10px; margin-top: 15px; border: 1px solid var(--border-color); }
-
+        #questionText { font-size: 1.4rem; font-weight: bold; color: var(--text-white); line-height: 1.6; margin-bottom: 20px; }
+        .q-img-wrapper { 
+            width: 100%; text-align: center; margin-bottom: 25px; cursor: zoom-in; 
+            background: rgba(255,255,255,0.02); border-radius: 15px; padding: 10px; border: 1px solid var(--border-color);
+        }
+        .q-img-wrapper img { max-width: 100%; max-height: 400px; border-radius: 10px; transition: 0.3s; }
+        .q-img-wrapper:hover img { transform: scale(1.01); }
+        
         .options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
         .option-label {
             display: block; background: rgba(255,255,255,0.05); border: 2px solid #34495e;
@@ -369,11 +374,12 @@
             const question = questions[currentQuestionIndex];
             
             // Render text and optional image
-            let contentHtml = question.text;
+            let contentHtml = question.text || "";
+            let imageHtml = "";
             if (question.imageURL) {
-                contentHtml += `<br><img src="${question.imageURL}" alt="صورة توضيحية">`;
+                imageHtml = `<div class="q-img-wrapper" onclick="openLightbox('${question.imageURL}', 'image')"><img src="${question.imageURL}" alt="سؤال مصور"></div>`;
             }
-            questionTextEl.innerHTML = contentHtml;
+            questionTextEl.innerHTML = contentHtml + imageHtml;
             
             optionsContainer.innerHTML = '';
 

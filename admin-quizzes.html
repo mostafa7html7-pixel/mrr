@@ -11,7 +11,7 @@
         /* Reusing admin styles from style.css */
         :root {
             --admin-bg: #020204;
-            --admin-surface: #0a0a0f;
+            --admin-surface: #0a0a0f; 
             --admin-surface-light: #161b22;
             --admin-border: #222;
             --admin-text-primary: #e0e0e0;
@@ -540,13 +540,13 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push, remove, update, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-storage.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
-        const storage = getStorage(app);
+        
+        const IMGBB_API_KEY = "0385965848fc62374c1c82810ffa7d18"; // مفتاح الرفع الخاص بك
 
         // Auth Check (Security)
         onAuthStateChanged(auth, async (user) => {
@@ -851,9 +851,10 @@
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = text;
             const plainText = tempDiv.textContent || tempDiv.innerText || "";
+            const hasImagePreview = document.getElementById('imagePreviewContainer').style.display !== 'none';
 
-            if (!plainText.trim() && !document.getElementById('questionImageInput').files[0] && document.getElementById('imagePreviewContainer').style.display === 'none') {
-                alert('يرجى ملء نص السؤال وكل الاختيارات.');
+            if (!plainText.trim() && !document.getElementById('questionImageInput').files[0] && !hasImagePreview) {
+                alert('يرجى إضافة نص للسؤال أو صورة على الأقل.');
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = originalBtnText;
                 return;
@@ -867,45 +868,33 @@
             }
 
             let imageURL = null;
-            let storagePath = null;
 
             // Keep existing image if editing and not removed
-            if (qId && questionsData[qId] && questionsData[qId].imageURL && document.getElementById('imagePreviewContainer').style.display !== 'none') {
+            if (qId && questionsData[qId] && questionsData[qId].imageURL && hasImagePreview) {
                 imageURL = questionsData[qId].imageURL;
-                storagePath = questionsData[qId].storagePath || null;
             }
 
             // Upload new image if selected
             const fileInput = document.getElementById('questionImageInput');
             if (fileInput.files[0]) {
-                // Delete old image if exists during edit
-                if (qId && questionsData[qId] && questionsData[qId].storagePath) {
-                    try { await deleteObject(storageRef(storage, questionsData[qId].storagePath)); } catch(e) { console.warn("Failed to delete old image", e); }
-                }
-
                 try {
-                    const file = fileInput.files[0];
-                    const path = `quiz_images/${currentEditingQuizId}/${Date.now()}_${file.name}`;
-                    const imgRef = storageRef(storage, path);
-                    await uploadBytes(imgRef, file);
-                    imageURL = await getDownloadURL(imgRef);
-                    storagePath = path;
+                    const formData = new FormData();
+                    formData.append('image', fileInput.files[0]);
+                    
+                    const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const resData = await response.json();
+                    imageURL = resData.data.url;
                 } catch (e) {
-                    console.error(e);
-                    alert('فشل رفع الصورة، يرجى المحاولة مرة أخرى.');
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = originalBtnText;
-                    return;
+                    alert('حدث خطأ أثناء رفع الصورة لـ ImgBB.');
                 }
-            } else if (document.getElementById('imagePreviewContainer').style.display === 'none') {
-                imageURL = null; // Image was removed manually
-                // Delete old image from storage if removed
-                if (qId && questionsData[qId] && questionsData[qId].storagePath) {
-                    try { await deleteObject(storageRef(storage, questionsData[qId].storagePath)); } catch(e) { console.warn("Failed to delete removed image", e); }
-                }
+            } else if (!hasImagePreview) {
+                imageURL = null;
             }
 
-            const questionData = { text, options, correctAnswer: parseInt(correctAnswer), imageURL, storagePath };
+            const questionData = { text, options, correctAnswer: parseInt(correctAnswer), imageURL };
             const promise = qId 
                 ? update(ref(db, `quizzes/${currentEditingQuizId}/questions/${qId}`), questionData)
                 : push(ref(db, `quizzes/${currentEditingQuizId}/questions`), {
@@ -945,10 +934,6 @@
         window.deleteQuestion = async (qId) => {
             if (confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
                 const q = questionsData[qId];
-                // Storage Cleanup: Delete image if exists
-                if (q.storagePath) {
-                    try { await deleteObject(storageRef(storage, q.storagePath)); } catch(e) { console.error("Error deleting image", e); }
-                }
                 remove(ref(db, `quizzes/${currentEditingQuizId}/questions/${qId}`));
             }
         };
@@ -1002,78 +987,10 @@
             update(ref(db), updates);
         }
 
-        // --- Print / Export PDF Logic ---
-        window.printQuiz = () => {
-            if (!questionsData || Object.keys(questionsData).length === 0) return alert("لا توجد أسئلة للطباعة");
-            
-            const quizTitle = document.getElementById('questionsModalTitle').innerText.replace('أسئلة: ', '');
-            const printWindow = window.open('', '', 'width=900,height=700');
-            
-            let html = `
-                <html dir="rtl" lang="ar">
-                <head>
-                    <title>${quizTitle}</title>
-                    <style>
-                        @media print {
-                            @page { size: A4; margin: 1.5cm; }
-                            body { -webkit-print-color-adjust: exact; }
-                        }
-                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #000; background: #fff; line-height: 1.5; }
-                        .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
-                        .header h1 { margin: 0 0 10px 0; font-size: 22px; }
-                        .header p { margin: 0; font-size: 14px; color: #333; }
-                        .q-item { margin-bottom: 25px; page-break-inside: avoid; break-inside: avoid; border-bottom: 1px dashed #ccc; padding-bottom: 15px; }
-                        .q-text { font-weight: bold; font-size: 16px; margin-bottom: 12px; }
-                        .q-img { max-width: 100%; max-height: 250px; display: block; margin: 10px auto; border: 1px solid #eee; border-radius: 5px; }
-                        .options { list-style-type: none; padding-right: 0; margin: 0; }
-                        .options li { margin-bottom: 8px; padding-right: 25px; position: relative; font-size: 15px; }
-                        .options li::before { content: ""; position: absolute; right: 0; top: 3px; width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%; }
-                        .answer-key { margin-top: 50px; page-break-before: always; border-top: 3px double #000; padding-top: 30px; }
-                        .key-item { margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding: 5px; font-size: 14px; display: flex; justify-content: space-between; }
-                        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(0,0,0,0.03); z-index: -1; white-space: nowrap; pointer-events: none; }
-                    </style>
-                </head>
-                <body>
-                    <div class="watermark">منصة الدكتور</div>
-                    <div class="header">
-                        <img src="212.png" alt="شعار المنصة" style="width: 80px; height: auto; margin-bottom: 10px;">
-                        <h1>${quizTitle}</h1>
-                        <p>الاسم: ................................................... | الدرجة: ...................</p>
-                    </div>
-            `;
 
-            let keyHtml = `<div class="answer-key"><h2>نموذج الإجابة (للمعلم فقط)</h2>`;
-            let i = 1;
+        // تم حذف دالة الطباعة printQuiz بناءً على طلبك.
+        // إذا أردت استعادتها أو استبدالها بوظيفة أخرى، يرجى إبلاغي.
 
-            // Sort questions same as displayed
-            const sortedQs = Object.values(questionsData).sort((a, b) => (a.order || 0) - (b.order || 0));
-
-            sortedQs.forEach(q => {
-                html += `<div class="q-item">
-                    <div class="q-text">${i}. ${q.text}</div>
-                    ${q.imageURL ? `<img src="${q.imageURL}" class="q-img">` : ''}
-                    <ul class="options">
-                        ${q.options.map(opt => `<li>${opt}</li>`).join('')}
-                    </ul>
-                </div>`;
-                
-                keyHtml += `<div class="key-item"><span><strong>س${i}:</strong> ${q.options[q.correctAnswer]}</span></div>`;
-                i++;
-            });
-
-            // إغلاق علامات الـ html النصية وإضافة مفتاح الإجابة
-            html += keyHtml + `</div></body></html>`;
-            
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.focus();
-
-            // الانتظار للتحميل ثم الطباعة
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
-        }; // إغلاق دالة printQuiz (هذا القوس كان مفقوداً)
     </script>
 </body>
 </html>

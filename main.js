@@ -94,4 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('.scroll-animate');
     animatedElements.forEach((el) => observer.observe(el));
 
-});
+}); 
+
+// Toggle Features Modal
+window.toggleFeaturesModal = function() {
+    const overlay = document.getElementById('featuresOverlay');
+    if (overlay) {
+        overlay.classList.toggle('open');
+        // إغلاق عند الضغط خارج النافذة
+        overlay.onclick = (e) => { if(e.target === overlay) overlay.classList.remove('open'); };
+    }
+};

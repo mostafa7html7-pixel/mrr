@@ -18,7 +18,7 @@
         @media (max-width: 992px) {
             .grid-container.grid-3 {
                 grid-template-columns: 1fr;
-            }
+            } 
         }
         @media (max-width: 768px) {
             .hero {
@@ -123,30 +123,79 @@
                 <div class="hero-btns">
                     <a href="schedule.html" class="btn-green">الجدول</a>
                     <a href="reviews.html" class="btn-outline">ورق الشرح</a>
+                    <button onclick="toggleFeaturesModal()" class="btn-gold-3d"><i class="fa-solid fa-wand-magic-sparkles"></i> المميزات</button>
                 </div>
             </div>
         </div>
     </section>
 
     <section class="container">
-        <div class="grid-container grid-3" style="padding-top: 50px;">
-            <div class="feature-box scroll-animate" style="transition-delay: 0.1s;">
-                <i class="fa-solid fa-book-open" style="color:var(--neon-red)"></i>
-                <h3>محتوى حصري</h3>
-                <p style="color:#888; font-size:0.9rem">كتب ومذكرات أعدها الدكتور خصيصاً لتسهيل أصعب المفاهيم.</p>
+        <!-- تم نقل المميزات إلى نافذة منبثقة لتوفير مساحة وتصميم أكثر عصرية -->
+    </section>
+
+    <!-- نافذة المميزات المنبثقة -->
+    <div class="features-modal-overlay" id="featuresOverlay">
+        <div class="features-modal">
+            <!-- خلفية الجزيئات داخل النافذة -->
+            <div class="particles">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-            <div class="feature-box green scroll-animate" style="transition-delay: 0.2s;">
-                <i class="fa-regular fa-circle-play"></i>
-                <h3>فيديوهات 4K</h3>
-                <p style="color:#888; font-size:0.9rem">شروحات تفصيلية بجودة عالية تركز على الفهم العميق للبيولوجيا.</p>
+
+            <div class="features-header">
+                <h3><i class="fa-solid fa-wand-magic-sparkles neon-gold-text"></i> ابتكارات منصة الدكتور</h3>
+                <div class="close-features" onclick="toggleFeaturesModal()" title="إغلاق">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
             </div>
-            <div class="feature-box scroll-animate" style="transition-delay: 0.3s;">
-                <i class="fa-solid fa-shield-halved" style="color:var(--neon-red)"></i>
-                <h3>تقييم مستمر</h3>
-                <p style="color:#888; font-size:0.9rem">اختبارات دورية ومتابعة دقيقة لكل طالب لضمان التفوق.</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fa-solid fa-book-atlas icon-lib"></i>
+                    <h3>المكتبة الشاملة</h3>
+                    <p>تضم المنصة كافة أوراق الشرح، بالإضافة إلى محتوى أربعة من أقوى الكتب الخارجية (الامتحان، الأضواء، المدرسة، والتفوق).</p>
+                    <a href="library.html" class="btn-card-3d"><i class="fa-solid fa-book-open"></i> تصفح المكتبة</a>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-cubes-stacked icon-3d"></i>
+                    <h3>تجربة بصرية 3D</h3>
+                    <p>انتقل من التلقين إلى التجسيد مع مجسمات تفاعلية للخلية، وتقنية Nano Banana 2 لرؤية فائقة الجودة مريحة للعين.</p>
+                    <a href="lab.html" class="btn-card-3d"><i class="fa-solid fa-vr-cardboard"></i> دخول المعرض</a>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-chart-line icon-eval"></i>
+                    <h3>التقييم والمتابعة</h3>
+                    <p>نظام ذكي للاختبارات الدورية، مع قسم خاص للفيديوهات التعليمية الحديثة التي تشرح المنهج بأسلوب مرئي متطور.</p>
+                    <a href="quizzes.html" class="btn-card-3d"><i class="fa-solid fa-graduation-cap"></i> ابدأ التقييم</a>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-bullhorn icon-comm"></i>
+                    <h3>التنظيم والتواصل</h3>
+                    <p>جدول مواعيد يتحدث تلقائياً، وصفحة "توجيهات المستر" لاستقبال الصور والأخبار الهامة فور صدورها.</p>
+                    <a href="contact.html" class="btn-card-3d"><i class="fa-solid fa-comments"></i> مركز الرسائل</a>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-code icon-tech"></i>
+                    <h3>بنية تقنية فائقة</h3>
+                    <p>نظام Backend قوي من تطوير مصطفى أبوطالب، وواجهة UI احترافية تم ابتكارها وتطويرها باستخدام تقنيات Gemini.</p>
+                    <a href="reviews.html" class="btn-card-3d"><i class="fa-solid fa-microscope"></i> تكنولوجيا الشرح</a>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-fingerprint icon-sec"></i>
+                    <h3>الوصول والأمان</h3>
+                    <p>تحميل مباشر كتطبيق، وتسجيل مبتكر يعتمد على صورة الوجه الشخصية لضمان أمان حسابك وتخصيص تجربتك.</p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button onclick="toggleFeaturesModal()" class="btn-mark-read" style="background: var(--neon-gold); color: #000; margin-top: 35px; width: auto; padding: 12px 40px; border-radius: 50px;">فهمت ذلك</button>
             </div>
         </div>
-    </section>
+    </div>
 
     <footer>
         <div style="text-align: center; padding: 20px;">
