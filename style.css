@@ -254,7 +254,7 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 .hero h1 { font-size: 4.5rem; line-height: 1.2; margin-bottom: 20px; }
 .neon-green-text { color: var(--neon-green); text-shadow: 0 0 20px rgba(0,255,65,0.4); }
 .neon-gold-text { color: var(--neon-gold); text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
-.hero-desc { max-width: 600px; color: var(--text-gray); margin-bottom: 30px; font-size: 1.1rem; }
+.hero-desc { max-width: 600px; color: var(--text-gray); margin-bottom: 30px; font-size: 1rem; line-height: 1.6; }
 .hero-btns { display: flex; gap: 20px; }
 .btn-green { 
     background: var(--neon-green); 
@@ -555,7 +555,7 @@ footer {
 @media (max-width: 768px) {
     .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
     .hero h1 { font-size: 2.5rem; }
-    .hero-desc { font-size: 1rem; padding: 0 20px; }
+    .hero-desc { font-size: 0.9rem; padding: 0 20px; line-height: 1.5; }
     .hero-btns { flex-direction: column; width: 100%; padding: 0 20px; }
     .btn-green, .btn-outline { width: 100%; }
     
