@@ -111,6 +111,18 @@
             touch-action: pan-y;
         }
 
+        /* تأثير التلاشي الناعم عند اختفاء الـ Poster */
+        model-viewer::part(poster) {
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 1s ease;
+            opacity: 1;
+        }
+
+        /* عندما يتم تحميل الموديل بنجاح ويختفي البوستر */
+        model-viewer[poster-dismissed]::part(poster) {
+            opacity: 0;
+            transform: scale(1.05); /* تكبير بسيط جداً يعطي إحساساً بالعمق أثناء التلاشي */
+        }
+
         /* تفاصيل الموديل الأسفل */
         .info-panel {
             padding: 20px;
@@ -235,6 +247,8 @@
                 camera-controls 
                 ar 
                 bounds="tight"
+                poster="1.png"
+                power-preference="high-performance"
                 enable-pan="false" 
                 environment-image="neutral"
                 shadow-intensity="1" 
@@ -259,6 +273,8 @@
                 camera-controls 
                 ar 
                 bounds="tight"
+                poster="2.png"
+                power-preference="high-performance"
                 enable-pan="false"
                 environment-image="neutral"
                 shadow-intensity="1" 
@@ -282,6 +298,8 @@
                 camera-controls 
                 ar 
                 bounds="tight"
+                poster="3.png"
+                power-preference="high-performance"
                 enable-pan="false"
                 environment-image="neutral"
                 shadow-intensity="1" 
@@ -305,6 +323,8 @@
                 camera-controls 
                 ar 
                 bounds="tight"
+                poster="4.png"
+                power-preference="high-performance"
                 enable-pan="false"
                 environment-image="neutral"
                 shadow-intensity="1" 
