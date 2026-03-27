@@ -94,6 +94,71 @@ document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('.scroll-animate');
     animatedElements.forEach((el) => observer.observe(el));
 
+    // 5. Smooth SPA Navigation (PJAX)
+    const appContent = document.getElementById('app-content');
+    
+    window.handleNavigation = async (url, pushState = true) => {
+        if (!appContent) return;
+        
+        // بدء تأثير التلاشي للخروج
+        appContent.classList.add('page-fade-out');
+        
+        try {
+            const response = await fetch(url);
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newContent = doc.getElementById('app-content').innerHTML;
+            const newTitle = doc.querySelector('title').innerText;
+
+            setTimeout(() => {
+                appContent.innerHTML = newContent;
+                document.title = newTitle;
+                
+                // تحديث الروابط النشطة في الهيدر الثابت
+                document.querySelectorAll('.nav-links a').forEach(link => {
+                    link.classList.remove('active');
+                    if (url.includes(link.getAttribute('href'))) link.classList.add('active');
+                });
+
+                if (pushState) history.pushState({ url }, '', url);
+                
+                // إعادة تشغيل الأنيميشن والمراقبين للمحتوى الجديد
+                const newAnimated = appContent.querySelectorAll('.scroll-animate');
+                newAnimated.forEach((el) => observer.observe(el));
+                
+                // إخفاء القائمة في الموبايل إذا كانت مفتوحة
+                navLinks.classList.remove('active');
+
+                // إنهاء تأثير التلاشي للدخول
+                appContent.classList.remove('page-fade-out');
+                window.scrollTo(0, 0);
+            }, 300);
+        } catch (err) {
+            console.error('Navigation failed:', err);
+            window.location.href = url; // Fallback في حالة الخطأ
+        }
+    };
+
+    // اعتراض جميع الضغطات على الروابط الداخلية
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (link && link.href.origin === window.location.origin && 
+            !link.getAttribute('target') && 
+            !link.href.includes('#')) {
+            e.preventDefault();
+            handleNavigation(link.href);
+        }
+    });
+
+    // 6. My Results Modal Logic
+    // التعامل مع أزرار الرجوع والتقدم في المتصفح
+    window.addEventListener('popstate', (e) => {
+        if (e.state && e.state.url) {
+            handleNavigation(e.state.url, false);
+        }
+    });
+
 }); 
 
 // Toggle Features Modal

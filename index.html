@@ -73,6 +73,7 @@
 </head>
 <body>
 
+    <!-- الهيدر سيبقى ثابتاً ولن يتم لمسه -->
     <nav class="navbar">
         <div class="logo">
             <i class="fa-solid fa-heart-pulse"></i>
@@ -95,6 +96,8 @@
         </div>
     </nav>
 
+    <!-- الحاوية التي سيتم تبديل محتواها فقط -->
+    <div id="app-content">
     <section class="hero">
         <div class="particles">
             <span></span>
@@ -210,6 +213,7 @@
             </div>
         </div>
     </div>
+    </div>
 
     <footer>
         <div style="text-align: center; padding: 20px;">
@@ -223,7 +227,7 @@
         </div>
     </footer>
 
-    <script src="main.js" defer></script>
+    <script type="module" src="main.js"></script>
 
     <!-- زر الأخبار العائم -->
     <div class="news-float-btn" onclick="openNewsModal()">

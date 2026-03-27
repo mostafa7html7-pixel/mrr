@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v37'; // إضافة صور الـ Poster للمجسمات
+const CACHE_NAME = 'abqarieno-v47'; // إزالة فكرة زر سجل النتائج
 const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل جميع الملفات الجديدة أو المعدلة
     './',
     './index.html',

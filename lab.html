@@ -19,55 +19,11 @@
     <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
 
     <style>
-        :root { 
-            --bg-color: #000000;
-            --card-bg: rgba(20, 0, 0, 0.4);
-            --accent-color: #ff003c; /* أحمر نيون */
-            --gold-color: #ffd700;   /* ذهبي */
-            --text-color: #ffffff; 
-            --neon-green: #00ff41; /* إضافة المتغير الناقص ليتوافق مع الهيدر */
-            --text-gray: #b3b3b3;
-            --text-white: #ffffff;
-        }
-        
-        /* إعدادات الوضع النهاري (Light Mode) */
-        body.light-mode {
-            --bg-color: #f4f4f9;
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --text-color: #1a1a1a;
-            --text-gray: #555555;
-            --text-white: #111111;
-            background: radial-gradient(circle at top center, #fff5f5, #e0e0e0);
-        }
-
-        /* إعدادات وضع القراءة المريح (Sepia Mode) */
-        body.sepia-mode {
-            --bg-color: #f5e6d3;
-            --card-bg: rgba(255, 253, 245, 0.8);
-            --text-color: #433422;
-            --text-gray: #7c6f5c;
-            --text-white: #433422;
-            background: radial-gradient(circle at top center, #fffdf5, #efe3d0);
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Cairo', sans-serif; /* توحيد الخط مع باقي الصفحات */
-            margin: 0;
-            overflow-x: hidden;
-            background: radial-gradient(circle at top center, #1a0505, #000000);
-            min-height: 100vh;
-            /* تحسين التمرير الناعم */
-            scroll-behavior: smooth;
-            direction: rtl;
-        }
-
         .container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -79,7 +35,7 @@
 
         /* تصميم الكارت الاحترافي */
         .model-card {
-            background: var(--card-bg);
+            background: rgba(20, 0, 0, 0.4);
             border: 1px solid rgba(255, 215, 0, 0.15); /* حدود ذهبية خفيفة */
             border-radius: 24px;
             position: relative;
@@ -235,6 +191,7 @@
         </div>
     </nav>
 
+    <div id="app-content">
     <div class="container">
         <div class="model-card">
             <button class="fullscreen-btn" title="ملء الشاشة">
@@ -337,6 +294,7 @@
                 <button class="ar-button">عرض AR</button>
             </div>
         </div>
+    </div>
     </div>
 
     <footer>

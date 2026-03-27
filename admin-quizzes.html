@@ -538,7 +538,7 @@
     <script src="main.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onValue, set, push, remove, update, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, onValue, set, push, remove, update, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
@@ -685,6 +685,7 @@
             const path = `quizzes/${quizId || push(ref(db, 'quizzes')).key}`;
             updates[`${path}/title`] = title;
             updates[`${path}/timeLimit`] = parseInt(timeLimit);
+            updates[`${path}/createdAt`] = serverTimestamp(); // تسجيل تاريخ الإصدار
             
             update(ref(db), updates).then(() => {
                 closeModal('addQuizModal');
