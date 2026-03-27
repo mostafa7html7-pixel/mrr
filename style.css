@@ -951,19 +951,82 @@ footer {
 /* --- Page Loader --- */
 #page-loader {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: #020202; z-index: 999999;
+    background: radial-gradient(circle at center, #0a0a0f 0%, #020202 100%);
+    z-index: 999999; overflow: hidden;
     display: flex; justify-content: center; align-items: center;
-    transition: opacity 0.6s ease, visibility 0.6s;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                visibility 0.4s;
 }
-.loader-content { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-.loader-icon {
-    font-size: 4rem; color: var(--neon-green);
-    animation: heartBeat 1.2s infinite;
-    filter: drop-shadow(0 0 20px var(--neon-green));
+.loader-content { 
+    text-align: center; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 25px; 
+    position: relative; z-index: 2;
+    animation: fadeInUp 0.8s ease-out;
 }
-.loader-text { font-family: 'Reem Kufi', sans-serif; font-size: 1.5rem; color: #fff; letter-spacing: 2px; }
-.loader-text small { display: block; font-size: 0.9rem; color: #888; margin-top: 5px; font-family: 'Cairo', sans-serif; }
+.loader-logo { 
+    width: 220px; 
+    height: auto; 
+    filter: drop-shadow(0 0 20px rgba(0, 255, 65, 0.4));
+    animation: logo-float 3s ease-in-out infinite;
+    user-select: none;
+    pointer-events: none;
+}
+
+.loader-text { font-family: 'Reem Kufi', sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; }
+.loader-text span { display: block; font-weight: 900; }
+.loader-text small { display: block; font-size: 1rem; color: var(--text-gray); margin-top: 5px; font-family: 'Cairo', sans-serif; }
+
+.loader-timer {
+    font-size: 1.2rem;
+    color: var(--neon-gold);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    margin-top: 15px;
+    font-weight: bold;
+}
+
 .loader-hidden { opacity: 0; visibility: hidden; }
+
+/* تأثير التفتت/الانفجار الاحترافي */
+.loader-explode {
+    animation: splash-explode 0.6s cubic-bezier(0.21, 0.01, 0.14, 1.01) forwards;
+    pointer-events: none;
+}
+
+@keyframes splash-explode {
+    0% {
+        transform: scale(1);
+        filter: blur(0px) brightness(1);
+    }
+    100% {
+        transform: scale(2.5); /* تكبير سريع يوحي بالانفجار */
+        filter: blur(30px) brightness(2); /* ضبابية مع زيادة سطوع */
+        opacity: 0;
+    }
+}
+
+@keyframes logo-float {
+    0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 20px rgba(0, 255, 65, 0.3)); }
+    50% { transform: translateY(-15px) scale(1.05); filter: drop-shadow(0 0 40px rgba(0, 255, 65, 0.6)); }
+}
+
+/* تحسينات الموبايل لشاشة التحميل */
+@media (max-width: 768px) {
+    .loader-logo {
+        width: 150px; /* حجم أصغر قليلاً للموبايل ليناسب الشاشة */
+    }
+    .loader-text {
+        font-size: 1.8rem;
+    }
+    .loader-timer {
+        font-size: 1rem;
+    }
+}
 
 /* --- Lightbox (عارض الصور) --- */
 .lightbox-overlay {

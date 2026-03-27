@@ -15,6 +15,8 @@
     
     <!-- تحسين السرعة: الاتصال المسبق بخوادم جوجل لتحميل المكتبة بشكل أسرع -->
     <link rel="preconnect" href="https://ajax.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -84,6 +86,7 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             overflow: hidden;
             backdrop-filter: blur(15px);
+            aspect-ratio: 4 / 5; /* يحافظ على أبعاد الكارت ثابتة قبل تحميل المجسم */
             /* تحسين الأداء: عدم رسم العناصر خارج الشاشة */
             content-visibility: auto;
             contain-intrinsic-size: 1px 500px;
@@ -98,11 +101,13 @@
         }
 
         model-viewer {
-            width: 100%;
-            height: 400px;
+            width: 100% !important;
+            height: 100% !important;
+            max-height: 450px;
             --poster-color: transparent;
             cursor: grab;
-            /* منع الصفحة من التمرير أثناء تحريك المجسم، والسماح به عند السحب عمودياً */
+            background-color: transparent;
+            /* منع التمرير العشوائي */
             touch-action: pan-y;
         }
 
@@ -229,9 +234,12 @@
                 auto-rotate 
                 camera-controls 
                 ar 
+                bounds="tight"
+                enable-pan="false" 
                 environment-image="neutral"
                 shadow-intensity="1" 
                 interaction-prompt="none"
+                interpolation-decay="200"
                 exposure="1"
                 loading="lazy">
             </model-viewer>
@@ -250,8 +258,11 @@
                 auto-rotate 
                 camera-controls 
                 ar 
+                bounds="tight"
+                enable-pan="false"
                 environment-image="neutral"
                 shadow-intensity="1" 
+                interpolation-decay="200"
                 interaction-prompt="none"
                 loading="lazy">
             </model-viewer>
@@ -270,8 +281,11 @@
                 auto-rotate 
                 camera-controls 
                 ar 
+                bounds="tight"
+                enable-pan="false"
                 environment-image="neutral"
                 shadow-intensity="1" 
+                interpolation-decay="200"
                 interaction-prompt="none"
                 loading="lazy">
             </model-viewer>
@@ -290,8 +304,11 @@
                 auto-rotate 
                 camera-controls 
                 ar 
+                bounds="tight"
+                enable-pan="false"
                 environment-image="neutral"
                 shadow-intensity="1" 
+                interpolation-decay="200"
                 interaction-prompt="none"
                 loading="lazy">
             </model-viewer>
@@ -347,9 +364,9 @@
                         observer.unobserve(modelViewer);
                     }
                 });
-            }, { 
-                // ابدأ التحميل عندما يكون المجسم على بعد 300 بكسل من الشاشة
-                rootMargin: '300px' 
+            }, {
+                // تم رفع المسافة إلى 1200 بكسل ليتم تحميل المجسمات البعيدة مسبقاً قبل وصول المستخدم إليها
+                rootMargin: '1200px' 
             });
 
             // ابدأ بمراقبة كل المجسمات
