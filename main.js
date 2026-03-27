@@ -94,25 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const animatedElements = document.querySelectorAll('.scroll-animate');
     animatedElements.forEach((el) => observer.observe(el));
 
-    // 5. Advanced Page Loader with Countdown
-    const loader = document.getElementById('page-loader');
-    if (loader) {
-        let timeLeft = 3; 
-        const timerDisplay = loader.querySelector('.timer-num');
-        
-        const countdown = setInterval(() => {
-            timeLeft--;
-            if (timerDisplay) timerDisplay.textContent = timeLeft;
-            
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                loader.classList.add('loader-explode'); // تفعيل تأثير الانفجار
-                // إزالة العنصر من الـ DOM بعد انتهاء الانتقال لتحسين الأداء
-                setTimeout(() => loader.remove(), 600);
-            }
-        }, 250); // العداد يتحرك كل ربع ثانية ليصبح الإجمالي أقل من ثانية
-    }
-
 }); 
 
 // Toggle Features Modal
