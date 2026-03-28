@@ -182,7 +182,9 @@
         let timerInterval;
         let timeLeft = 0;
         let currentUser = null;
-        const quizId = new URLSearchParams(window.location.search).get('id');
+        const urlParams = new URLSearchParams(window.location.search);
+        const quizId = urlParams.get('id');
+        const isReviewMode = urlParams.get('review') === 'true';
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -199,11 +201,26 @@
             if (snapshot.exists()) {
                 quizData = snapshot.val();
                 questions = quizData.questions ? Object.values(quizData.questions).sort((a,b) => (a.order || 0) - (b.order || 0)) : [];
+
+                // إذا كنا في وضع المراجعة، جلب نتائج الطالب السابقة
+                if (isReviewMode) {
+                    const resultSnap = await get(ref(db, `quiz_results/${quizId}/${currentUser.uid}`));
+                    if (resultSnap.exists()) {
+                        userAnswers = resultSnap.val().userAnswers || {};
+                    } else {
+                        alert("لم يتم العثور على إجابات سابقة لهذا الاختبار.");
+                        window.location.href = 'quizzes.html';
+                        return;
+                    }
+                }
                 
                 document.getElementById('quizTitle').innerText = quizData.title;
                 document.getElementById('qCount').innerText = questions.length;
                 document.getElementById('qTime').innerText = quizData.timeLimit;
                 document.getElementById('questionNumber').innerText = `السؤال 1 من ${questions.length}`;
+                
+                // تشغيل الاختبار تلقائياً في وضع المراجعة
+                if (isReviewMode) startQuiz();
             }
         }
 
@@ -214,8 +231,19 @@
             document.getElementById('questionScreen').style.display = 'block';
             document.getElementById('quizSidebar').style.display = 'block';
             
-            timeLeft = quizData.timeLimit * 60;
-            startTimer();
+            if (!isReviewMode) {
+                timeLeft = quizData.timeLimit * 60;
+                startTimer();
+            } else {
+                // إخفاء العداد في وضع المراجعة
+                document.getElementById('timer').parentElement.style.visibility = 'hidden';
+                document.getElementById('markBtn').style.display = 'none';
+                const sideFinishBtn = document.querySelector('.quiz-sidebar .btn-confirm-start');
+                if(sideFinishBtn) {
+                    sideFinishBtn.innerText = "إنهاء المراجعة";
+                    sideFinishBtn.onclick = () => window.location.href = 'quizzes.html';
+                }
+            }
             renderQuestion();
         };
 
@@ -249,9 +277,29 @@
             optionsGrid.innerHTML = '';
             q.options.forEach((opt, idx) => {
                 const btn = document.createElement('div');
-                btn.className = `option-btn ${userAnswers[currentIndex] === idx ? 'selected' : ''}`;
-                btn.innerText = opt;
-                btn.onclick = () => selectOption(idx);
+                btn.className = 'option-btn';
+                
+                if (isReviewMode) {
+                    const isCorrect = idx === q.correctAnswer;
+                    const isUserChoice = userAnswers[currentIndex] === idx;
+
+                    if (isCorrect) {
+                        btn.classList.add('selected');
+                        btn.style.borderColor = 'var(--neon-green)';
+                        btn.innerHTML = `${opt} <i class="fa-solid fa-circle-check" style="margin-right:10px;"></i>`;
+                    } else if (isUserChoice) {
+                        btn.style.borderColor = 'var(--neon-red)';
+                        btn.style.background = 'rgba(255,0,0,0.1)';
+                        btn.innerHTML = `${opt} <i class="fa-solid fa-circle-xmark" style="margin-right:10px;"></i>`;
+                    } else {
+                        btn.innerText = opt;
+                    }
+                    btn.style.cursor = 'default';
+                } else {
+                    if (userAnswers[currentIndex] === idx) btn.classList.add('selected');
+                    btn.innerText = opt;
+                    btn.onclick = () => selectOption(idx);
+                }
                 optionsGrid.appendChild(btn);
             });
 
@@ -332,6 +380,11 @@
         };
 
         window.finishQuiz = async function() {
+            if (isReviewMode) {
+                window.location.href = "quizzes.html";
+                return;
+            }
+
             // إخفاء مودال التأكيد وخريطة الاختبار فوراً عند التسليم
             document.getElementById('finishModal').style.display = 'none';
             document.getElementById('quizSidebar').style.display = 'none';
@@ -359,7 +412,8 @@
                     score: score,
                     total: questions.length,
                     percentage: percentage,
-                    submittedAt: serverTimestamp()
+                    submittedAt: serverTimestamp(),
+                    userAnswers: userAnswers // حفظ الإجابات للمراجعة لاحقاً
                 });
 
                 // عرض النتيجة النهائية
