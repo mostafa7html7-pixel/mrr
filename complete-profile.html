@@ -148,23 +148,22 @@
         /* Buttons */
         .btn-action {
             width: 100%;
-            padding: 15px;
-            border-radius: 15px;
+            height: 56px;
+            border-radius: 16px;
             border: none;
-            font-weight: bold;
+            font-weight: 900;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .btn-next {
             background: var(--neon-green);
             color: #000;
             box-shadow: 0 10px 30px -10px rgba(0, 255, 65, 0.6);
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
-        .btn-next:hover { transform: translateY(-3px); background: #fff; box-shadow: 0 20px 40px -10px rgba(0, 255, 65, 0.5); }
+        .btn-next:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 20px 40px -10px rgba(0, 255, 65, 0.5); }
         .btn-next:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
 
         .step-indicator {
