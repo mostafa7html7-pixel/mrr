@@ -8,22 +8,108 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- تحضير الصفحة القادمة لسرعة الانتقال -->
+    <link rel="prefetch" href="complete-profile.html">
+    <style>
+        :root {
+            --neon-green: #00ff41;
+            --neon-red: #ff003c;
+            --glass-bg: rgba(10, 10, 15, 0.8);
+            --car-reflection: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.15) 55%, transparent 70%);
+        }
+
+        body {
+            background: #050505;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; overflow: hidden; position: relative;
+        }
+
+        /* Background orbs for premium feel */
+        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.5; z-index: 0; }
+        .orb-1 { width: 400px; height: 400px; background: var(--neon-red); top: -10%; left: -10%; }
+        .orb-2 { width: 350px; height: 350px; background: var(--neon-green); bottom: -10%; right: -10%; }
+
+        .auth-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 35px;
+            padding: 50px 30px;
+            width: calc(100% - 40px);
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);
+            position: relative; overflow: hidden; z-index: 10;
+        }
+
+        /* Car Glass Reflection */
+        .auth-container::after {
+            content: ""; position: absolute; top: 0; left: -150%; width: 300%; height: 100%;
+            background: var(--car-reflection); animation: lightSweep 8s infinite ease-in-out; pointer-events: none;
+        }
+
+        @keyframes lightSweep { 0% { left: -150%; } 25% { left: 100%; } 100% { left: 100%; } }
+
+        .auth-logo i {
+            font-size: 4rem; color: var(--neon-red);
+            filter: drop-shadow(0 0 15px var(--neon-red));
+            margin-bottom: 20px; animation: heartBeat 2s infinite;
+        }
+
+        .auth-title { font-size: 2rem; font-weight: 900; color: #fff; margin-bottom: 10px; }
+        .auth-subtitle { color: #aaa; font-size: 1rem; margin-bottom: 40px; }
+
+        .auth-btn {
+            width: 100%; padding: 18px; border-radius: 20px;
+            background: var(--neon-green); color: #000;
+            border: none; font-weight: 900; font-size: 1.1rem;
+            cursor: pointer; transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px -10px rgba(0, 255, 65, 0.6);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: #fff; box-shadow: 0 20px 40px -10px rgba(0, 255, 65, 0.4);
+        }
+
+        .auth-btn:active { transform: translateY(0) scale(0.98); }
+
+        .error-msg {
+            background: rgba(255, 0, 60, 0.1); border: 1px solid var(--neon-red);
+            color: var(--neon-red); padding: 12px; border-radius: 12px;
+            margin-bottom: 20px; font-size: 0.9rem; display: none;
+        }
+
+        @keyframes heartBeat {
+            0%, 28%, 70%, 100% { transform: scale(1); }
+            14%, 42% { transform: scale(1.15); }
+        }
+    </style>
 </head>
-<body class="auth-body">
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
 
     <div class="auth-container">
         <div class="auth-logo">
             <i class="fa-solid fa-heart-pulse"></i>
         </div>
-        <h2 class="auth-title">أهلاً بك يا دكتور</h2>
-        <p class="auth-subtitle">اضغط على الزر أدناه للدخول إلى المنصة</p>
+        <h2 class="auth-title">منصة الدكتور</h2>
+        <p class="auth-subtitle">بوابتك لعالم الأحياء بمنظور مختلف</p>
 
-        <div id="errorBox" class="error-msg"></div>
+        <div id="errorBox" class="error-msg"></div> 
  
         <button id="loginBtn" class="auth-btn" onclick="anonymousLogin()">
-            <i class="fa-solid fa-right-to-bracket"></i> دخول كزائر (Anonymous)
+            <i class="fa-solid fa-bolt"></i> دخول سريع للمنصة
         </button>
 
+        <p style="margin-top: 25px; color: #555; font-size: 0.8rem;">
+            <i class="fa-solid fa-shield-halved"></i> نظام دخول آمن ومستقر
+        </p>
     </div>
 
     <script type="module">
@@ -36,21 +122,15 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
+        const errorBox = document.getElementById('errorBox');
 
         // تفعيل الحفظ المحلي للجلسة
         setPersistence(auth, browserLocalPersistence).catch(console.error);
 
-        // التحقق مما إذا كان المستخدم مسجلاً بالفعل
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                checkUserRole(user.uid);
-            }
-        });
-
         window.anonymousLogin = function() {
             const btn = document.getElementById('loginBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الدخول...';
+            btn.innerHTML = '<i class="fa-solid fa-bolt fa-spin"></i> جاري التحليق للمنصة...';
             
             signInAnonymously(auth)
             .then(() => {
@@ -59,7 +139,7 @@
             .catch((error) => {
                 console.error(error);
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> دخول كزائر (Anonymous)';
+                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> دخول سريع للمنصة';
                 errorBox.style.display = 'block';
                 // رسالة خطأ واضحة إذا لم يتم تفعيل الخاصية في فايربيز
                 if(error.code === 'auth/admin-restricted-operation') {
@@ -70,18 +150,30 @@
             });
         }
 
+        // مراقب الحالة: توجيه فوري بدون تأخير
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                checkUserRole(user.uid);
+            }
+        });
+
         async function checkUserRole(uid) {
             const snapshot = await get(ref(db, 'users/' + uid));
             if (snapshot.exists()) {
                 const userData = snapshot.val();
                 if (userData.banned) {
                     alert("تم حظر حسابك من قبل الإدارة.");
+                    signOut(auth);
                     return;
                 }
+                
+                // منطق الربط الذكي: إذا لم يكمل البيانات يذهب فوراً لصفحة الإكمال
                 if (userData.role === 'admin') window.location.href = "admin.html";
+                else if (!userData.username) window.location.href = "complete-profile.html";
                 else window.location.href = "index.html";
             } else {
-                window.location.href = "index.html";
+                // مستخدم جديد تماماً -> لصفحة الإكمال فوراً
+                window.location.href = "complete-profile.html";
             }
         }
     </script>

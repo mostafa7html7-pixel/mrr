@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إكمال البيانات - الدكتور</title>
+    <title>تسجيل بياناتك - منصة الدكتور</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
@@ -12,15 +12,18 @@
             --neon-green: #00ff41;
             --neon-gold: #ffd700;
             --neon-red: #ff003c;
-            --glass-bg: rgba(20, 20, 20, 0.6);
-            --border-color: rgba(255, 255, 255, 0.1);
+            --glass-bg: rgba(10, 10, 15, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shine: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            --car-reflection: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.15) 55%, transparent 70%);
+            --card-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
 
         body {
             margin: 0;
             padding: 0; 
-            height: 100vh;
-            width: 100vw;
+            min-height: 100vh; 
+            width: 100%;
             overflow: hidden;
             background-color: #050505;
             font-family: 'Cairo', sans-serif;
@@ -36,8 +39,7 @@
             border-radius: 50%;
             filter: blur(80px);
             opacity: 0.6;
-            /* animation: fly 10s infinite alternate ease-in-out; -- Removed for JS control */
-            transition: transform 0.2s ease-out; /* Smooth transition for mouse follow */
+            transition: transform 0.2s ease-out, background 1s ease-in-out; /* إضافة انتقال للألوان */
             will-change: transform; /* Performance optimization */
             z-index: 0;
         }
@@ -48,98 +50,106 @@
         /* 1:1 Container */
         .profile-card {
             position: relative;
-            width: 400px;
-            height: 400px; /* 1:1 Aspect Ratio */
+            width: calc(100% - 40px); /* يضمن وجود مساحة على الأطراف في الموبايل */
+            max-width: 420px;
+            min-height: 460px; /* زيادة بسيطة لراحة المحتوى */
             background: var(--glass-bg);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border-color);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: var(--card-shadow), inset 0 0 20px rgba(255,255,255,0.05);
             z-index: 10;
             display: flex;
             flex-direction: column;
+            padding: 40px 25px;
             overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .progress-container {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-        }
-        .progress-bar {
-            height: 100%;
-            width: 33%;
-            background: linear-gradient(90deg, var(--neon-green), var(--neon-gold));
-            transition: width 0.4s ease;
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-
-        .step-content {
-            position: absolute; /* Allow steps to overlap for transitions */
+        
+        /* Car Glass Light Sweep Animation */
+        .profile-card::after {
+            content: "";
+            position: absolute;
             top: 0;
-            left: 0;
-            width: 100%;
+            left: -150%;
+            width: 300%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            background: var(--car-reflection);
+            transition: 0s;
+            pointer-events: none;
+            animation: lightSweep 6s infinite ease-in-out;
+            z-index: 1;
+        }
+
+        @keyframes lightSweep {
+            0% { left: -150%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .step-card {
+            position: absolute;
+            top: 50%; left: 50%; width: 100%; height: auto;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 30px;
             text-align: center;
-            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-            opacity: 1;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0; pointer-events: none; transform: translate(-50%, -40%) scale(0.9);
+            z-index: 5;
         }
+        .step-card.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
 
-        .step-content.hidden {
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none; /* Disable interaction on hidden steps */
-        }
-
-        h2 { color: #fff; margin: 0 0 10px; font-size: 1.5rem; }
+        h2 { color: #fff; margin: 0 0 10px; font-size: 1.5rem; font-weight: 900; }
         p { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
 
         /* Avatar Step */
         .avatar-upload {
-            width: 140px; height: 140px;
+            width: 150px; height: 150px;
             border-radius: 50%;
-            border: 2px dashed var(--neon-green);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; overflow: hidden; position: relative;
             transition: 0.3s;
-            background: rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.03);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6), 0 0 0 4px rgba(0, 255, 65, 0.1);
         }
         .avatar-upload:hover {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            border-color: var(--neon-green);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 0 25px rgba(0, 255, 65, 0.3);
         }
         .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-upload i { font-size: 2.5rem; color: var(--neon-green); }
 
         /* Input Steps */
+        .input-wrapper { width: 100%; position: relative; margin-bottom: 15px; }
+        .input-wrapper i { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--neon-green); font-size: 1.1rem; z-index: 3; }
         .custom-input {
             background: rgba(0,0,0,0.4);
-            border: 1px solid #333;
+            border: 1px solid rgba(255,255,255,0.1);
             color: #fff;
-            padding: 15px;
-            border-radius: 12px;
-            width: 80%;
-            font-size: 1.1rem;
-            text-align: center;
+            padding: 16px 55px 16px 16px;
+            border-radius: 15px;
+            width: 100%;
+            font-size: 16px; /* يمنع التكبير التلقائي في آيفون */
+            text-align: right;
             outline: none;
-            transition: 0.3s;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
         .custom-input:focus {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+            border-color: rgba(0, 255, 65, 0.5);
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1), inset 0 0 10px rgba(0, 255, 65, 0.05);
         }
 
         /* Buttons */
         .btn-action {
-            margin-top: 20px;
-            padding: 10px 30px;
-            border-radius: 25px;
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
             border: none;
             font-weight: bold;
             cursor: pointer;
@@ -149,25 +159,23 @@
         .btn-next {
             background: var(--neon-green);
             color: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0, 255, 65, 0.6);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .btn-next:hover { transform: scale(1.05); background: #fff; }
-        
-        .btn-back {
-            background: transparent;
-            color: #777;
-            border: 1px solid #333;
-            margin-left: 10px;
-        }
-        .btn-back:hover { color: #fff; border-color: #fff; }
+        .btn-next:hover { transform: translateY(-3px); background: #fff; box-shadow: 0 20px 40px -10px rgba(0, 255, 65, 0.5); }
+        .btn-next:disabled { background: #333; color: #666; cursor: not-allowed; box-shadow: none; }
 
         .step-indicator {
-            position: absolute;
-            bottom: 15px;
-            width: 100%;
-            text-align: center;
-            color: #555;
-            font-size: 0.8rem;
+            position: absolute; bottom: 20px; width: 100%; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.8rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        /* تحسينات الموبايل الصغير جداً */
+        @media (max-height: 600px) {
+            .profile-card { transform: scale(0.85); margin-top: -20px; }
+            .step-indicator { bottom: 10px; }
+            h2 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -179,46 +187,38 @@
     <div class="flying-orb orb-3"></div>
 
     <div class="profile-card">
-        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-
-        <!-- The form now acts as a relative container for the absolute-positioned steps -->
         <form id="completeProfileForm" style="flex: 1; position: relative;">
-            <input type="file" id="avatarInput" accept="image/*" hidden required>
-
-            <!-- Step 1: Avatar -->
-            <div class="step-content" id="step1">
-                <h2>الصورة الشخصية</h2>
-                <p>اختر صورة واضحة لملفك الشخصي</p>
+            <!-- البطاقة الأولى: الصورة (تم نقلها للأول كما كانت) -->
+            <div class="step-card active" id="card1">
+                <h2>صورتك الشخصية</h2>
+                <p>ارفع صورتك عشان تظهر في لوحة الشرف</p>
                 <label for="avatarInput" class="avatar-upload" id="avatarPreview">
                     <i class="fa-solid fa-camera"></i>
                 </label>
-                <button type="button" class="btn-action btn-next" onclick="nextStep(2)">التالي <i class="fa-solid fa-arrow-left"></i></button>
+                <input type="file" id="avatarInput" accept="image/*" hidden required>
+                <button type="button" class="btn-action btn-next" style="margin-top: 20px;" onclick="goToStep(2)">التالي <i class="fa-solid fa-arrow-left"></i></button>
             </div>
 
-            <!-- Step 2: Name -->
-            <div class="step-content hidden" id="step2">
-                <h2>الاسم الثلاثي</h2>
-                <p>يرجى كتابة اسمك الحقيقي كاملاً</p>
-                <input type="text" id="nameInput" class="custom-input" placeholder="مثال: أحمد محمد علي" required>
-                <div style="display: flex; gap: 10px;">
-                    <button type="button" class="btn-action btn-back" onclick="prevStep(1)">رجوع</button>
-                    <button type="button" class="btn-action btn-next" onclick="nextStep(3)">التالي</button>
+            <!-- البطاقة الأولى: البيانات -->
+            <div class="step-card" id="card2">
+                <h2>البيانات الأساسية</h2>
+                <p>أدخل اسمك ورقمك لإنهاء التسجيل</p>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" id="nameInput" class="custom-input" placeholder="الاسم الثلاثي" required>
                 </div>
-            </div>
-
-            <!-- Step 3: Phone & Save -->
-            <div class="step-content hidden" id="step3">
-                <h2>رقم الهاتف</h2>
-                <p>للتواصل وتأمين الحساب</p>
-                <input type="tel" id="phoneInput" class="custom-input" placeholder="01xxxxxxxxx" required>
-                <div style="display: flex; gap: 10px;">
-                    <button type="button" class="btn-action btn-back" onclick="prevStep(2)">رجوع</button>
-                    <button type="submit" class="btn-action btn-next" id="submitBtn">حفظ وإنهاء <i class="fa-solid fa-check"></i></button>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="phoneInput" class="custom-input" placeholder="رقم الموبايل" required>
+                </div>
+                <div style="display: flex; gap: 10px; width: 100%;">
+                    <button type="button" class="btn-action" style="background: #222; color: #fff; flex: 1;" onclick="goToStep(1)">رجوع</button>
+                    <button type="submit" class="btn-action btn-next" id="submitBtn" style="flex: 2;">إنهاء <i class="fa-solid fa-check"></i></button>
                 </div>
             </div>
         </form>
-        
-        <div class="step-indicator" id="stepIndicator">خطوة 1 من 3</div>
+
+        <div class="step-indicator" id="stepIndicator">خطوة 1 من 2</div>
     </div>
 
     <script type="module">
@@ -231,44 +231,50 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // إعدادات Cloudinary لبقية الموقع
-        const CLOUD_NAME = "dzwrz9qzb";
-        const UPLOAD_PRESET = "my_chat_preset";
+        // إعدادات ImgBB للرفع السريع جداً
+        const IMGBB_API_KEY = "0385965848fc62374c1c82810ffa7d18";
 
         let currentUserUid = null;
         let selectedFile = null;
-        let currentStep = 1;
 
-        // Expose functions to window for HTML onclick attributes
-        window.nextStep = (step) => {
-            // Validation
-            if (step === 2 && !selectedFile) {
-                alert("يرجى اختيار صورة شخصية أولاً");
-                return;
+        // تغيير ألوان الخلفية ديناميكياً لزيادة الحماس
+        const updateBackdropColors = (step) => {
+            const orbs = [document.querySelector('.orb-1'), document.querySelector('.orb-2'), document.querySelector('.orb-3')];
+            if (step === 2) {
+                orbs[0].style.background = '#4285f4'; // Blue
+                orbs[1].style.background = '#9b72f3'; // Purple
+                orbs[2].style.background = '#34a853'; // Green
             }
-            if (step === 3) {
-                const name = document.getElementById('nameInput').value;
-                if (name.length < 5) {
-                    alert("يرجى كتابة الاسم الثلاثي بشكل صحيح");
-                    return;
-                }
-            }
-            showStep(step);
         };
 
-        window.prevStep = (step) => {
-            showStep(step);
+        window.goToStep = (step) => {
+            if (step === 2 && !selectedFile) return alert("يا بطل، لازم تختار صورتك الأول عشان تظهر في لوحة الشرف!");
+            document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(`card${step}`).classList.add('active');
+            document.getElementById('stepIndicator').innerText = `خطوة ${step} من 2`;
+            updateBackdropColors(step);
         };
 
-        function showStep(step) {
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`step${step}`).classList.remove('hidden');
-            
-            // Update Progress
-            const progress = (step / 3) * 100;
-            document.getElementById('progressBar').style.width = `${progress}%`;
-            document.getElementById('stepIndicator').innerText = `خطوة ${step} من 3`;
-            currentStep = step;
+        // ضغط ذكي: موازنة بين السرعة والجودة للـ Admin
+        async function compressImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 400; // حجم كافي ليكون واضح جداً في لوحة التحكم
+                        const scaleSize = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scaleSize;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7); // جودة عالية 70% للـ Admin
+                    };
+                };
+            });
         }
 
         onAuthStateChanged(auth, (user) => {
@@ -291,29 +297,31 @@
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> لحظة...';
 
             try {
-                let photoURL = "https://abqarieno.firebaseapp.com/212.png"; // صورة افتراضية
+                const name = document.getElementById('nameInput').value.trim();
+                const phone = document.getElementById('phoneInput').value.trim();
 
-                if (selectedFile) {
-                    const formData = new FormData();
-                    formData.append('file', selectedFile);
-                    formData.append('upload_preset', UPLOAD_PRESET);
+                if (name.length < 5) throw new Error("اكتب اسمك الثلاثي بالكامل");
+                if (phone.length < 11) throw new Error("رقم الهاتف غير صحيح");
 
-                    const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-                        method: 'POST',
-                        body: formData
-                    });
+                const compressedBlob = await compressImage(selectedFile);
+                const formData = new FormData();
+                formData.append('image', compressedBlob);
 
-                    if (!response.ok) throw new Error('فشل رفع الصورة، يرجى المحاولة مرة أخرى');
-                    const data = await response.json();
-                    photoURL = data.secure_url;
-                }
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('فشل الرفع، تأكد من الإنترنت');
+                const data = await response.json();
+                const photoURL = data.data.url;
 
                 await update(ref(db, 'users/' + currentUserUid), {
-                    username: document.getElementById('nameInput').value,
-                    phone: document.getElementById('phoneInput').value,
+                    username: name,
+                    phone: phone,
                     photoURL: photoURL,
                     role: 'student',
                     joinedAt: new Date().toISOString()
@@ -323,7 +331,7 @@
             } catch (error) {
                 alert("حدث خطأ: " + error.message);
                 btn.disabled = false;
-                btn.innerText = 'حفظ وإنهاء';
+                btn.innerHTML = 'إنهاء <i class="fa-solid fa-check"></i>';
             }
         });
 

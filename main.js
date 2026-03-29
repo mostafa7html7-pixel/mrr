@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (installBtn) { 
         if (!window.matchMedia('(display-mode: standalone)').matches) {
             installBtn.style.display = 'flex'; 
-        }
+        } 
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
