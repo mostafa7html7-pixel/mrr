@@ -15,7 +15,11 @@
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
-            --gemini-blue: #4285f4;
+            --accent-primary: #00ff88;
+            --accent-secondary: #00d2ff;
+            --accent-hot: #ff0055;
+            --bg-deep: #02040a;
+            --card-surface: rgba(13, 17, 23, 0.7);
             --gemini-purple: #9b72f3;
             --gemini-pink: #d96570;
             --gemini-gradient: linear-gradient(135deg, #4285f4, #9b72f3, #d96570);
@@ -29,25 +33,47 @@
             margin-top: 40px;
         }
  
+        body {
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 255, 136, 0.08) 0%, transparent 50%);
+            transition: background 0.1s ease;
+        }
+
         .quiz-card {
-            background: var(--card-bg-dark);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(138, 180, 248, 0.2); 
+            background: var(--card-surface);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
             padding: 25px;
             display: flex;
             flex-direction: column;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
 
-        .quiz-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            border-color: rgba(155, 114, 243, 0.5);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(66, 133, 244, 0.15);
+        .quiz-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+            pointer-events: none;
         }
+
+        .quiz-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            border-color: var(--accent-primary);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(0, 255, 136, 0.15);
+        }
+
+        .quiz-card::after {
+            content: "";
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            opacity: 0; transition: 0.5s; pointer-events: none;
+        }
+        .quiz-card:hover::after { opacity: 1; }
 
         .quiz-icon {
             font-size: 2.5rem;
@@ -170,8 +196,67 @@
             gap: 6px;
             transition: 0.3s;
         }
-        .quiz-date-info.is-today { color: var(--neon-gold); font-weight: bold; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        .quiz-date-info.is-today { color: var(--accent-primary); font-weight: bold; text-shadow: 0 0 15px rgba(0, 255, 136, 0.4); }
         .quiz-date-info.is-today i { animation: heartBeat 1.5s infinite; }
+
+        /* --- ستايلات سجل المحاولات والنتائج --- */
+        .attempts-history {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .attempts-list {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 5px 0 10px;
+            scrollbar-width: none;
+        }
+        .attempts-list::-webkit-scrollbar { display: none; }
+        .attempt-chip {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 6px 12px;
+            border-radius: 12px;
+            min-width: 80px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .attempt-chip .score { display: block; font-weight: 900; color: var(--accent-primary); font-size: 0.9rem; }
+        .attempt-chip .label { display: block; font-size: 0.6rem; color: #666; margin-top: 2px; }
+        
+        .retry-notice {
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--accent-primary);
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            font-weight: bold;
+        }
+
+        /* --- تحسينات الدخول الفوري والاحترافي --- */
+        .quiz-card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: cardEntrance 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(10, 15, 25, 0.9));
+        }
+
+        @keyframes cardEntrance {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quiz-card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -199,14 +284,14 @@
     </nav>
 
     <div id="app-content">
-    <div class="page-header">
+    <div class="page-header" style="animation: fadeInUp 0.8s ease; position: relative; z-index: 2;">
         <p class="subtitle">BIOLOGY QUIZ BANK</p>
-        <h2 class="main-title">بنك <span style="background: var(--gemini-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">الاختبارات</span></h2>
+        <h2 class="main-title">بنك <span style="color: var(--accent-primary); text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);">الاختبارات</span></h2>
         <p style="color:#888">اختبر فهمك، تحدى نفسك، وتفوق في المادة.</p>
     </div>
 
     <section class="container">
-        <div class="quiz-grid">
+        <div class="quiz-grid" id="quizGrid">
             <p style="text-align: center; color: var(--text-gray);">جاري تحميل الاختبارات المتاحة...</p>
         </div>
     </section>
@@ -227,27 +312,70 @@
     <script type="module" src="main.js"></script>
     <script type="module">
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
+        const auth = getAuth(app);
 
-        const quizGrid = document.querySelector('.quiz-grid');
+        const quizGrid = document.getElementById('quizGrid');
         const icons = ['fa-dna', 'fa-microscope', 'fa-puzzle-piece', 'fa-flask-vial', 'fa-seedling'];
 
-        onValue(ref(db, 'quizzes'), (snapshot) => {
-            quizGrid.innerHTML = '';
+        // --- نظام الإضاءة الديناميكي (Dynamic Spotlight) ---
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 100;
+            const y = (e.clientY / window.innerHeight) * 100;
+            document.body.style.setProperty('--mouse-x', x + '%');
+            document.body.style.setProperty('--mouse-y', y + '%');
+        });
+
+        // --- Rocket Speed: تحميل الكاش فوراً قبل الاتصال بالسيرفر ---
+        const cachedHTML = localStorage.getItem('quizzes_cache_v2');
+        if (cachedHTML) { quizGrid.innerHTML = cachedHTML; }
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return;
+
+            onValue(ref(db, 'quizzes'), async (snapshot) => {
             if (snapshot.exists()) {
-                let iconIndex = 0;
-                snapshot.forEach(childSnapshot => {
-                    const quizId = childSnapshot.key;
-                    const quiz = childSnapshot.val();
+                let htmlContent = '';
+                const quizzesData = snapshot.val();
+                let displayIndex = 0;
+
+                for (const quizId in quizzesData) {
+                    const quiz = quizzesData[quizId];
                     
                     // إخفاء الاختبار إذا لم يكن منشوراً
-                    if (quiz.published !== true) return;
+                    if (quiz.published !== true) continue;
 
                     const questionCount = quiz.questions ? Object.keys(quiz.questions).length : 0;
+                    const attemptsLimit = quiz.attemptsLimit || 1;
+
+                    // جلب نتيجة الطالب لهذا الاختبار تحديداً
+                    const resultSnap = await get(ref(db, `quiz_results/${quizId}/${user.uid}`));
+                    const userResult = resultSnap.val();
+                    const attemptsMade = userResult ? (userResult.attemptsMade || 0) : 0;
+                    const isLocked = attemptsMade >= attemptsLimit;
+                    
+                    // بناء قائمة النتائج السابقة
+                    let historyHtml = '';
+                    if (userResult) {
+                        // إذا كانت هناك مصفوفة تاريخ، نعرضها، وإلا نعرض النتيجة الأساسية كأول محاولة
+                        const history = userResult.history ? Object.values(userResult.history) : (userResult.percentage !== undefined ? [{ percentage: userResult.percentage }] : []);
+                        historyHtml = `
+                            <div class="attempts-history">
+                                <span style="font-size:0.7rem; color:#555; display:block; margin-bottom:8px;">نتائج محاولاتك السابقة:</span>
+                                <div class="attempts-list">
+                                    ${history.map((h, i) => `
+                                        <div class="attempt-chip">
+                                            <span class="score">${h.percentage}%</span>
+                                            <span class="label">محاولة ${i+1}</span>
+                                        </div>`).join('')}
+                                </div>
+                            </div>`;
+                    }
                     
                     // تنسيق التاريخ والوقت والفترة
                     const quizDate = quiz.createdAt ? new Date(quiz.createdAt) : null;
@@ -264,29 +392,38 @@
                         hour12: true
                     }) : 'تاريخ الإصدار غير متوفر';
 
-                    const iconClass = icons[iconIndex % icons.length];
-                    iconIndex++;
+                    const iconClass = icons[displayIndex % icons.length];
 
-                    const card = document.createElement('div');
-                    card.className = 'quiz-card';
-                    card.innerHTML = `
-                        <div class="quiz-icon"><i class="fa-solid ${iconClass}"></i></div>
-                        <h3>${quiz.title}</h3>
-                        <div class="quiz-date-info ${isToday ? 'is-today' : ''}">
-                            <i class="${isToday ? 'fa-solid fa-star' : 'fa-regular fa-calendar-check'}"></i>
-                            <span>${isToday ? 'صدر اليوم: ' : 'صدر في: '} ${dateFormatted}</span>
-                        </div>
-                        <div class="quiz-details">
-                            <span><i class="fa-solid fa-list-ol"></i> ${questionCount} سؤال</span>
-                            <span><i class="fa-regular fa-clock"></i> ${quiz.timeLimit} دقيقة</span>
-                        </div>
-                        <a href="quiz-player.html?id=${quizId}" class="btn-start-quiz">ابدأ الاختبار <i class="fa-solid fa-arrow-left"></i></a>
-                    `;
-                    quizGrid.appendChild(card);
-                });
+                    const statusText = isLocked ? 'استنفدت المحاولات' : (attemptsMade > 0 ? `محاولة ${attemptsMade + 1} من ${attemptsLimit}` : 'ابدأ الاختبار الآن');
+                    const btnClass = isLocked ? 'btn-start-quiz locked' : 'btn-start-quiz';
+                    const showRetryNotice = !isLocked && attemptsMade > 0;
+
+                    htmlContent += `
+                        <div class="quiz-card" style="animation-delay: ${displayIndex * 0.1}s;">
+                            <div class="quiz-icon"><i class="fa-solid ${iconClass}"></i></div>
+                            <h3>${quiz.title}</h3>
+                            ${showRetryNotice ? `<div class="retry-notice"><i class="fa-solid fa-bolt"></i> مسموح لك بمحاولة أخرى لتحسين درجتك!</div>` : ''}
+                            <div class="quiz-details">
+                                <span><i class="fa-solid fa-repeat"></i> ${attemptsMade} / ${attemptsLimit} محاولات</span>
+                                <span><i class="fa-solid fa-list-ol"></i> ${questionCount} سؤال</span>
+                                <span><i class="fa-regular fa-clock"></i> ${quiz.timeLimit} دقيقة</span>
+                            </div>
+                            <a href="${isLocked ? '#' : `quiz-player.html?id=${quizId}&title=${encodeURIComponent(quiz.title)}&time=${quiz.timeLimit}&q=${questionCount}&made=${attemptsMade}&limit=${attemptsLimit}`}" class="${btnClass}">${statusText} <i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-arrow-left'}"></i></a>
+                            ${attemptsMade > 0 ? `<a href="quiz-player.html?id=${quizId}&review=true" target="_top" class="btn-start-quiz" style="background:rgba(255,255,255,0.05); color:#fff; border:1px solid #333; margin-top:10px; box-shadow:none;"><i class="fa-solid fa-magnifying-glass-chart"></i> مراجعة الإجابات السابقة</a>` : ''}
+                            ${historyHtml}
+                        </div>`;
+                    
+                    displayIndex++;
+                }
+                
+                quizGrid.innerHTML = htmlContent;
+                // تحديث الكاش للزيارة القادمة
+                localStorage.setItem('quizzes_cache_v2', htmlContent);
             } else {
                 quizGrid.innerHTML = '<p style="text-align: center; color: var(--text-gray); grid-column: 1 / -1;">لا توجد اختبارات متاحة حالياً. ترقبوا الجديد!</p>';
+                localStorage.removeItem('quizzes_cache_v2');
             }
+        });
         });
     </script>
 </body>

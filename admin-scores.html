@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Reusing admin styles from style.css */
         :root {
@@ -16,15 +17,19 @@
             --admin-border: #222;
             --admin-text-primary: #e0e0e0;
             --admin-text-secondary: #888;
+            --admin-accent: #00ff88;
+            --admin-card-bg: #1a1d27; /* تمييز الكروت عن الخلفية */
+            --admin-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
   
         body.light-mode {
-            --admin-bg: #f0f2f5;
+            --admin-bg: #f1f5f9;
             --admin-surface: #ffffff;
-            --admin-surface-light: #f8f9fa;
-            --admin-border: #ddd;
+            --admin-surface-light: #e2e8f0;
+            --admin-border: #cbd5e0;
             --admin-text-primary: #333;
             --admin-text-secondary: #666;
+            --admin-card-bg: rgba(0,0,0,0.02);
         }
 
         body.sepia-mode {
@@ -36,51 +41,100 @@
             --admin-text-secondary: #7c6f5c;
         }
 
-        body { background-color: var(--admin-bg); color: var(--admin-text-primary); }
-        .filter-bar {
+        body { 
+            background-color: var(--admin-bg); 
+            color: var(--admin-text-primary);
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* --- تحسين واجهة اختيار الاختبار (Quiz Selector) --- */
+        .quiz-selector-wrapper { margin-bottom: 30px; }
+        .quiz-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            background: var(--admin-surface-light);
+            border-radius: 15px;
+            border: 1px solid var(--admin-border);
+        }
+        .quiz-select-card {
             background: var(--admin-surface);
+            border: 1px solid transparent;
             padding: 15px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            display: flex; flex-direction: column; gap: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .quiz-select-card:hover { border-color: var(--admin-accent); transform: translateY(-5px); background: var(--admin-card-bg); }
+        .quiz-select-card.active { 
+            background: var(--admin-accent); 
+            border-color: var(--admin-accent); 
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        .quiz-select-card.active h4 { color: #000; }
+        .quiz-select-card.active span { color: rgba(0,0,0,0.7); }
+        .quiz-select-card h4 { margin: 0; color: var(--admin-text-primary); font-size: 1rem; font-family: 'Reem Kufi', sans-serif; }
+        .quiz-select-card span { font-size: 0.8rem; color: var(--admin-text-secondary); }
+
+        /* --- إحصائيات الاختبار المحدد --- */
+        .quiz-stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
+            margin-bottom: 35px;
+            align-items: center;
         }
-        .filter-bar label { font-weight: bold; }
-        .filter-bar select {
-            flex-grow: 1;
-            background: var(--admin-surface-light);
-            border: 1px solid var(--admin-border);
-            color: var(--admin-text-primary);
-            padding: 10px;
-            border-radius: 8px;
-            outline: none;
+        .mini-stat {
+            background: var(--admin-surface); border: 1px solid var(--admin-border);
+            padding: 20px; border-radius: 20px;
+            text-align: center;
+            position: relative; overflow: hidden;
         }
+        .mini-stat::before { content: ''; position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: var(--admin-accent); opacity: 0.5; }
+        .mini-stat .val { display: block; font-size: 1.8rem; font-weight: 900; color: #fff; }
+        .mini-stat .lbl { font-size: 0.85rem; color: var(--admin-text-secondary); font-weight: bold; }
+        body.light-mode .mini-stat .val { color: #000; }
+
+        .search-box { position: relative; margin-bottom: 15px; }
+        .search-box input { 
+            width: 100%; background: var(--admin-surface); border: 1px solid var(--admin-border); 
+            padding: 12px 45px 12px 15px; border-radius: 12px; color: var(--admin-text-primary); outline: none; 
+        }
+        .search-box i { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--admin-accent); }
+
         .results-table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+            border-collapse: separate;
+            border-spacing: 0 8px;
         }
-        .results-table th, .results-table td {
-            padding: 15px;
+        .results-table th { padding: 15px; color: var(--admin-text-secondary); font-size: 0.9rem; border-bottom: 2px solid var(--admin-border); }
+        .results-table td {
+            padding: 18px 15px;
             text-align: right;
+            background: var(--admin-surface);
+            border-top: 1px solid var(--admin-border);
             border-bottom: 1px solid var(--admin-border);
         }
-        .results-table th {
-            color: var(--admin-text-secondary);
-            font-size: 0.9rem;
+        .results-table td:first-child { border-right: 1px solid var(--admin-border); border-radius: 0 12px 12px 0; }
+        .results-table td:last-child { border-left: 1px solid var(--admin-border); border-radius: 12px 0 0 12px; }
+        
+        .results-table tr:hover td { background: var(--admin-card-bg); border-color: var(--admin-accent); }
+
+        .rank-badge {
+            width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 0.8rem; margin-left: 10px;
         }
-        .results-table td {
-            color: var(--admin-text-primary);
-        }
-        .results-table tr:hover {
-            background: var(--admin-surface);
-        }
-        .score-percentage {
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 6px;
-        }
+        .rank-1 { background: var(--neon-gold); color: #000; box-shadow: 0 0 15px var(--neon-gold); }
+        .rank-2 { background: #c0c0c0; color: #000; }
+        .rank-3 { background: #cd7f32; color: #000; }
+
+        .score-percentage { font-weight: 900; padding: 6px 12px; border-radius: 8px; font-size: 0.9rem; }
 
         .admin-container {
             display: block;
@@ -125,10 +179,40 @@
                 text-align: right;
             }
         }
+
+        /* --- تحسينات الهيدر الخاص بالأدمن (Admin Header Professionalism) --- */
+        .navbar.admin-nav {
+            border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+            background: rgba(15, 17, 21, 0.98);
+            backdrop-filter: blur(15px);
+            padding: 10px 5%;
+        }
+        .admin-nav .logo-text span {
+            color: var(--admin-accent);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            font-family: 'Reem Kufi', sans-serif;
+        }
+        .admin-nav .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .admin-nav .nav-links a.logout-link {
+            color: var(--neon-red) !important;
+            border: 1px solid rgba(255, 0, 60, 0.3);
+            padding: 6px 15px !important;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+        .admin-nav .nav-links a.logout-link:hover {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <nav class="navbar admin-nav">
         <div class="logo">
             <i class="fa-solid fa-heart-pulse"></i>
             <div class="logo-text"><span>الدكتور</span><small>ADMIN DASHBOARD</small></div>
@@ -138,8 +222,8 @@
             <li><a href="admin-quizzes.html">الاختبارات</a></li>
             <li><a href="admin-scores.html" class="active">النتائج</a></li>
             <li><a href="admin-payments.html">المدفوعات</a></li>
-            <li><a href="index.html">الموقع</a></li>
-            <li><a href="#" onclick="logout()">خروج</a></li>
+            <li><a href="index.html" style="color: var(--admin-accent);"><i class="fa-solid fa-eye"></i> الموقع</a></li>
+            <li><a href="#" onclick="logout()" class="logout-link"><i class="fa-solid fa-power-off"></i> خروج</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
@@ -151,22 +235,34 @@
         <!-- Main Content -->
         <main class="admin-content">
             <div class="panel-section">
-                <div class="panel-header">
-                    <h2 class="panel-title">نتائج الطلاب في الاختبارات</h2>
+                <div class="panel-header" style="margin-bottom: 20px;">
+                    <h2 class="panel-title"><i class="fa-solid fa-chart-line"></i> نتائج الاختبارات</h2>
                 </div>
-                <div class="filter-bar">
-                    <label for="quizSelector">اختر اختباراً:</label>
-                    <select id="quizSelector">
-                        <option value="">-- يرجى الاختيار --</option>
-                    </select>
+                
+                <div class="quiz-selector-wrapper">
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="quizSearch" placeholder="ابحث عن اسم الاختبار..." onkeyup="filterQuizzes(this.value)">
+                    </div>
+                    <div class="quiz-cards-grid" id="quizCardsGrid">
+                        <p style="grid-column: 1/-1; text-align:center; padding:20px; color:var(--admin-text-secondary);">جاري تحميل قائمة الاختبارات...</p>
+                    </div>
                 </div>
+
+                <div id="quizStatsArea" class="quiz-stats-summary" style="display: none; animation: fadeInUp 0.4s ease;">
+                    <div class="mini-stat"><span class="val" id="totalSubmits">0</span><span class="lbl">إجمالي التسليمات</span></div>
+                    <div class="mini-stat"><span class="val" id="avgScore">0%</span><span class="lbl">متوسط الدرجات</span></div>
+                    <div class="mini-stat"><span class="val" id="topScore">0</span><span class="lbl">أعلى درجة</span></div>
+                </div>
+
                 <table class="results-table">
                     <thead>
                         <tr>
+                            <th style="width: 60px;">الترتيب</th>
                             <th>اسم الطالب</th>
-                            <th>النتيجة</th>
+                            <th style="text-align:center;">الدرجة</th>
                             <th>النسبة المئوية</th>
-                            <th>تاريخ التسليم</th>
+                            <th style="text-align:left;">تاريخ التسليم</th>
                         </tr>
                     </thead>
                     <tbody id="resultsBody">
@@ -194,50 +290,90 @@
             }
         };
 
-        const quizSelector = document.getElementById('quizSelector');
+        const quizCardsGrid = document.getElementById('quizCardsGrid');
         const resultsBody = document.getElementById('resultsBody');
+        const quizStatsArea = document.getElementById('quizStatsArea');
 
-        // Populate quizzes dropdown
+        // جلب الاختبارات وعرضها ككروت
         onValue(ref(db, 'quizzes'), (snapshot) => {
             if (snapshot.exists()) {
+                quizCardsGrid.innerHTML = '';
                 snapshot.forEach(child => {
-                    const option = document.createElement('option');
-                    option.value = child.key;
-                    option.innerText = child.val().title;
-                    quizSelector.appendChild(option);
+                    const quiz = child.val();
+                    const id = child.key;
+                    const qCount = quiz.questions ? Object.keys(quiz.questions).length : 0;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'quiz-select-card';
+                    card.onclick = () => loadResults(id, card);
+                    card.innerHTML = `
+                        <h4>${quiz.title}</h4>
+                        <span><i class="fa-solid fa-layer-group"></i> ${qCount} سؤال</span>
+                    `;
+                    quizCardsGrid.appendChild(card);
                 });
             }
         });
 
-        // Fetch results on selection
-        quizSelector.addEventListener('change', (e) => {
-            const quizId = e.target.value;
-            resultsBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">جاري تحميل النتائج...</td></tr>';
-            if (!quizId) {
-                resultsBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">اختر اختباراً من القائمة.</td></tr>';
-                return;
-            }
+        window.filterQuizzes = (val) => {
+            const cards = document.querySelectorAll('.quiz-select-card');
+            cards.forEach(c => {
+                const title = c.querySelector('h4').innerText.toLowerCase();
+                c.style.display = title.includes(val.toLowerCase()) ? 'flex' : 'none';
+            });
+        };
 
+        // جلب النتائج عند الضغط على كارت
+        window.loadResults = (quizId, cardElement) => {
+            // تمييز الكارت المختار
+            document.querySelectorAll('.quiz-select-card').forEach(c => c.classList.remove('active'));
+            cardElement.classList.add('active');
+
+            resultsBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">جاري تحميل النتائج...</td></tr>';
+            
             onValue(ref(db, `quiz_results/${quizId}`), (snapshot) => {
                 resultsBody.innerHTML = '';
                 if (snapshot.exists()) {
-                    snapshot.forEach(child => {
-                        const result = child.val();
+                    let resultsArray = [];
+                    snapshot.forEach(child => { resultsArray.push(child.val()); });
+
+                    // ترتيب النتائج تنازلياً حسب الدرجة
+                    resultsArray.sort((a, b) => b.score - a.score);
+
+                    let sumPercentages = 0;
+                    let maxScore = 0;
+                    resultsArray.forEach((result, index) => {
                         const percentageColor = result.percentage >= 80 ? 'var(--neon-green)' : result.percentage >= 50 ? 'var(--neon-gold)' : 'var(--neon-red)';
-                        const date = new Date(result.submittedAt).toLocaleString('ar-EG');
+                        const date = new Date(result.submittedAt).toLocaleString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                        
+                        const rank = index + 1;
+                        const rankHtml = rank <= 3 ? `<span class="rank-badge rank-${rank}">${rank}</span>` : `<span style="margin-left:20px; color:#666;">${rank}</span>`;
+
+                        sumPercentages += result.percentage;
+                        if (result.score > maxScore) maxScore = result.score;
+
                         resultsBody.innerHTML += `
-                            <tr>
-                                <td data-label="اسم الطالب">${result.username}</td>
-                                <td data-label="النتيجة">${result.score} / ${result.total}</td>
+                            <tr style="animation: fadeInUp 0.3s ease forwards;">
+                                <td>${rankHtml}</td>
+                                <td data-label="اسم الطالب" style="font-weight:bold;">${result.username}</td>
+                                <td data-label="النتيجة" style="text-align:center;">${result.score} / ${result.total}</td>
                                 <td data-label="النسبة المئوية"><span class="score-percentage" style="color: ${percentageColor}; background: ${percentageColor}20;">${result.percentage}%</span></td>
-                                <td data-label="تاريخ التسليم">${date}</td>
+                                <td data-label="تاريخ التسليم" style="text-align:left; font-size:0.8rem; color:var(--admin-text-secondary);">${date}</td>
                             </tr>`;
                     });
+
+                    // تحديث الإحصائيات
+                    document.getElementById('totalSubmits').innerText = resultsArray.length;
+                    document.getElementById('avgScore').innerText = Math.round(sumPercentages / resultsArray.length) + '%';
+                    document.getElementById('topScore').innerText = maxScore;
+                    quizStatsArea.style.display = 'grid';
+
                 } else {
                     resultsBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">لا توجد نتائج لهذا الاختبار بعد.</td></tr>';
+                    quizStatsArea.style.display = 'none';
                 }
-            });
-        });
+            }, { onlyOnce: true });
+        };
     </script>
 </body>
 </html>

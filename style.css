@@ -6,14 +6,14 @@
 /* style.css - ملف التصميم لكل الصفحات */
 
 :root {
-    --bg-color: #020202;
-    --card-bg: #0a0a0a;
+    --bg-color: #020204; /* عمق أكثر للسواد */
+    --card-bg: #0f111a; /* لون مغاير للخلفية للحاويات */
     --neon-green: #00ff41;
     --neon-red: #ff0000;
     --neon-gold: #ffd700;
     --text-white: #ffffff;
-    --text-gray: #b3b3b3;
-    --border-color: #333;
+    --text-gray: #a0aec0; /* تفتيح الرمادي للوضوح */
+    --border-color: rgba(255, 255, 255, 0.12); /* حدود واضحة في الظلام */
     /* Gemini Colors */
     --gemini-blue: #4285f4;
     --gemini-purple: #9b72f3;
@@ -28,20 +28,20 @@
 
 /* إعدادات الوضع النهاري (Light Mode) */
 body.light-mode {
-    --bg-color: #f0f2f5;
+    --bg-color: #f8fafc;
     --card-bg: #ffffff;
     --text-white: #111111;
-    --text-gray: #555555;
-    --border-color: #cccccc;
+    --text-gray: #4a5568;
+    --border-color: #cbd5e0; /* حدود أغمق قليلاً للوضوح */
 }
 
 /* إعدادات وضع القراءة المريح (Sepia Mode) */
 body.sepia-mode {
     --bg-color: #f5e6d3;
     --card-bg: #fffdf5; 
-    --text-white: #433422;
-    --text-gray: #7c6f5c; 
-    --border-color: #dccfb6;
+    --text-white: #2d2418;
+    --text-gray: #5d4d3b; 
+    --border-color: #cbbba0;
     --neon-green: #2e8b57; /* أخضر داكن مريح */
     --neon-red: #c0392b; 
     --neon-gold: #d35400;
@@ -75,6 +75,11 @@ body, button, input, textarea, select {
     font-family: 'Cairo', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+html, body { /* إضافة html هنا لضمان تطبيق overflow-x على كامل الصفحة */
+    overflow-x: hidden; /* منع أي تجاوز أفقي */
+    width: 100%; /* ضمان أن الصفحة تأخذ العرض الكامل */
 }
 
 body { 
@@ -1030,22 +1035,25 @@ footer {
 .quiz-player-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* تغيير للبدء من الأعلى لضمان عدم قص المحتوى الطويل */
     min-height: calc(100vh - 150px);
-    padding: 20px;
+    padding: clamp(10px, 3vw, 20px); /* حشو متجاوب للحاوية الكبرى */
+    width: 100%; /* ضمان أن الحاوية تأخذ العرض الكامل */
+    box-sizing: border-box; /* التأكد من أن الحشو والحدود داخل العرض المحدد */
+    overflow-x: hidden; /* منع أي تجاوز أفقي داخل هذه الحاوية */
 }
 
 .quiz-card-player {
     width: 100%;
-    max-width: 800px;
-    min-height: 500px;
-    background: rgba(15, 15, 25, 0.8);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
-    padding: 40px;
+    max-width: 850px;
+    min-height: auto; /* السماح للحاوية بالتكيف مع المحتوى */
+    background: rgba(15, 15, 25, 0.85);
+    backdrop-filter: blur(25px); /* زيادة حدة الضبابية */
+    border: 1px solid rgba(255, 255, 255, 0.15); /* حدود أكثر وضوحاً */
+    border-radius: clamp(20px, 4vw, 35px); /* حواف متجاوبة */
+    padding: clamp(15px, 5vw, 40px); /* تقليل الحشو في الموبايل لزيادة المساحة */
     position: relative;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6); /* ظل أقوى */
     display: flex;
     flex-direction: column;
     transition: all 0.5s ease;
@@ -1068,19 +1076,13 @@ footer {
     box-shadow: 0 0 15px var(--neon-green);
 }
 
-.quiz-start-screen {
-    text-align: center;
-    animation: fadeInUp 0.6s ease-out;
-}
-
 .quiz-info-box {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin: 30px 0;
+    gap: clamp(10px, 3vw, 20px);
+    margin: clamp(20px, 5vw, 30px) 0;
     background: rgba(255,255,255,0.02);
-    padding: 20px;
-    border-radius: 20px;
+    padding: clamp(15px, 4vw, 25px); /* جعل الحشو متجاوباً */
     border: 1px solid rgba(255,255,255,0.05);
 }
 
@@ -1088,19 +1090,30 @@ footer {
 .info-item span { color: var(--text-gray); font-size: 0.9rem; }
 .info-item h4 { font-size: 1.2rem; color: #fff; }
 
+.info-item i { 
+    color: var(--neon-gold); 
+    font-size: clamp(1.2rem, 3.5vw, 1.5rem); /* حجم خط متجاوب */
+    margin-bottom: clamp(5px, 2vw, 10px); /* هامش متجاوب */
+    display: block; 
+}
+.info-item span { 
+    color: var(--text-gray); 
+    font-size: clamp(0.8rem, 2.2vw, 0.9rem); /* حجم خط متجاوب */
+}
+.info-item h4 { 
+    font-size: clamp(1rem, 2.8vw, 1.2rem); /* حجم خط متجاوب */
+    color: #fff; 
+}
+
 .btn-confirm-start {
     background: var(--neon-green);
     color: #000;
-    padding: 15px 50px;
-    border-radius: 15px;
-    font-size: 1.2rem;
-    font-weight: 900;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 8px 0 #009926, 0 15px 25px rgba(0, 255, 65, 0.2);
-    transition: all 0.2s;
-    position: relative;
-    top: 0;
+    padding: clamp(12px, 4vw, 15px) clamp(30px, 8vw, 50px); /* حشو متجاوب */
+    border-radius: clamp(10px, 3vw, 15px); /* حواف متجاوبة */
+    font-size: clamp(1rem, 3vw, 1.2rem); /* حجم خط متجاوب */
+    font-weight: 900; border: none; cursor: pointer;
+    box-shadow: 0 clamp(6px, 2vw, 8px) 0 #009926, 0 clamp(10px, 4vw, 15px) clamp(15px, 5vw, 25px) rgba(0, 255, 65, 0.2);
+    transition: all 0.2s; position: relative; top: 0;
 }
 .btn-confirm-start:hover { transform: translateY(-2px); box-shadow: 0 10px 0 #009926, 0 20px 30px rgba(0, 255, 65, 0.3); }
 .btn-confirm-start:active { top: 6px; box-shadow: 0 2px 0 #009926; }
@@ -1121,13 +1134,13 @@ footer {
 .option-btn {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.1);
-    padding: 18px 25px;
+    padding: clamp(12px, 3vw, 20px); /* حشو متجاوب */
     border-radius: 15px;
     text-align: right;
     color: #ddd;
     cursor: pointer;
     transition: 0.3s;
-    font-size: 1.05rem;
+    font-size: clamp(0.9rem, 2.5vw, 1.1rem); /* حجم خط متجاوب */
     font-weight: 500;
 }
 .option-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--neon-gold); color: #fff; }
@@ -1756,5 +1769,25 @@ audio::-webkit-media-controls-play-button { background-color: #fff; border-radiu
     .feature-card {
         padding: 20px;
         background: rgba(255, 255, 255, 0.05);
+    }
+}
+
+/* حل مشكلة ضيق مساحة النص في الموبايل في معاينة الأسئلة */
+@media (max-width: 768px) {
+    .question-item-content {
+        flex-direction: column !important;
+        display: flex !important;
+        gap: 15px !important;
+    }
+
+    .question-item-text {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .question-item-img {
+        width: 100% !important;
+        max-width: 350px !important;
+        height: auto !important;
     }
 }

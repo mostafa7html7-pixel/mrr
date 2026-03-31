@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --admin-bg: #020204;
@@ -15,6 +16,7 @@
             --admin-border: #222;
             --admin-text-primary: #e0e0e0;
             --admin-text-secondary: #888; 
+            --admin-accent: #00ff88;
         } 
 
         body.light-mode {
@@ -74,10 +76,40 @@
             .req-card { grid-template-columns: 1fr; text-align: center; }
             .req-actions { flex-direction: row; justify-content: center; }
         }
+
+        /* --- تحسينات الهيدر الخاص بالأدمن (Admin Header Professionalism) --- */
+        .navbar.admin-nav {
+            border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+            background: rgba(15, 17, 21, 0.98);
+            backdrop-filter: blur(15px);
+            padding: 10px 5%;
+        }
+        .admin-nav .logo-text span {
+            color: var(--admin-accent);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+            font-family: 'Reem Kufi', sans-serif;
+        }
+        .admin-nav .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .admin-nav .nav-links a.logout-link {
+            color: var(--neon-red) !important;
+            border: 1px solid rgba(255, 0, 60, 0.3);
+            padding: 6px 15px !important;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+        .admin-nav .nav-links a.logout-link:hover {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
+    <nav class="navbar admin-nav">
         <div class="logo">
             <i class="fa-solid fa-heart-pulse"></i>
             <div class="logo-text"><span>الدكتور</span><small>ADMIN DASHBOARD</small></div>
@@ -87,8 +119,8 @@
             <li><a href="admin-quizzes.html">الاختبارات</a></li>
             <li><a href="admin-scores.html">النتائج</a></li>
             <li><a href="admin-payments.html" class="active">المدفوعات</a></li>
-            <li><a href="index.html">الموقع</a></li>
-            <li><a href="#" onclick="logout()">خروج</a></li>
+            <li><a href="index.html" style="color: var(--admin-accent);"><i class="fa-solid fa-eye"></i> الموقع</a></li>
+            <li><a href="#" onclick="logout()" class="logout-link"><i class="fa-solid fa-power-off"></i> خروج</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>

@@ -22,8 +22,8 @@
             backdrop-filter: blur(15px); 
         }
         @media (max-width: 1024px) { 
-            .quiz-layout { flex-direction: column; align-items: center; } 
-            .quiz-sidebar { width: 280px; max-width: 90%; position: static; order: 2; } /* حجم صغير وثابت في الموبايل أيضاً */
+            .quiz-layout { flex-direction: column; align-items: stretch; gap: 20px; } 
+            .quiz-sidebar { width: 100%; max-width: 100%; position: static; order: 2; } 
         }
 
         .q-palette { display: grid; grid-template-columns: repeat(5, 35px); justify-content: center; gap: 8px; margin-top: 15px; }
@@ -46,12 +46,114 @@
         }
         .finish-modal {
             background: #0f0f1a; border: 1px solid var(--gemini-purple, #9b72f3);
-            padding: 40px; border-radius: 30px; text-align: center; max-width: 450px; width: 90%;
+            padding: clamp(20px, 5vw, 40px); border-radius: 30px; text-align: center; max-width: 450px; width: 90%;
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
         .finish-stats { display: flex; justify-content: space-around; margin: 25px 0; }
         .f-stat-item i { display: block; font-size: 1.5rem; margin-bottom: 8px; }
         .f-stat-item span { font-weight: 900; font-size: 1.2rem; }
+
+        /* شريط أزرار المودال الاحترافي */
+        .finish-modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap; /* يمنع خروج الأزرار بره الحاوية في الموبايل */
+        }
+        .finish-modal-actions button {
+            min-width: 120px; /* ضمان حجم مناسب للضغط */
+        }
+
+        /* تحسينات السؤال في الموبايل */
+        .quiz-q-img { max-width: 100%; max-height: 38vh; /* min-height: 150px; */ object-fit: contain; display: block; margin: 0 auto clamp(10px, 3vw, 15px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); cursor: zoom-in; background: rgba(0,0,0,0.3); transition: 0.3s; }
+        .quiz-q-text { font-size: clamp(1rem, 2.8vw, 1.35rem); line-height: 1.6; color: #fff; font-weight: 700; word-wrap: break-word; overflow-wrap: anywhere; text-align: center; margin-bottom: clamp(15px, 4vw, 25px); }
+        @media (max-width: 768px) {
+            .quiz-card-player { padding: clamp(15px, 4vw, 25px) !important; min-height: auto !important; border-radius: clamp(15px, 3vw, 20px); width: 100%; } /* إزالة !important من width */
+            .question-text { margin-bottom: 20px; }
+            .options-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* --- تحسين أزرار التحكم في الموبايل --- */
+        .quiz-controls {
+            margin-top: clamp(20px, 5vh, 40px);
+            display: flex;
+            justify-content: space-between;
+            gap: clamp(8px, 2vw, 15px);
+            flex-wrap: wrap; /* السماح للأزرار بالنزول لسطر جديد */
+        }
+        .quiz-controls button {
+            flex: 1 1 auto; /* السماح للأزرار بالتمدد والانكماش */
+            padding: clamp(10px, 3vw, 12px) clamp(8px, 2vw, 10px) !important;
+            font-size: clamp(0.8rem, 2.5vw, 1rem) !important;
+            white-space: nowrap;
+        }
+
+        /* تصميم حاوية النتيجة الاحترافية */
+        .result-card-pro {
+            text-align: center;
+            padding: clamp(20px, 5vw, 40px);
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .result-circle {
+            width: clamp(120px, 30vw, 180px); 
+            height: clamp(120px, 30vw, 180px);
+            border-radius: 50%;
+            margin: 0 auto clamp(20px, 4vw, 30px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 8px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+            position: relative;
+            background: rgba(0,0,0,0.2);
+        }
+        .result-circle .pct { 
+            font-size: clamp(2rem, 6vw, 3rem); 
+            font-weight: 900; color: var(--neon-green); line-height: 1; 
+        }
+        .result-circle .label { 
+            font-size: clamp(0.6rem, 1.5vw, 0.8rem); 
+            color: #888; text-transform: uppercase; margin-top: 5px; 
+        }
+        
+        .result-msg { 
+            font-family: 'Reem Kufi', sans-serif; 
+            font-size: clamp(1.2rem, 4vw, 1.8rem); 
+            margin-bottom: clamp(10px, 3vw, 15px); color: #fff; 
+        }
+        .result-desc { 
+            color: var(--text-gray); 
+            font-size: clamp(0.85rem, 2.5vw, 1rem); 
+            margin-bottom: clamp(20px, 5vw, 30px); line-height: 1.6; 
+        }
+        
+        .result-stats-mini {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* مرونة أكبر في الأعمدة */
+            gap: clamp(8px, 2vw, 15px); 
+            margin-bottom: clamp(20px, 5vw, 30px);
+        }
+        .res-stat { 
+            background: rgba(255,255,255,0.02); 
+            padding: clamp(10px, 3vw, 15px); 
+            border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); 
+        }
+        .res-stat i { 
+            display: block; margin-bottom: 5px; 
+            font-size: clamp(1rem, 2.8vw, 1.3rem); 
+        }
+        .res-stat span { 
+            display: block; font-weight: bold; 
+            font-size: clamp(1rem, 2.8vw, 1.3rem); 
+        }
+        .res-stat small { 
+            display: block; font-size: clamp(0.7rem, 1.8vw, 0.8rem); 
+            color: var(--text-gray); margin-top: 3px; 
+        }
+        
+        .result-actions { 
+            display: flex; flex-direction: column; 
+            gap: clamp(10px, 3vw, 15px); 
+            max-width: 300px; margin: 0 auto; 
+        }
     </style>
 </head>
 <body>
@@ -66,17 +168,28 @@
         </ul>
     </nav>
 
-    <div id="app-content">
+    <!-- عارض الصور الاحترافي (Lightbox) -->
+    <div id="lightbox-overlay" class="lightbox-overlay">
+        <span class="close-lightbox">&times;</span>
+        <div class="lightbox-content" id="lightbox-content"></div>
+    </div>
+
+    <div id="app-content" style="padding-bottom: 60px;">
         <div class="quiz-player-container">
             <div class="quiz-layout">
             <div class="quiz-main-area">
-            <div class="quiz-card-player" id="quizCard">
+            <div class="quiz-card-player" id="quizCard" style="border-top: 4px solid var(--neon-green); margin: 0 auto;">
                 <!-- شاشة تأكيد البدء -->
                 <div class="quiz-start-screen" id="startScreen">
-                    <p class="subtitle" style="color: var(--neon-gold);">جاهز للتحدي؟</p>
-                    <h2 class="main-title" id="quizTitle">عنوان الاختبار</h2>
+                    <div style="margin-bottom: 30px;">
+                        <div style="width: 80px; height: 80px; background: rgba(0, 255, 65, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid var(--neon-green);">
+                            <i class="fa-solid fa-bolt-lightning" style="font-size: 2.5rem; color: var(--neon-green); filter: drop-shadow(0 0 10px var(--neon-green));"></i>
+                        </div>
+                        <p class="subtitle" style="color: var(--neon-gold); font-weight: 900; letter-spacing: 2px;">CONFIRMATION REQUIRED</p>
+                        <h2 class="main-title" id="quizTitle" style="font-family: 'Reem Kufi', sans-serif; font-size: clamp(1.8rem, 5vw, 2.2rem); margin-top: 10px;">--</h2>
+                    </div>
                     
-                    <div class="quiz-info-box">
+                    <div class="quiz-info-box" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;">
                         <div class="info-item">
                             <i class="fa-solid fa-clipboard-question"></i>
                             <span>عدد الأسئلة</span>
@@ -89,14 +202,20 @@
                         </div>
                     </div>
 
-                    <div style="margin: 30px 0; color: #888; font-size: 0.9rem; line-height: 1.6;">
-                        <p><i class="fa-solid fa-circle-info" style="color:var(--neon-green)"></i> بمجرد الضغط على زر البدء، سيبدأ العداد التنازلي فوراً.</p>
-                        <p>تأكد من استقرار اتصال الإنترنت لديك قبل البدء.</p>
+                    <div style="margin: 25px 0; padding: 15px; background: rgba(255, 0, 0, 0.05); border-radius: 12px; border: 1px dashed rgba(255, 0, 60, 0.2);">
+                        <p style="color: #aaa; font-size: 0.85rem; line-height: 1.6;">
+                            <i class="fa-solid fa-circle-exclamation" style="color: var(--neon-red);"></i> تنبيه: العداد الزمني سيبدأ فور الضغط على الزر أدناه.
+                        </p>
                     </div>
 
-                    <button class="btn-confirm-start" onclick="startQuiz()">
-                        <i class="fa-solid fa-play"></i> تأكيد وبدء الاختبار
-                    </button>
+                    <div style="display: flex; flex-direction: column; gap: 15px; align-items: center; width: 100%;">
+                        <button class="btn-confirm-start" onclick="startQuiz()" style="width: 100%; max-width: 400px; height: clamp(50px, 12vw, 60px);">
+                            <i class="fa-solid fa-play"></i> تأكيد الانطلاق
+                        </button>
+                        <a href="quizzes.html" style="color: #666; font-weight: bold; font-size: 0.95rem; text-decoration: none; transition: 0.3s; display: flex; align-items: center; gap: 8px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#666'">
+                            <i class="fa-solid fa-rotate-right"></i> تراجع، لست مستعداً بعد
+                        </a>
+                    </div>
                 </div>
 
                 <!-- شاشة الأسئلة (مخفية في البداية) -->
@@ -118,10 +237,10 @@
                         <!-- الخيارات ستظهر هنا -->
                     </div>
 
-                    <div style="margin-top: 40px; display: flex; justify-content: space-between; gap: 15px;">
-                        <button class="btn-outline" style="flex: 1; padding: 12px;" onclick="prevQuestion()" id="prevBtn">السابق</button>
-                        <button class="btn-gold-3d" style="flex: 1; padding: 12px;" onclick="toggleMark()" id="markBtn"><i class="fa-solid fa-thumbtack"></i> مراجعة</button>
-                        <button class="btn-green" style="flex: 1.5; padding: 12px;" onclick="nextQuestion()" id="nextBtn">التالي</button>
+                    <div class="quiz-controls">
+                        <button class="btn-outline" style="flex: 1;" onclick="prevQuestion()" id="prevBtn">السابق</button>
+                        <button class="btn-gold-3d" style="flex: 1;" onclick="toggleMark()" id="markBtn"><i class="fa-solid fa-thumbtack"></i> مراجعة</button>
+                        <button class="btn-green" style="flex: 1.5;" onclick="nextQuestion()" id="nextBtn">التالي</button>
                     </div>
                 </div>
             </div>
@@ -155,12 +274,42 @@
                 <div class="f-stat-item"><i class="fa-solid fa-xmark" style="color:var(--neon-red)"></i><span id="statLeft">0</span><small style="display:block; color:#666; font-size:0.7rem;">متروك</small></div>
                 <div class="f-stat-item"><i class="fa-solid fa-thumbtack" style="color:var(--neon-gold)"></i><span id="statMarked">0</span><small style="display:block; color:#666; font-size:0.7rem;">مراجعة</small></div>
             </div>
-            <div style="display:flex; gap:15px; margin-top: 30px;">
-                <button class="btn-green" style="flex:2; box-shadow: none;" onclick="finishQuiz()">نعم، تسليم الآن</button>
+            <div class="finish-modal-actions">
+                <button class="btn-green" style="flex:2; box-shadow: none;" onclick="finishQuiz()">نعم، إنهاء</button>
                 <button class="btn-outline" style="flex:1; box-shadow: none;" onclick="document.getElementById('finishModal').style.display='none'">تراجع</button>
             </div>
         </div>
     </div>
+
+    <script>
+        // --- نظام العرض الفوري (Zero-Delay Metadata) ---
+        (function() {
+            const p = new URLSearchParams(window.location.search);
+            const t = p.get('title');
+            const q = p.get('q');
+            const m = p.get('time');
+            const made = parseInt(p.get('made') || 0);
+            const limit = parseInt(p.get('limit') || 1);
+            const isRev = p.get('review') === 'true';
+
+            window.addEventListener('DOMContentLoaded', () => {
+                if(t) document.getElementById('quizTitle').innerText = decodeURIComponent(t);
+                if(q) document.getElementById('qCount').innerText = q;
+                if(m) document.getElementById('qTime').innerText = m + ' دقيقة';
+
+                // فحص المحاولات فوراً من الرابط لمنع الانتظار
+                if (made >= limit && !isRev) {
+                    document.getElementById('quizCard').innerHTML = `
+                        <div class="quiz-start-screen" style="padding: 40px;">
+                            <i class="fa-solid fa-lock" style="font-size: 4rem; color: var(--neon-red); margin-bottom: 20px;"></i>
+                            <h2 class="main-title">المحاولات انتهت</h2>
+                            <p style="color:#888; margin-bottom:20px;">لقد استهلكت جميع محاولاتك في هذا الاختبار.</p>
+                            <a href="quizzes.html" class="btn-confirm-start" style="text-decoration:none;">العودة للاختبارات</a>
+                        </div>`;
+                }
+            });
+        })();
+    </script>
 
     <script src="main.js"></script>
     <script type="module">
@@ -200,6 +349,31 @@
             const snapshot = await get(ref(db, `quizzes/${quizId}`));
             if (snapshot.exists()) {
                 quizData = snapshot.val();
+                
+                // --- فحص عدد المحاولات (Attempt Control) ---
+                const resultSnap = await get(ref(db, `quiz_results/${quizId}/${currentUser.uid}`));
+                const attemptsLimit = quizData.attemptsLimit || 1;
+                let attemptsMade = 0;
+
+                if (resultSnap.exists()) {
+                    attemptsMade = resultSnap.val().attemptsMade || 1;
+                    
+                    // إذا وصل للحد، نمنعه من البدء (إلا في وضع المراجعة)
+                    if (attemptsMade >= attemptsLimit && !isReviewMode) {
+                        document.getElementById('quizCard').innerHTML = `
+                            <div class="quiz-start-screen" style="padding: 40px;">
+                                <i class="fa-solid fa-lock" style="font-size: 4rem; color: var(--neon-red); margin-bottom: 20px;"></i>
+                                <h2 class="main-title">المحاولات انتهت</h2>
+                                <p style="color:#888; margin-bottom:20px;">لقد استهلكت ${attemptsMade} من أصل ${attemptsLimit} محاولات حددها الدكتور.</p>
+                                <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:15px; border:1px solid rgba(255,255,255,0.05); margin-bottom:30px;">
+                                    <span style="color:var(--neon-green); font-weight:bold; font-size:1.5rem;">آخر نتيجة: ${resultSnap.val().percentage}%</span>
+                                </div>
+                                <a href="quizzes.html" class="btn-confirm-start" style="text-decoration:none;">العودة للاختبارات</a>
+                            </div>`;
+                        return;
+                    }
+                }
+
                 questions = quizData.questions ? Object.values(quizData.questions).sort((a,b) => (a.order || 0) - (b.order || 0)) : [];
 
                 // إذا كنا في وضع المراجعة، جلب نتائج الطالب السابقة
@@ -266,12 +440,15 @@
             visitedQuestions.add(currentIndex);
             const q = questions[currentIndex];
             document.getElementById('questionNumber').innerText = `السؤال ${currentIndex + 1} من ${questions.length}`;
-            document.getElementById('questionContent').innerHTML = q.text;
-            
-            // إضافة صورة السؤال إن وجدت
+
+            let contentHtml = '';
+            // نظام "الصورة أولاً" لراحة الطالب ووضوح الرسم التوضيحي
             if (q.imageURL) {
-                document.getElementById('questionContent').innerHTML += `<img src="${q.imageURL}" style="max-width:100%; border-radius:15px; margin-top:15px; border:1px solid rgba(255,255,255,0.1);">`;
+                contentHtml += `<img src="${q.imageURL}" class="quiz-q-img" onclick="openLightbox('${q.imageURL}', 'image')">`;
             }
+            contentHtml += `<div class="quiz-q-text">${q.text}</div>`;
+            
+            document.getElementById('questionContent').innerHTML = contentHtml;
 
             const optionsGrid = document.getElementById('optionsGrid');
             optionsGrid.innerHTML = '';
@@ -311,6 +488,18 @@
             document.getElementById('prevBtn').style.visibility = currentIndex === 0 ? 'hidden' : 'visible';
             document.getElementById('nextBtn').innerText = currentIndex === questions.length - 1 ? 'إنهاء الاختبار' : 'التالي';
             
+            // تحديث شكل زر المراجعة (الدبوس) ليعرف الطالب أنه تم الضغط عليه
+            const markBtn = document.getElementById('markBtn');
+            if (markedQuestions.has(currentIndex)) {
+                markBtn.innerHTML = '<i class="fa-solid fa-thumbtack-slash"></i> إلغاء المراجعة';
+                markBtn.style.background = 'var(--neon-gold)';
+                markBtn.style.color = '#000';
+            } else {
+                markBtn.innerHTML = '<i class="fa-solid fa-thumbtack"></i> مراجعة';
+                markBtn.style.background = '';
+                markBtn.style.color = '';
+            }
+
             updatePalette();
         }
 
@@ -402,33 +591,104 @@
             const percentage = Math.round((score / questions.length) * 100);
             
             try {
+                // جلب عدد المحاولات الحالي
+                const resultSnap = await get(ref(db, `quiz_results/${quizId}/${currentUser.uid}`));
+                const currentData = resultSnap.val() || {};
+                const currentAttempts = currentData.attemptsMade || 0;
+                const history = currentData.history || {};
+
                 // جلب بيانات المستخدم للاسم
                 const userSnap = await get(ref(db, `users/${currentUser.uid}`));
                 const username = userSnap.exists() ? userSnap.val().username : "طالب مجهول";
 
-                // حفظ النتيجة في قاعدة البيانات
+                // تسجيل المحاولة الجديدة في التاريخ
+                const attemptId = Date.now();
+                history[attemptId] = { percentage, score, submittedAt: serverTimestamp() };
+
                 await set(ref(db, `quiz_results/${quizId}/${currentUser.uid}`), {
                     username: username,
                     score: score,
                     total: questions.length,
                     percentage: percentage,
+                    attemptsMade: currentAttempts + 1,
+                    history: history,
                     submittedAt: serverTimestamp(),
                     userAnswers: userAnswers // حفظ الإجابات للمراجعة لاحقاً
                 });
 
+                // تحضير رسالة التشجيع بناءً على النتيجة
+                let encourageMsg = "";
+                let statusIcon = "fa-medal";
+                let iconColor = "var(--neon-gold)";
+
+                if (percentage === 100) {
+                    encourageMsg = "أسطوري! درجة كاملة.. أنت فخر للدكتور عبدالله.";
+                    statusIcon = "fa-trophy";
+                } else if (percentage >= 90) {
+                    encourageMsg = "ممتاز جداً! اقتربت من الكمال، استمر في هذا الأداء.";
+                } else if (percentage >= 75) {
+                    encourageMsg = "جيد جداً! مستوى مبشر، بقليل من التركيز ستصل للقمة.";
+                } else if (percentage >= 50) {
+                    encourageMsg = "نتيجة مقبولة، لكن الدكتور ينتظر منك الأفضل دائماً.";
+                    iconColor = "var(--neon-green)";
+                } else {
+                    encourageMsg = "لا بأس.. الفشل هو أول خطوات النجاح. راجع أخطاءك وحاول مجدداً.";
+                    statusIcon = "fa-heart-pulse";
+                    iconColor = "var(--neon-red)";
+                }
+
                 // عرض النتيجة النهائية
                 document.getElementById('quizCard').innerHTML = `
-                    <div class="quiz-start-screen">
-                        <i class="fa-solid fa-trophy" style="font-size: 4rem; color: var(--neon-gold); margin-bottom: 20px;"></i>
-                        <h2 class="main-title">تم الانتهاء بنجاح!</h2>
-                        <div class="price-tag" style="font-size: 3rem; margin: 20px 0;">${percentage}%</div>
-                        <p style="color: var(--text-gray); margin-bottom: 30px;">لقد حصلت على ${score} من إجمالي ${questions.length} أسئلة.</p>
-                        <a href="quizzes.html" class="btn-confirm-start" style="text-decoration:none; display:inline-block;">العودة للاختبارات</a>
+                    <div class="result-card-pro">
+                        <div class="result-circle" style="border-color: ${iconColor}33; box-shadow: 0 0 40px ${iconColor}22;">
+                            <i class="fa-solid ${statusIcon}" style="position:absolute; top:-20px; font-size:2.5rem; color:${iconColor}; filter:drop-shadow(0 0 10px ${iconColor});"></i>
+                            <span class="pct" style="color:${iconColor}">${percentage}%</span>
+                            <span class="label">النتيجة النهائية</span>
+                        </div>
+                        <h2 class="result-msg">${encourageMsg}</h2>
+                        <p class="result-desc">لقد أكملت الاختبار بنجاح. يمكنك الآن مراجعة إجاباتك لمعرفة نقاط القوة والضعف لديك.</p>
+                        
+                        <div class="result-stats-mini">
+                            <div class="res-stat"><i class="fa-solid fa-circle-check" style="color:var(--neon-green)"></i><span>${score}</span><small>صح</small></div>
+                            <div class="res-stat"><i class="fa-solid fa-circle-xmark" style="color:var(--neon-red)"></i><span>${questions.length - score}</span><small>خطأ</small></div>
+                            <div class="res-stat"><i class="fa-solid fa-bullseye" style="color:var(--neon-gold)"></i><span>${questions.length}</span><small>سؤال</small></div>
+                        </div>
+
+                        <div class="result-actions">
+                            <a href="quiz-player.html?id=${quizId}&review=true" target="_top" class="btn-confirm-start" style="text-decoration:none; background:var(--gemini-gradient); color:#fff; box-shadow:none;">مراجعة الإجابات</a>
+                            <a href="quizzes.html" style="color:#888; font-weight:bold; text-decoration:none; font-size:0.9rem;"><i class="fa-solid fa-arrow-right"></i> العودة لقائمة الاختبارات</a>
+                        </div>
                     </div>`;
             } catch (err) {
                 alert("حدث خطأ أثناء حفظ النتيجة: " + err.message);
             }
         }
+
+        // --- دوال عارض الصور (Lightbox) ---
+        window.openLightbox = function(src, type) {
+            const container = document.getElementById('lightbox-content');
+            const overlay = document.getElementById('lightbox-overlay');
+            if(!container || !overlay) return;
+            
+            container.innerHTML = type === 'video' ? 
+                `<video src="${src}" controls autoplay style="max-width:100%; max-height:90vh; border-radius:10px;"></video>` :
+                `<img src="${src}" style="max-width:100%; max-height:90vh; border-radius:10px; object-fit:contain;">`;
+            
+            overlay.classList.add('active');
+        };
+
+        window.closeLightbox = function() {
+            const overlay = document.getElementById('lightbox-overlay');
+            if(overlay) {
+                overlay.classList.remove('active');
+                setTimeout(() => { document.getElementById('lightbox-content').innerHTML = ''; }, 400);
+            }
+        };
+        
+        const closeBtn = document.querySelector('.close-lightbox');
+        if(closeBtn) closeBtn.onclick = window.closeLightbox;
+        const overlayEl = document.getElementById('lightbox-overlay');
+        if(overlayEl) overlayEl.onclick = (e) => { if(e.target.id === 'lightbox-overlay') window.closeLightbox(); };
     </script>
 </body>
 </html>

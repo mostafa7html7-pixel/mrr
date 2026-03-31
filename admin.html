@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* --- Admin Dashboard V2 Styles --- */
         :root {
@@ -185,16 +186,54 @@
             .stat-card .number { font-size: 2.2rem; }
             .admin-users-grid { grid-template-columns: 1fr; } /* Single column for user cards */
         }
+
+        /* --- تحسينات الهيدر الخاص بالأدمن (Admin Header Professionalism) --- */
+        .navbar.admin-nav {
+            border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+            background: rgba(15, 17, 21, 0.98);
+            backdrop-filter: blur(15px);
+            padding: 10px 5%;
+        }
+        .admin-nav .logo-text span {
+            color: var(--admin-accent);
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+        .admin-nav .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .admin-nav .nav-links a.logout-link {
+            color: var(--neon-red) !important;
+            border: 1px solid rgba(255, 0, 60, 0.3);
+            padding: 6px 15px !important;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+        .admin-nav .nav-links a.logout-link:hover {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
+        }
     </style>
 </head>
 <body>
-
-    <!-- Gatekeeper Overlay -->
-    <div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#020204; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column;">
-        <i id="lockIcon" class="fa-solid fa-shield-halved" style="font-size:4rem; color:var(--neon-green); margin-bottom:20px; animation:heartBeat 1.5s infinite;"></i>
-        <h3 id="lockText" style="color:#fff; margin-bottom: 20px;">جاري التحقق من الصلاحيات...</h3>
-        <input type="password" id="secretCode" placeholder="كود التفعيل السري" style="display:none; padding:10px 20px; border-radius:30px; border:1px solid #333; background:#111; color:#fff; text-align:center; width:250px; outline:none;">
-        <button id="secretBtn" onclick="activateMaster()" style="display:none; margin-top:15px; padding:10px 30px; background:var(--neon-red); color:#fff; border:none; border-radius:30px; cursor:pointer; font-weight:bold;">تفعيل وضع المستر</button>
+    <!-- Gatekeeper Overlay (Hidden by Default) -->
+    <div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(circle at center, #0a0a0f 0%, #020204 100%); z-index:99999; display:none; align-items:center; justify-content:center; backdrop-filter: blur(20px); transition: 0.5s;">
+        <div class="auth-card-mini" id="authCard" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+            <i id="lockIcon" class="fa-solid fa-shield-halved main-lock" style="font-size: 3.5rem; color: var(--neon-green); margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(0, 255, 65, 0.4));"></i>
+            <h2 id="lockText" style="font-family: 'Reem Kufi', sans-serif; margin-bottom: 10px; color: #fff;">مرحباً بك يا دكتور</h2>
+            <p id="lockSubText" style="color: #888; font-size: 0.9rem; margin-bottom: 25px;">جاري فحص تصريح الدخول...</p>
+            
+            <div id="passwordArea" style="display: none; animation: fadeInUp 0.4s ease;">
+                <div class="secret-input-wrapper" style="position: relative; margin-bottom: 20px;">
+                    <input type="password" id="secretCode" placeholder="••••" maxlength="4" style="width: 100%; padding: 15px; border-radius: 15px; border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 1.2rem; letter-spacing: 5px; outline: none;">
+                </div>
+                <button class="btn-unlock" onclick="activateMaster()" style="width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--neon-green); color: #000; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;">
+                    <i class="fa-solid fa-bolt"></i> فتح لوحة التحكم
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Lightbox -->
@@ -203,19 +242,18 @@
         <div class="lightbox-content" id="lightbox-content"></div>
     </div>
 
-    <nav class="navbar">
+    <nav class="navbar admin-nav">
         <div class="logo">
             <i class="fa-solid fa-heart-pulse"></i>
             <div class="logo-text"><span>الدكتور</span><small>ADMIN DASHBOARD</small></div>
         </div>
         <ul class="nav-links">
             <li><a href="admin.html" class="active">الطلاب</a></li>
-            <li><a href="#" onclick="openScheduleEditor()">إدارة المواعيد</a></li>
             <li><a href="admin-quizzes.html">الاختبارات</a></li>
             <li><a href="admin-scores.html">النتائج</a></li>
             <li><a href="admin-payments.html">المدفوعات</a></li>
-            <li><a href="index.html">الموقع</a></li>
-            <li><a href="#" onclick="logout()">خروج</a></li>
+            <li><a href="index.html" style="color: var(--admin-accent);"><i class="fa-solid fa-eye"></i> الموقع</a></li>
+            <li><a href="#" onclick="logout()" class="logout-link"><i class="fa-solid fa-power-off"></i> خروج</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
@@ -225,7 +263,8 @@
         </div>
     </nav>
 
-    <div class="admin-container" id="adminPanel" style="opacity:0; transition: opacity 0.5s;">
+    <div id="app-content">
+    <div class="admin-container" id="adminPanel" style="opacity:1;">
         <!-- Main Content -->
         <main class="admin-content">
             <!-- Stat Cards -->
@@ -257,29 +296,7 @@
             </div>
         </main>
     </div>
-
-    <!-- The old container is removed -->
-    <!-- 
-    <div class="container" id="adminPanel_old" style="opacity:0; transition:1s; padding-top: 50px;">
-        <div class="page-header">
-            <p class="subtitle">STUDENTS MANAGEMENT</p>
-            <h2 class="main-title">الطلاب <span style="color:var(--neon-green)">المسجلين</span></h2>
-            <p style="color:#888">إجمالي الطلاب: <span id="userCount" style="color:var(--neon-green); font-weight:bold;">0</span></p>
-        </div>
-
-        <div class="admin-controls" style="display: flex; justify-content: center; margin-bottom: 40px;">
-            <div class="search-box" style="width: 100%; max-width: 500px;">
-                <i class="fa-solid fa-search"></i>
-                <input type="text" id="searchInput" placeholder="بحث عن طالب (الاسم أو الرقم)..." onkeyup="filterUsers()">
-            </div>
-        </div>
-
-        <!-- User Cards Grid -->
-        <div class="admin-users-grid" id="usersGridContainer_old">
-            <p style="color:#888; text-align:center;">جاري تحميل بيانات الطلاب...</p>
-        </div>
-    </div> 
-    -->
+    </div>
 
     <script src="main.js"></script>
     <script type="module">
@@ -291,6 +308,34 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
+
+        // --- نظام الدخول الصاروخي (Rocket Speed Check) ---
+        const checkLocalAccess = () => {
+            const overlay = document.getElementById('loadingOverlay');
+            const grid = document.getElementById('usersGridContainer');
+            const isVerified = localStorage.getItem('master_verified_2028');
+            
+            // --- تحضير البيانات المخزنة مسبقاً للعرض الفوري ---
+            const cachedTotal = localStorage.getItem('admin_cache_total');
+            const cachedBanned = localStorage.getItem('admin_cache_banned');
+            const cachedGrid = localStorage.getItem('admin_cache_grid');
+
+            if (cachedTotal) document.getElementById('totalUsersStat').innerText = cachedTotal;
+            if (cachedBanned) document.getElementById('bannedUsersStat').innerText = cachedBanned;
+            if (cachedGrid) grid.innerHTML = cachedGrid;
+
+            // إذا لم يتم التحقق، نظهر واجهة كلمة المرور فقط
+            if (isVerified !== 'true') {
+                overlay.style.display = 'flex';
+                // إذا لم يتم التحقق، نجهز واجهة كلمة المرور
+                document.getElementById('lockIcon').className = "fa-solid fa-lock-open main-lock";
+                document.getElementById('lockSubText').innerText = "يرجى إدخال كود الوصول السري";
+                document.getElementById('passwordArea').style.display = 'block';
+            }
+        };
+
+        // استدعاء فحص السرعة فوراً
+        checkLocalAccess();
 
         let currentUserUid = null;
 
@@ -320,24 +365,24 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserUid = user.uid;
+                
+                // تشغيل لوحة التحكم فوراً لسرعة الاستجابة
+                initDashboard();
+
                 // التحقق من الصلاحية من قاعدة البيانات
                 const snapshot = await get(ref(db, 'users/' + user.uid));
                 const userData = snapshot.val();
                 
-                if (userData && userData.role === 'admin') {
-                    // المستخدم أدمن بالفعل -> افتح اللوحة
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    document.getElementById('adminPanel').style.opacity = '1';
-                    initDashboard();
-                } else {
-                    // المستخدم ليس أدمن -> اطلب الكود السري
-                    document.getElementById('lockIcon').className = "fa-solid fa-lock";
-                    document.getElementById('lockIcon').style.color = "var(--neon-red)";
-                    document.getElementById('lockIcon').style.animation = "none";
-                    document.getElementById('lockText').innerText = "أدخل كود المستر للوصول";
-                    document.getElementById('secretCode').style.display = "block";
-                    document.getElementById('secretBtn').style.display = "block";
+                // التحقق من حالة الأدمن في القاعدة لضمان الأمان
+                if (userData && userData.role === 'admin') { 
+                    localStorage.setItem('master_verified_2028', 'true'); 
+                } else if (localStorage.getItem('master_verified_2028') === 'true') {
+                    // حماية: إذا سحب الأدمن منك في القاعدة، نسحبه من جهازك فوراً
+                    localStorage.removeItem('master_verified_2028');
+                    location.reload();
                 }
+                
+                document.getElementById('adminPanel').style.opacity = '1';
             } else {
                 window.location.href = "auth.html";
             }
@@ -351,6 +396,7 @@
                 update(ref(db, 'users/' + currentUserUid), {
                     role: 'admin'
                 }).then(() => {
+                    localStorage.setItem('master_verified_2028', 'true');
                     alert("تم تفعيل وضع المستر بنجاح! أهلاً بك يا دكتور.");
                     location.reload(); // إعادة تحميل لتطبيق الصلاحيات الجديدة
                 });
@@ -494,6 +540,11 @@
                 // Update stat cards
                 document.getElementById('totalUsersStat').innerText = totalUsers;
                 document.getElementById('bannedUsersStat').innerText = bannedUsers;
+                
+                // --- حفظ البيانات للزيارة القادمة (Rocket Cache) ---
+                localStorage.setItem('admin_cache_total', totalUsers);
+                localStorage.setItem('admin_cache_banned', bannedUsers);
+                localStorage.setItem('admin_cache_grid', grid.innerHTML);
 
                 if(totalUsers === 0) {
                     grid.innerHTML = '<p style="color:var(--admin-text-secondary); text-align:center; grid-column: 1 / -1;">لا يوجد طلاب مسجلين حتى الآن.</p>';
