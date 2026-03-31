@@ -7,8 +7,7 @@
     
     <!-- إعدادات الأمان (Security Headers) -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <!-- تم تعديل السياسة للسماح بتحميل الخامات (Textures) عبر blob: لمنع ظهور المجسمات باللون الأبيض -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://ajax.googleapis.com; connect-src 'self' blob: https://ajax.googleapis.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: blob:; object-src 'self' blob:; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://ajax.googleapis.com https://www.gstatic.com https://*.firebaseio.com; connect-src 'self' blob: https://ajax.googleapis.com https://www.gstatic.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob:; object-src 'self' blob:; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://www.gstatic.com;">
     
     <!-- منع خطأ 404 للأيقونة -->
     <link rel="icon" href="data:,">
@@ -16,7 +15,7 @@
     <!-- تحسين السرعة: الاتصال المسبق بخوادم جوجل لتحميل المكتبة بشكل أسرع -->
     <link rel="preconnect" href="https://ajax.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
+    <link rel="preload" as="script" href="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js" crossorigin>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,24 +43,27 @@
             backdrop-filter: blur(15px);
             aspect-ratio: 4 / 5; /* يحافظ على أبعاد الكارت ثابتة قبل تحميل المجسم */
             /* تحسين الأداء: عدم رسم العناصر خارج الشاشة */
+            display: flex; flex-direction: column;
             content-visibility: auto;
             contain-intrinsic-size: 1px 500px;
-            /* تحسين الأداء: إخبار المتصفح بأن هذا العنصر سيتغير عند التحويم */
-            will-change: transform;
         }
 
         .model-card:hover {
             transform: translateY(-10px);
             border-color: var(--gold-color);
             box-shadow: 0 20px 40px rgba(255, 0, 60, 0.15); /* توهج أحمر */
+            will-change: transform; /* تفعيلها فقط عند التحويم لتوفير الذاكرة */
         }
 
         model-viewer {
-            width: 100% !important;
-            height: 100% !important;
-            max-height: 450px;
+            width: 100%;
+            height: 100%;
+            flex: 1; /* يشغل كل المساحة المتبقية في الكارت */
+            min-height: 0; /* يمنع التمدد الزائد في متصفحات الموبايل */
             --poster-color: transparent;
             cursor: grab;
+            display: block;
+            margin: 0 auto;
             background-color: transparent;
             /* منع التمرير العشوائي */
             touch-action: pan-y;
@@ -78,6 +80,38 @@
             opacity: 0;
             transform: scale(1.05); /* تكبير بسيط جداً يعطي إحساساً بالعمق أثناء التلاشي */
         }
+
+        /* شريط تحميل داخلي (سلس وغير مزعج) */
+        model-viewer::part(progress-bar) {
+            background-color: var(--neon-green);
+        }
+
+        /* --- واجهة التشغيل الاحترافية --- */
+        .model-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 20; transition: 0.5s; pointer-events: auto;
+        }
+        .model-card.loaded .model-overlay { opacity: 0; pointer-events: none; }
+        
+        .btn-play-3d {
+            background: var(--neon-green); color: #000;
+            border: none; padding: 15px 30px; border-radius: 50px;
+            font-weight: 900; font-size: 1rem; cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            transition: 0.3s; transform: scale(1);
+        }
+        .btn-play-3d:hover { transform: scale(1.1); background: #fff; }
+        .btn-play-3d i { font-size: 1.2rem; }
+
+        /* شريط تحميل صغير */
+        .load-bar {
+            width: 150px; height: 4px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; margin-top: 15px; overflow: hidden; display: none;
+        }
+        .load-progress { width: 0%; height: 100%; background: var(--neon-green); transition: 0.3s; }
 
         /* تفاصيل الموديل الأسفل */
         .info-panel {
@@ -193,104 +227,117 @@
 
     <div id="app-content">
     <div class="container">
-        <div class="model-card">
+        <div class="model-card" id="card-1">
+            <div class="model-overlay">
+                <button class="btn-play-3d" onclick="loadModel(1)"><i class="fa-solid fa-play"></i> تشغيل المجسم</button>
+                <div class="load-bar" id="bar-1"><div class="load-progress" id="progress-1"></div></div>
+            </div>
             <button class="fullscreen-btn" title="ملء الشاشة">
                 <!-- أيقونة SVG احترافية وخفيفة -->
                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
-            <model-viewer data-src="1.glb" 
-                alt="Product 1" 
+            <model-viewer id="model-1" data-src="1.glb" 
+                alt="Biology Model 1" 
                 auto-rotate 
                 camera-controls 
                 ar 
+                reveal="manual"
+                disable-zoom
+                min-field-of-view="auto"
+                max-field-of-view="auto"
+                camera-orbit="auto auto 100%"
+                camera-target="center center center"
                 bounds="tight"
                 poster="1.png"
                 power-preference="high-performance"
-                enable-pan="false" 
-                environment-image="neutral"
-                shadow-intensity="1" 
-                interaction-prompt="none"
-                interpolation-decay="200"
-                exposure="1"
-                loading="lazy">
+                interaction-prompt="none">
             </model-viewer>
             <div class="info-panel">
-                <span class="model-name">Neo Structure 01</span>
+                <span class="model-name">التركيب الخلوي 01</span>
                 <button class="ar-button">عرض AR</button>
             </div>
         </div>
 
-        <div class="model-card">
+        <div class="model-card" id="card-2">
+            <div class="model-overlay">
+                <button class="btn-play-3d" onclick="loadModel(2)"><i class="fa-solid fa-play"></i> تشغيل المجسم</button>
+                <div class="load-bar" id="bar-2"><div class="load-progress" id="progress-2"></div></div>
+            </div>
             <button class="fullscreen-btn" title="ملء الشاشة">
                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
-            <model-viewer data-src="2.glb" 
-                alt="Product 2" 
+            <model-viewer id="model-2" data-src="2.glb" 
+                alt="Biology Model 2" 
                 auto-rotate 
                 camera-controls 
                 ar 
+                reveal="manual"
+                disable-zoom
+                camera-orbit="auto 75deg 100%"
+                camera-target="auto"
                 bounds="tight"
                 poster="2.png"
                 power-preference="high-performance"
-                enable-pan="false"
-                environment-image="neutral"
-                shadow-intensity="1" 
-                interpolation-decay="200"
-                interaction-prompt="none"
-                loading="lazy">
+                interaction-prompt="none">
             </model-viewer>
             <div class="info-panel">
-                <span class="model-name">Cyber Essence 02</span>
+                <span class="model-name">التشريح العضلي 02</span>
                 <button class="ar-button">عرض AR</button>
             </div>
         </div>
 
-        <div class="model-card">
+        <div class="model-card" id="card-3">
+            <div class="model-overlay">
+                <button class="btn-play-3d" onclick="loadModel(3)"><i class="fa-solid fa-play"></i> تشغيل المجسم</button>
+                <div class="load-bar" id="bar-3"><div class="load-progress" id="progress-3"></div></div>
+            </div>
             <button class="fullscreen-btn" title="ملء الشاشة">
                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
-            <model-viewer data-src="3.glb" 
-                alt="Product 3" 
+            <model-viewer id="model-3" data-src="3.glb" 
+                alt="Biology Model 3" 
                 auto-rotate 
                 camera-controls 
                 ar 
+                reveal="manual"
+                disable-zoom
+                camera-orbit="auto 75deg 100%"
+                camera-target="auto"
                 bounds="tight"
                 poster="3.png"
                 power-preference="high-performance"
-                enable-pan="false"
-                environment-image="neutral"
-                shadow-intensity="1" 
-                interpolation-decay="200"
-                interaction-prompt="none"
-                loading="lazy">
+                interaction-prompt="none">
             </model-viewer>
             <div class="info-panel">
-                <span class="model-name">Quantum Mesh 03</span>
+                <span class="model-name">الجهاز العصبي 03</span>
                 <button class="ar-button">عرض AR</button>
             </div>
         </div>
 
-        <div class="model-card">
+        <div class="model-card" id="card-4">
+            <div class="model-overlay">
+                <button class="btn-play-3d" onclick="loadModel(4)"><i class="fa-solid fa-play"></i> تشغيل المجسم</button>
+                <div class="load-bar" id="bar-4"><div class="load-progress" id="progress-4"></div></div>
+            </div>
             <button class="fullscreen-btn" title="ملء الشاشة">
                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
-            <model-viewer data-src="4.glb" 
-                alt="Product 4" 
+            <model-viewer id="model-4" data-src="4.glb" 
+                alt="Biology Model 4" 
                 auto-rotate 
                 camera-controls 
                 ar 
+                reveal="manual"
+                disable-zoom
+                camera-orbit="auto 75deg 100%"
+                camera-target="auto"
                 bounds="tight"
                 poster="4.png"
                 power-preference="high-performance"
-                enable-pan="false"
-                environment-image="neutral"
-                shadow-intensity="1" 
-                interpolation-decay="200"
-                interaction-prompt="none"
-                loading="lazy">
+                interaction-prompt="none">
             </model-viewer>
             <div class="info-panel">
-                <span class="model-name">Void Object 04</span>
+                <span class="model-name">المكونات الحيوية 04</span>
                 <button class="ar-button">عرض AR</button>
             </div>
         </div>
@@ -325,31 +372,6 @@
     <script src="main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- التحميل الكسول الحقيقي للمجسمات لتحسين الأداء ---
-            // هذا الكود يضمن عدم تحميل أي مجسم إلا عند اقترابه من الشاشة
-            const models = document.querySelectorAll('model-viewer[data-src]');
-
-            const lazyLoadObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    // هل العنصر دخل نطاق الرؤية؟
-                    if (entry.isIntersecting) {
-                        const modelViewer = entry.target;
-                        
-                        // قم بوضع الرابط الحقيقي في خاصية src لبدء التحميل
-                        modelViewer.src = modelViewer.dataset.src;
-
-                        // أوقف المراقبة عن هذا العنصر لأنه تم تحميله
-                        observer.unobserve(modelViewer);
-                    }
-                });
-            }, {
-                // تم رفع المسافة إلى 1200 بكسل ليتم تحميل المجسمات البعيدة مسبقاً قبل وصول المستخدم إليها
-                rootMargin: '1200px' 
-            });
-
-            // ابدأ بمراقبة كل المجسمات
-            models.forEach(model => lazyLoadObserver.observe(model));
-
             // --- تفعيل أزرار الواقع المعزز (AR) ---
             document.querySelectorAll('.ar-button').forEach(button => {
                 button.addEventListener('click', () => {

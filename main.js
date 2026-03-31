@@ -159,6 +159,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- نظام تشغيل المجسمات 3D (Universal Loader) ---
+    window.loadModel = function(id) {
+        const viewer = document.getElementById(`model-${id}`);
+        const card = document.getElementById(`card-${id}`);
+        if (!viewer) return;
+
+        // 1. إخفاء طبقة الانتظار فوراً (استجابة بصرية في 0 ثانية)
+        if (card) card.classList.add('loaded');
+
+        // 2. إعطاء أمر المحرك بإزالة البوستر والبدء فوراً
+        viewer.dismissPoster();
+
+        // 3. تعيين المصدر إذا لم يتم تعيينه مسبقاً
+        if (!viewer.getAttribute('src')) {
+            viewer.src = viewer.dataset.src;
+        }
+        
+        // 4. التركيز على المجسم لضمان التحكم من أول لمسة
+        viewer.focus();
+    };
+
 }); 
 
 // Toggle Features Modal

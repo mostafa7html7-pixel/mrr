@@ -1167,7 +1167,7 @@ footer {
     aspect-ratio: 4 / 5;
 }
 .model-card:hover { transform: translateY(-10px); border-color: #ffd700; box-shadow: 0 20px 40px rgba(255, 0, 60, 0.15); }
-model-viewer { width: 100% !important; height: 100% !important; max-height: 450px; background-color: transparent; }
+model-viewer { width: 100% !important; height: 100% !important; background-color: transparent; outline: none; }
 
 .info-panel { padding: 20px; background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(128, 128, 128, 0.1); display: flex; justify-content: space-between; align-items: center; }
 .ar-button { background: transparent; color: #ffd700; border: 1px solid #ffd700; padding: 10px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
