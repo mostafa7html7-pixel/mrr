@@ -44,7 +44,12 @@
         }
 
         body { background-color: var(--admin-bg); color: var(--admin-text-primary); }
-        .modal { display: flex; } /* Override from style.css to use flex for centering */
+        .modal { 
+            display: none; 
+            z-index: 20000 !important; /* ضمان الظهور فوق الهيدر الرئيسي (10000) */
+            align-items: center; 
+            justify-content: center; 
+        }
         .modal-content { animation: none; } /* Override from style.css */
         .quiz-admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
         .quiz-admin-card { background: var(--admin-surface); border: 1px solid var(--admin-border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 15px; position: relative; overflow: hidden; }
@@ -239,6 +244,30 @@
         .btn-save-q:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 255, 65, 0.4); }
         .btn-cancel-q { flex: 1; background: #333; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; display: none; }
         .btn-cancel-q:hover { background: #555; }
+
+        /* تحسين زر الإغلاق ليكون احترافياً وسريع الاستجابة على الموبايل */
+        .close-manage-q {
+            width: 44px; /* حجم قياسي لسهولة اللمس */
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .close-manage-q:hover {
+            background: rgba(255, 0, 60, 0.15);
+            color: #ff3366;
+            border-color: #ff3366;
+            transform: rotate(90deg);
+        }
+        .close-manage-q:active { transform: scale(0.9) rotate(90deg); }
 
         @media (max-width: 600px) {
             .options-grid { grid-template-columns: 1fr; }
@@ -531,7 +560,9 @@
     <!-- Add/Edit Quiz Modal -->
     <div id="addQuizModal" class="modal" style="display: none;">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal('addQuizModal')">&times;</span>
+            <div class="close-manage-q" onclick="closeModal('addQuizModal')" style="position: absolute; top: 15px; left: 15px;">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
             <h2 id="modalTitle">إضافة اختبار جديد</h2>
             <input type="hidden" id="quizIdInput">
             <div class="modal-input-group">
@@ -555,8 +586,9 @@
         <div class="modal-content manage-q-modal">
             <div class="manage-q-header">
                 <h2 id="questionsModalTitle" style="margin:0; color:#fff;">إدارة الأسئلة</h2>
-                <button onclick="printQuiz()" class="btn-action" style="background:var(--admin-surface-light); color:var(--admin-text-primary); border:1px solid var(--admin-border); margin-right:auto; margin-left:10px;"><i class="fa-solid fa-print"></i> طباعة / PDF</button>
-                <span class="close-modal" onclick="closeModal('manageQuestionsModal')" style="float:none;">&times;</span>
+                <div class="close-manage-q" onclick="closeModal('manageQuestionsModal')" title="إغلاق">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
             </div>
             
             <div class="manage-q-body">
@@ -689,6 +721,7 @@
 
         let currentEditingQuizId = null;
         let questionsData = {};
+        let selectedQuestions = new Set();
 
         window.openAddQuizModal = (quizId = null, quizData = {}) => {
             const modal = document.getElementById('addQuizModal');
@@ -700,7 +733,10 @@
             modal.style.display = 'flex';
         };
 
-        window.closeModal = (modalId) => { document.getElementById(modalId).style.display = 'none'; };
+        window.closeModal = (modalId) => { 
+            document.getElementById(modalId).style.display = 'none';
+            if (modalId === 'manageQuestionsModal') exitSelectionMode();
+        };
 
         // --- Text Formatting ---
         window.formatDoc = (cmd, value = null) => {
@@ -887,10 +923,71 @@
                         const item = clone.querySelector('.question-item');
                         
                         item.setAttribute('data-id', q.key);
+                        if (selectedQuestions.has(q.key)) item.classList.add('selected');
+
                         clone.querySelector('.q-index-badge').innerText = `سؤال ${count}`;
                         clone.querySelector('.question-item-text').innerHTML = q.text;
 
+                        // منطق الضغط المطول (WhatsApp Style)
+                        let pressTimer;
+                        item.onmousedown = item.ontouchstart = () => {
+                            pressTimer = setTimeout(() => toggleSelection(q.key), 600);
+                        };
+                        item.onmouseup = item.ontouchend = item.onmouseleave = () => clearTimeout(pressTimer);
+
+                        item.onclick = (e) => {
+                            if (selectedQuestions.size > 0) {
+                                toggleSelection(q.key);
+                            } else {
+                                if (!e.target.closest('button')) editQuestion(q.key);
+                            }
+                        };
+
                         if (q.imageURL) {
+        window.toggleSelection = (id) => {
+            if (selectedQuestions.has(id)) {
+                selectedQuestions.delete(id);
+            } else {
+                selectedQuestions.add(id);
+                if (navigator.vibrate) navigator.vibrate(50); // اهتزاز خفيف للموبايل
+            }
+            updateBulkUI();
+        };
+
+        window.updateBulkUI = () => {
+            const bar = document.getElementById('bulkActionBar');
+            const countLabel = document.getElementById('selectedCount');
+            const title = document.getElementById('questionsModalTitle');
+
+            if (selectedQuestions.size > 0) {
+                bar.style.display = 'flex';
+                title.style.display = 'none';
+                countLabel.innerText = `${selectedQuestions.size} سؤال مختار`;
+            } else {
+                bar.style.display = 'none';
+                title.style.display = 'block';
+            }
+            
+            document.querySelectorAll('.question-item').forEach(item => {
+                if (selectedQuestions.has(item.getAttribute('data-id'))) item.classList.add('selected');
+                else item.classList.remove('selected');
+            });
+        };
+
+        window.exitSelectionMode = () => {
+            selectedQuestions.clear();
+            updateBulkUI();
+        };
+
+        window.bulkDelete = async () => {
+            if (selectedQuestions.size === 0) return;
+            if (confirm(`هل أنت متأكد من حذف ${selectedQuestions.size} أسئلة نهائياً؟`)) {
+                const updates = {};
+                selectedQuestions.forEach(qId => { updates[`quizzes/${currentEditingQuizId}/questions/${qId}`] = null; });
+                await update(ref(db), updates);
+                exitSelectionMode();
+            }
+        };
                             const img = clone.querySelector('.question-item-img');
                             img.src = q.imageURL;
                             img.style.display = 'block';
