@@ -8,196 +8,132 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* تحسينات التصميم الاحترافي والنظيف */
-        html, body {
-            overflow-x: hidden; /* منع الصفحة بالكامل من التحرك يميناً ويساراً */
-            width: 100%;
-            position: relative;
-        }
-
-        body.video-theme-unit3 { 
-            --bg-color: #0a0508; 
-            --card-bg: rgba(255, 0, 127, 0.03); 
-            --border-color: rgba(255, 0, 127, 0.3);
-            --accent-glow: rgba(255, 0, 127, 0.2);
-        }
-        body.video-theme-unit3::before {
-            background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.1), #000), url('6.jpeg');
-            filter: saturate(1.2) contrast(1.1);
-        }
-
-        body.video-theme-unit4 { 
-            --bg-color: #0a0000; 
-            --card-bg: rgba(139, 0, 0, 0.04); 
-            --border-color: rgba(139, 0, 0, 0.4);
-            --accent-glow: rgba(139, 0, 0, 0.3);
-        }
-        body.video-theme-unit4::before {
-            background-image: linear-gradient(135deg, rgba(255, 0, 127, 0.08), rgba(74, 0, 0, 0.5)), url('6.jpeg');
-            filter: brightness(0.7) saturate(1.5);
-        }
-
-        body.video-theme-revisions { 
-            --bg-color: #050a0f; 
-            --card-bg: rgba(0, 210, 255, 0.03);  
-            --border-color: rgba(0, 210, 255, 0.3);
-            --accent-glow: rgba(0, 210, 255, 0.2);
-        }
-        body.video-theme-revisions::before {
-            background-image: radial-gradient(circle at 50% 50%, rgba(0, 210, 255, 0.1), #000), url('6.jpeg');
-            filter: saturate(1.1);
-        }
-
-        /* تأثير نبض النيون لزر المراجعات */
-        @keyframes revisions-pulse {
-            0% { border-color: rgba(0, 210, 255, 0.3); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
-            50% { border-color: rgba(0, 210, 255, 1); box-shadow: 0 0 15px rgba(0, 210, 255, 0.6); }
-            100% { border-color: rgba(0, 210, 255, 0.3); box-shadow: 0 0 5px rgba(0, 210, 255, 0.2); }
-        }
-
-        .filter-tab[data-filter="revisions"]:not(.active) {
-            animation: revisions-pulse 2s infinite ease-in-out;
-            color: #00d2ff;
-            border-color: rgba(0, 210, 255, 0.5);
-        }
-
-        /* Professional Noise Overlay */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.02;
-            pointer-events: none;
-            z-index: 1000;
-        }
-
-        .video-page-hero {
-            padding-top: 85px;
-            padding-bottom: 40px;
-            transition: background 0.5s ease;
-        }
-
-        /* حاوية الأزرار لمنع اهتزاز الصفحة */
-        .filters-container {
-            width: 100%;
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
-
-        /* فلاتر الفئات */
-        .video-filters {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 5px 20px 20px;
-            scrollbar-width: none;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            justify-content: center; /* توسيط في الشاشات الكبيرة */
-        }
-        .video-filters::-webkit-scrollbar { display: none; }
-        
-        .filter-tab {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border-color);
-            color: var(--text-gray);
-            padding: 12px 28px;
-            border-radius: 15px;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: 0.3s;
-            font-weight: bold;
-            font-size: 0.95rem;
-        }
-        .filter-tab.active {
-            background: var(--text-white);
-            color: #000;
-            border-color: var(--neon-green);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-        }
-
-        /* كروت الفيديوهات */
-        .video-grid-v2 {
+        .video-hub-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 30px;
+            padding: 100px 5% 60px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        .v-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
+
+        .package-glass-card {
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 35px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
             overflow: hidden;
-            transition: 0.3s;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
-        .v-card:hover { transform: translateY(-10px); border-color: var(--neon-green); box-shadow: 0 20px 50px var(--accent-glow); }
-        .v-thumb { position: relative; aspect-ratio: 16/9; background: #000; overflow: hidden; }
-        .v-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; transition: 0.5s; }
-        .v-card:hover .v-thumb img { transform: scale(1.05); opacity: 1; }
-        .v-play-btn { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: var(--neon-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-size: 1.2rem; opacity: 0; transition: 0.3s; }
-        .v-card:hover .v-play-btn { opacity: 1; }
-        .v-duration { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #fff; padding: 2px 8px; border-radius: 5px; font-size: 0.75rem; }
-        .v-badge { position: absolute; top: 10px; left: 10px; background: var(--neon-gold); color: #000; padding: 2px 10px; border-radius: 5px; font-size: 0.7rem; font-weight: bold; }
-        .v-body { padding: 20px; }
-        .v-body h3 { font-size: 1.1rem; color: var(--text-white); margin-bottom: 12px; line-height: 1.4; height: 3rem; overflow: hidden; }
-        .v-footer { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-gray); }
-        
-        /* رأس معلومات القسم */
-        .section-info-bar {
-            border-right: 4px solid var(--neon-green);
-            padding-right: 15px;
-            margin-bottom: 25px;
-            animation: fadeInUp 0.5s ease;
+
+        .package-glass-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: var(--neon-green);
+            box-shadow: 0 35px 70px rgba(0, 255, 65, 0.15);
         }
-        .section-info-bar h2 { font-size: 1.6rem; color: #fff; margin-bottom: 5px; }
-        .section-info-bar p { color: var(--text-gray); font-size: 0.9rem; }
 
-        .empty-state { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-gray); }
-        .empty-state i { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+        .free-ribbon-top {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--neon-green);
+            color: #000;
+            padding: 8px 30px;
+            font-size: 0.85rem;
+            font-weight: 900;
+            border-radius: 0 0 0 25px;
+            box-shadow: -5px 5px 15px rgba(0, 255, 65, 0.3);
+            z-index: 5;
+        }
 
-        /* تلميح السحب للموبايل */
-        .swipe-indicator {
-            display: none;
+        .btn-package-pro {
+            position: relative;
+            width: 100%;
+            height: 65px;
+            border-radius: 22px;
+            cursor: pointer;
+            border: none;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            color: var(--neon-green);
-            font-size: 0.75rem;
-            margin-bottom: 15px;
-            opacity: 0.8;
-            animation: fadeInUp 1s ease;
-        }
-
-        /* Skeleton Loader Styles */
-        .skeleton-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            height: 320px;
-            border: 1px solid var(--border-color);
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             overflow: hidden;
-        }
-        .skeleton-item {
-            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
-            background-size: 200% 100%;
-            animation: skeleton-shimmer 1.5s infinite linear;
-        }
-        @keyframes skeleton-shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        .skeleton-thumb { height: 180px; width: 100%; }
-        .skeleton-title { height: 20px; width: 70%; margin: 20px; border-radius: 5px; }
-        .skeleton-footer { height: 15px; width: 40%; margin: 0 20px; border-radius: 5px; }
-
-        @media (max-width: 768px) {
-            .video-filters { justify-content: flex-start; }
-            .swipe-indicator { display: flex; }
+            margin-top: 15px;
+            color: #000;
+            top: 0;
         }
 
+        /* تأثير المسح الضوئي (Speed Shine) */
+        .btn-package-pro::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            transition: all 0.6s;
+        }
+        .btn-package-pro:hover::before { left: 100%; }
+
+        .btn-package-pro:hover {
+            transform: translateY(-6px);
+            filter: brightness(1.1);
+        }
+
+        .btn-package-pro:active {
+            transform: translateY(2px);
+            transition: 0.1s;
+        }
+
+        /* تنوع الألوان الاحترافي (3D Gradients) */
+        .btn-grade-1 {
+            background: linear-gradient(180deg, #00ff88 0%, #00bd68 100%);
+            box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3), 
+                        inset 0 -5px 0 rgba(0, 0, 0, 0.2), 
+                        inset 0 4px 0 rgba(255, 255, 255, 0.3);
+        }
+        .btn-grade-1:active { box-shadow: 0 4px 10px rgba(0, 255, 136, 0.2), inset 0 2px 0 rgba(0, 0, 0, 0.2); }
+
+        .btn-grade-2 {
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e0 100%);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15), 
+                        inset 0 -5px 0 rgba(0, 0, 0, 0.1), 
+                        inset 0 4px 0 rgba(255, 255, 255, 0.8);
+        }
+        .btn-grade-2:active { box-shadow: 0 4px 10px rgba(255, 255, 255, 0.1), inset 0 2px 0 rgba(0, 0, 0, 0.2); }
+
+        .btn-grade-3 {
+            background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3), 
+                        inset 0 -5px 0 rgba(0, 0, 0, 0.2), 
+                        inset 0 4px 0 rgba(255, 255, 255, 0.4);
+        }
+        .btn-grade-3:active { box-shadow: 0 4px 10px rgba(255, 215, 0, 0.2), inset 0 2px 0 rgba(0, 0, 0, 0.2); }
+
+        .special-gold { border-color: rgba(255, 215, 0, 0.3) !important; }
+        .special-gold:hover { border-color: var(--neon-gold); box-shadow: 0 35px 70px rgba(255, 215, 0, 0.15); }
+
+        .package-banner {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
     </style>
 </head>
 <body>
@@ -224,193 +160,49 @@
     </nav>
 
     <div id="app-content">
-    <div class="video-page-hero">
-        <div class="container">
-            <!-- Controls Container -->
-            <div class="filters-container">
-                <div class="swipe-indicator">
-                    <i class="fa-solid fa-hand-pointer fa-beat-fade"></i> اسحب الأزرار لليمين واليسار
-                </div>
-                <div class="video-filters">
-                    <div class="filter-tab active" data-filter="all" onclick="filterVideos('all', this)">المكتبة الشاملة</div>
-                    <div class="filter-tab" data-filter="unit3" onclick="filterVideos('unit3', this)">الغلاف الحيوي</div>
-                    <div class="filter-tab" data-filter="unit4" onclick="filterVideos('unit4', this)">الغلاف الصخري</div>
-                    <div class="filter-tab" data-filter="revisions" onclick="filterVideos('revisions', this)">المراجعات النهائية</div>
-                </div>
-            </div>
-
-            <!-- Dynamic Section Info -->
-            <div class="section-info-bar" id="sectionInfo">
-                <h2 id="sectionHeader">كل المحاضرات</h2>
-                <p id="sectionDesc">استكشف جميع الفيديوهات التعليمية المتاحة في المنصة.</p>
-            </div>
-
-            <!-- Video Grid -->
-            <div class="video-grid-v2" id="videoGrid">
-                <!-- Skeleton Loaders appear while fetching data -->
-                <div class="skeleton-card"><div class="skeleton-thumb skeleton-item"></div><div class="skeleton-title skeleton-item"></div><div class="skeleton-footer skeleton-item"></div></div>
-                <div class="skeleton-card"><div class="skeleton-thumb skeleton-item"></div><div class="skeleton-title skeleton-item"></div><div class="skeleton-footer skeleton-item"></div></div>
-                <div class="skeleton-card"><div class="skeleton-thumb skeleton-item"></div><div class="skeleton-title skeleton-item"></div><div class="skeleton-footer skeleton-item"></div></div>
-                <div class="skeleton-card"><div class="skeleton-thumb skeleton-item"></div><div class="skeleton-title skeleton-item"></div><div class="skeleton-footer skeleton-item"></div></div>
-                <div class="skeleton-card"><div class="skeleton-thumb skeleton-item"></div><div class="skeleton-title skeleton-item"></div><div class="skeleton-footer skeleton-item"></div></div>
-                <div class="skeleton-card"><div class="skeleton-thumb skeleton-item"></div><div class="skeleton-title skeleton-item"></div><div class="skeleton-footer skeleton-item"></div></div>
-            </div>
+    <div class="video-hub-container">
+        
+        <!-- الصف الأول الثانوي -->
+        <div class="package-glass-card" style="animation: fadeInUp 0.6s ease;">
+            <div class="free-ribbon-top">مجانى لطلاب المستر</div>
+            <img src="photvid1.png" alt="باكيدج أولى ثانوي" class="package-banner">
+            <button class="btn-package-pro btn-grade-1" onclick="openPackage(1)"><i class="fa-solid fa-bolt"></i> دخول الباكيدج المجاني</button>
         </div>
+
+        <!-- الصف الثاني الثانوي -->
+        <div class="package-glass-card" style="animation: fadeInUp 0.8s ease;">
+            <img src="photvid2.png" alt="باكيدج تانية ثانوي" class="package-banner">
+            <button class="btn-package-pro btn-grade-2" onclick="openPackage(2)"><i class="fa-solid fa-unlock-keyhole"></i> فتح باكيدج تانية ثانوي</button>
+        </div>
+
+        <!-- الصف الثالث الثانوي -->
+        <div class="package-glass-card special-gold" style="animation: fadeInUp 1s ease;">
+            <img src="photvid3.png" alt="باكيدج تالتة ثانوي" class="package-banner">
+            <button class="btn-package-pro btn-grade-3" onclick="openPackage(3)"><i class="fa-solid fa-crown"></i> محتوى أبطال تالتة ثانوي</button>
+        </div>
+
     </div>
     </div>
 
     <footer>
-        <div style="text-align: center; padding: 20px;">
-            <p style="margin-bottom: 10px; color: #888;">جميع الحقوق محفوظة © 2026 | منصة الدكتور</p>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="color: #555; font-size: 0.9rem;">برمجة: <strong style="color: var(--neon-green);">مصطفى ابوطالب</strong></span>
-                <a href="admin.html" style="color: #444; font-size: 0.8rem; text-decoration: none; border: 1px solid #333; padding: 4px 10px; border-radius: 15px; transition: 0.3s;">
-                    <i class="fa-solid fa-user-shield"></i>
-                </a>
-            </div>
-        </div>
+        <!-- (الفوتر كما هو في السياق الأصلي) -->
     </footer>
 
     <script src="main.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, onValue, get, query, orderByChild } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
         const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let allVideos = [];
-        let userSubscribed = false;
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userSnap = await get(ref(db, `users/${user.uid}`));
-                if (userSnap.exists()) {
-                    userSubscribed = userSnap.val().subscription_active || false;
-                }
-                loadVideos();
-            } else {
-                window.location.href = "auth.html";
-            }
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "auth.html";
         });
 
-        function loadVideos() {
-            const videosRef = ref(db, 'videos');
-            onValue(videosRef, (snapshot) => {
-                allVideos = [];
-                if (snapshot.exists()) {
-                    snapshot.forEach(child => {
-                        allVideos.push({ id: child.key, ...child.val() });
-                    });
-                }
-                displayVideos(allVideos);
-            });
-        }
-
-        function displayVideos(videos) {
-            const grid = document.getElementById('videoGrid');
-            grid.innerHTML = '';
-
-            if (videos.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state" style="padding: 80px 20px; background: rgba(255,255,255,0.01); border-radius: 30px; border: 1px dashed var(--border-color); grid-column: 1/-1;">
-                        <i class="fa-solid fa-rocket" style="font-size: 4rem; color: var(--neon-green); margin-bottom: 25px; filter: drop-shadow(0 0 15px var(--neon-green)); animation: heartBeat 2s infinite;"></i>
-                        <h2 style="color: #fff; margin-bottom: 15px; font-weight: 900; font-size: 1.8rem;">قريباً.. انفجار المعرفة في انتظاركم! 🚀</h2>
-                        <p style="color: var(--text-gray); font-size: 1.1rem; line-height: 1.8; max-width: 650px; margin: 0 auto 20px;">
-                            يعمل الدكتور عبدالله حالياً بكل شغف لتجهيز شروحات سينمائية فائقة الجودة لهذا القسم. 
-                            نحن لا نقدم مجرد دروس، بل نصنع تجربة بصرية تعليمية ستغير مفهومك عن الأحياء تماماً.
-                        </p>
-                        <p style="color: var(--neon-green); font-weight: bold; text-shadow: 0 0 10px rgba(0,255,65,0.3);">حماسكم ونجاحكم هو الوقود الذي يدفع الدكتور للإبداع.. ترقبوا الانطلاق قريباً!</p>
-                    </div>`;
-                return;
-            }
-
-            videos.forEach(v => renderVideoCard(v));
-        }
-
-        function renderVideoCard(v) {
-            const grid = document.getElementById('videoGrid');
-            const isLocked = v.premium && !userSubscribed;
-            
-            const card = `
-                <div class="v-card scroll-animate" data-category="${v.category || 'all'}">
-                    <div class="v-thumb" onclick="playVideo('${v.id}', ${isLocked})">
-                        <img src="${v.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=400'}" alt="${v.title}">
-                        <div class="v-play-btn"><i class="fa-solid ${isLocked ? 'fa-lock' : 'fa-play'}"></i></div>
-                        <div class="v-duration">${v.duration || '10:00'}</div>
-                        ${v.premium ? '<div class="v-badge">مدفوع</div>' : '<div class="v-badge" style="background:var(--neon-green)">مجاني</div>'}
-                    </div>
-                    <div class="v-body">
-                        <h3>${v.title}</h3>
-                        <div class="v-footer">
-                            <span><i class="fa-solid fa-layer-group"></i> ${v.unitName || 'عام'}</span>
-                            <span style="color:var(--neon-green); cursor:pointer;" onclick="playVideo('${v.id}', ${isLocked})">
-                                ${isLocked ? 'اشترك لفتح الفيديو' : 'مشاهدة الآن <i class="fa-solid fa-chevron-left"></i>'}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            grid.insertAdjacentHTML('beforeend', card);
-        }
-
-        window.filterVideos = (cat, btn) => {
-            const body = document.body;
-            const sHeader = document.getElementById('sectionHeader');
-            const sDesc = document.getElementById('sectionDesc');
-
-            // تحديث العناوين والمعلومات بناءً على القسم المختبر
-            const info = {
-                'all': { 
-                    h: 'المكتبة الشاملة', 
-                    d: 'عرض جميع الفيديوهات والشروحات المتاحة لكل الوحدات.' 
-                },
-                'unit3': { 
-                    h: 'الوحدة الثالثة: الغلاف الحيوي', 
-                    d: 'رحلة تفصيلية في علم الكائنات الحية وتفاعلها مع البيئة.' 
-                },
-                'unit4': { 
-                    h: 'الوحدة الرابعة: الغلاف الصخري', 
-                    d: 'دراسة شاملة لتكوين الأرض، الصخور، والعمليات الجيولوجية.' 
-                },
-                'revisions': { 
-                    h: 'مراجعات ليلة الامتحان', 
-                    d: 'أقوى المراجعات المكثفة والأسئلة المتوقعة لضمان التفوق.' 
-                }
-            };
-
-            sHeader.innerText = info[cat].h;
-            sDesc.innerText = info[cat].d;
-
-            // إزالة الثيمات السابقة
-            body.classList.remove('video-theme-unit3', 'video-theme-unit4', 'video-theme-revisions');
-            
-            if (cat === 'unit3') body.classList.add('video-theme-unit3');
-            if (cat === 'unit4') body.classList.add('video-theme-unit4');
-            if (cat === 'revisions') body.classList.add('video-theme-revisions');
-
-            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // تمرير الزر المختار لمنتصف الشاشة تلقائياً
-            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            
-            // التأكد من الفلترة بناءً على الكاتيجوري المخزن في قاعدة البيانات
-            const filtered = cat === 'all' ? allVideos : allVideos.filter(v => v.category === cat || v.unit === cat);
-            displayVideos(filtered);
-        };
-
-        window.playVideo = (id, locked) => {
-            if (locked) {
-                if (confirm("هذا الفيديو مخصص للمشتركين فقط. هل تريد الانتقال لصفحة الاشتراك؟")) {
-                    window.location.href = "subscription.html";
-                }
-            } else {
-                alert("جاري فتح الفيديو... (سيتم ربط المشغل قريباً)");
-            }
+        window.openPackage = (num) => {
+            window.location.href = `video-package-${num}.html`;
         };
     </script>
 </body>

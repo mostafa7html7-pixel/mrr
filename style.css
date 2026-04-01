@@ -1537,29 +1537,6 @@ audio::-webkit-media-controls-play-button { background-color: #fff; border-radiu
     justify-content: center;
     font-family: 'Cairo', sans-serif;
 }
-
-.auth-container {
-    background: rgba(10, 10, 15, 0.85);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 255, 65, 0.2);
-    border-radius: 20px;
-    padding: 40px;
-    width: 100%;
-    max-width: 450px;
-    box-shadow: 0 0 50px rgba(0,0,0,0.8);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.auth-container::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 5px;
-    background: linear-gradient(90deg, var(--neon-red), var(--neon-green), var(--neon-gold));
-    animation: gradientMove 3s linear infinite;
-}
-
 @keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
 
 .auth-logo i { font-size: 3rem; color: var(--neon-red); margin-bottom: 10px; animation: heartBeat 2s infinite; }
