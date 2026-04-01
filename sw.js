@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v47'; // إزالة فكرة زر سجل النتائج
+const CACHE_NAME = 'abqarieno-v48'; // تحديث بعد إضافة صفحات الفيديوهات والبانرات الجديدة
 const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل جميع الملفات الجديدة أو المعدلة
     './',
     './index.html',
@@ -9,6 +9,9 @@ const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل ج
     './profile.html',
     './lab.html',
     './subscription.html',
+    './video-package-1.html',
+    './video-package-2.html',
+    './video-package-3.html',
     './auth.html',
     './complete-profile.html', // إضافة صفحة إكمال البيانات
     './scientific-books.html', // إضافة صفحة الكتب العلمية
@@ -29,6 +32,9 @@ const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل ج
     './232.png', // صورة كتاب
     './6.jpeg',
     './212.png',
+    './photvid1.png',
+    './photvid2.png',
+    './photvid3.png',
     './1.glb', // مجسم 3D
     './2.glb', // مجسم 3D
     './3.glb', // مجسم 3D
