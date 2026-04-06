@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v49'; // تحديث للسرعة القصوى
+const CACHE_NAME = 'abqarieno-v50'; // غير الرقم من 49 إلى 50 مثلاً
 const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل جميع الملفات الجديدة أو المعدلة
     './',
     './index.html',
