@@ -20,8 +20,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script> 
+ 
     <style>
         .container { 
             display: grid;
@@ -249,8 +249,7 @@
                 camera-target="center center center"
                 bounds="tight"
                 poster="1.png"
-                power-preference="high-performance"
-                interaction-prompt="none">
+                power-preference="high-performance">
             </model-viewer>
             <div class="info-panel">
                 <span class="model-name">مجسم القلب</span>
@@ -277,8 +276,7 @@
                 camera-target="auto"
                 bounds="tight"
                 poster="2.png"
-                power-preference="high-performance"
-                interaction-prompt="none">
+                power-preference="high-performance">
             </model-viewer>
             <div class="info-panel">
                 <span class="model-name">مجسم القلب</span>
@@ -305,8 +303,7 @@
                 camera-target="auto"
                 bounds="tight"
                 poster="3.png"
-                power-preference="high-performance"
-                interaction-prompt="none">
+                power-preference="high-performance">
             </model-viewer>
             <div class="info-panel">
                 <span class="model-name">مجسم الكلية</span>
@@ -333,8 +330,7 @@
                 camera-target="auto"
                 bounds="tight"
                 poster="4.png"
-                power-preference="high-performance"
-                interaction-prompt="none">
+                power-preference="high-performance">
             </model-viewer>
             <div class="info-panel">
                 <span class="model-name">مجسم الرئة</span>
@@ -357,10 +353,11 @@
     </footer>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
-        const app = initializeApp(firebaseConfig);
+        import { firebaseConfig } from "./firebase-config.js"; // استيراد إعدادات Firebase
+
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const auth = getAuth(app);
         window.logout = () => {
             if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {

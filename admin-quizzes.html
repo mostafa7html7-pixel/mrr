@@ -9,11 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Reusing admin styles from style.css */
+        /* Reusing admin styles from style.css */ 
         :root {
             --admin-bg: #050508; /* خلفية الصفحة الأغمق */
             --admin-surface: #0f111a; /* خلفية الحاويات أفتح */
-            --admin-surface-light: #1a1d27; /* أفتح درجة للتمييز */
+            --admin-surface-light: #1a1d27; /* أفتح درجة للتمييز */ 
             --admin-border: rgba(255, 255, 255, 0.1);
             --admin-text-primary: #f7fafc;
             --admin-text-secondary: #a0aec0; 
@@ -46,7 +46,7 @@
         body { background-color: var(--admin-bg); color: var(--admin-text-primary); }
         .modal { 
             display: none; 
-            z-index: 20000 !important; /* ضمان الظهور فوق الهيدر الرئيسي (10000) */
+            z-index: 100001 !important; /* ضمان الظهور فوق الهيدر الرئيسي (10000) */
             align-items: center; 
             justify-content: center; 
         }
@@ -120,7 +120,11 @@
         /* Toggle Switch for Publish */
         .status-toggle {
             display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
-            background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; width: fit-content; border: 1px solid rgba(255,255,255,0.05);
+            background: var(--admin-surface-light); 
+            padding: 8px 12px; border-radius: 8px; width: fit-content; 
+            border: 1px solid var(--admin-border);
+            flex-shrink: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -586,6 +590,11 @@
         <div class="modal-content manage-q-modal">
             <div class="manage-q-header">
                 <h2 id="questionsModalTitle" style="margin:0; color:#fff;">إدارة الأسئلة</h2>
+                <div id="bulkActionBar" style="display:none; align-items:center; gap:15px;">
+                    <span id="selectedCount" style="color:var(--neon-gold); font-weight:bold;">0 سؤال مختار</span>
+                    <button class="btn-action btn-delete" onclick="bulkDelete()"><i class="fa-solid fa-trash-can"></i> حذف الكل</button>
+                    <button class="btn-action btn-info" onclick="exitSelectionMode()"><i class="fa-solid fa-xmark"></i> إلغاء</button>
+                </div>
                 <div class="close-manage-q" onclick="closeModal('manageQuestionsModal')" title="إغلاق">
                     <i class="fa-solid fa-xmark"></i>
                 </div>
@@ -687,12 +696,12 @@
 
     <script src="main.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onValue, set, push, remove, update, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js"; // استيراد إعدادات Firebase
 
-        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
         const auth = getAuth(app);
         
@@ -722,6 +731,7 @@
         let currentEditingQuizId = null;
         let questionsData = {};
         let selectedQuestions = new Set();
+        let lastQuestionText = ''; // Define lastQuestionText here
 
         window.openAddQuizModal = (quizId = null, quizData = {}) => {
             const modal = document.getElementById('addQuizModal');
@@ -780,7 +790,7 @@
             const items = document.querySelectorAll('.question-item');
             query = query.toLowerCase();
             items.forEach(item => {
-                const text = item.querySelector('p').innerText.toLowerCase();
+                const text = item.querySelector('.question-item-text').innerText.toLowerCase();
                 item.style.display = text.includes(query) ? 'flex' : 'none';
             });
         };
@@ -820,15 +830,22 @@
             const title = document.getElementById('quizTitleInput').value;
             const timeLimit = document.getElementById('quizTimeInput').value;
             const attemptsLimit = document.getElementById('quizAttemptsInput').value;
-            if (!title || !timeLimit) return alert('يرجى ملء العنوان والمدة الزمنية.');
+            
+            if (!title.trim()) return alert('يرجى كتابة عنوان للاختبار أولاً.');
+            if (!timeLimit || isNaN(timeLimit) || parseInt(timeLimit) <= 0) return alert('يرجى تحديد مدة زمنية صحيحة للاختبار (بالدقائق).');
 
             const updates = {};
             const path = `quizzes/${quizId || push(ref(db, 'quizzes')).key}`;
             updates[`${path}/title`] = title;
             updates[`${path}/timeLimit`] = parseInt(timeLimit);
             updates[`${path}/attemptsLimit`] = parseInt(attemptsLimit || 1);
-            updates[`${path}/createdAt`] = serverTimestamp(); // تسجيل تاريخ الإصدار
             
+            // تعيين قيم افتراضية للاختبار الجديد فقط
+            if (!quizId) {
+                updates[`${path}/createdAt`] = serverTimestamp();
+                updates[`${path}/published`] = false;
+            }
+
             update(ref(db), updates).then(() => {
                 closeModal('addQuizModal');
                 alert('تم حفظ الاختبار بنجاح!');
@@ -944,50 +961,6 @@
                         };
 
                         if (q.imageURL) {
-        window.toggleSelection = (id) => {
-            if (selectedQuestions.has(id)) {
-                selectedQuestions.delete(id);
-            } else {
-                selectedQuestions.add(id);
-                if (navigator.vibrate) navigator.vibrate(50); // اهتزاز خفيف للموبايل
-            }
-            updateBulkUI();
-        };
-
-        window.updateBulkUI = () => {
-            const bar = document.getElementById('bulkActionBar');
-            const countLabel = document.getElementById('selectedCount');
-            const title = document.getElementById('questionsModalTitle');
-
-            if (selectedQuestions.size > 0) {
-                bar.style.display = 'flex';
-                title.style.display = 'none';
-                countLabel.innerText = `${selectedQuestions.size} سؤال مختار`;
-            } else {
-                bar.style.display = 'none';
-                title.style.display = 'block';
-            }
-            
-            document.querySelectorAll('.question-item').forEach(item => {
-                if (selectedQuestions.has(item.getAttribute('data-id'))) item.classList.add('selected');
-                else item.classList.remove('selected');
-            });
-        };
-
-        window.exitSelectionMode = () => {
-            selectedQuestions.clear();
-            updateBulkUI();
-        };
-
-        window.bulkDelete = async () => {
-            if (selectedQuestions.size === 0) return;
-            if (confirm(`هل أنت متأكد من حذف ${selectedQuestions.size} أسئلة نهائياً؟`)) {
-                const updates = {};
-                selectedQuestions.forEach(qId => { updates[`quizzes/${currentEditingQuizId}/questions/${qId}`] = null; });
-                await update(ref(db), updates);
-                exitSelectionMode();
-            }
-        };
                             const img = clone.querySelector('.question-item-img');
                             img.src = q.imageURL;
                             img.style.display = 'block';
@@ -1056,13 +1029,6 @@
             document.getElementById('questionTextInput').innerHTML = '';
             
             window.removeQuestionImage();
-
-            const clearBtn = document.getElementById('clearQBtn');
-            if(clearBtn) {
-                clearBtn.innerHTML = '<i class="fa-solid fa-eraser"></i>';
-                clearBtn.classList.remove('undo-mode');
-                lastQuestionText = '';
-            }
 
             document.querySelectorAll('.option-input').forEach(i => i.value = '');
             document.querySelector('input[name="correctAnswer"][value="0"]').checked = true;
@@ -1235,6 +1201,52 @@
             });
             update(ref(db), updates);
         }
+
+        // الدوال المتعلقة بالتحديد الجماعي والحذف (تم نقلها للنطاق العام)
+        window.toggleSelection = (id) => {
+            if (selectedQuestions.has(id)) {
+                selectedQuestions.delete(id);
+            } else {
+                selectedQuestions.add(id);
+                if (navigator.vibrate) navigator.vibrate(50);
+            }
+            updateBulkUI();
+        };
+
+        window.updateBulkUI = () => {
+            const bar = document.getElementById('bulkActionBar');
+            const countLabel = document.getElementById('selectedCount');
+            const title = document.getElementById('questionsModalTitle');
+
+            if (selectedQuestions.size > 0) {
+                bar.style.display = 'flex';
+                title.style.display = 'none';
+                countLabel.innerText = `${selectedQuestions.size} سؤال مختار`;
+            } else {
+                bar.style.display = 'none';
+                title.style.display = 'block';
+            }
+            
+            document.querySelectorAll('.question-item').forEach(item => {
+                if (selectedQuestions.has(item.getAttribute('data-id'))) item.classList.add('selected');
+                else item.classList.remove('selected');
+            });
+        };
+
+        window.bulkDelete = async () => {
+            if (selectedQuestions.size === 0) return;
+            if (confirm(`هل أنت متأكد من حذف ${selectedQuestions.size} أسئلة نهائياً؟`)) {
+                const updates = {};
+                selectedQuestions.forEach(qId => { updates[`quizzes/${currentEditingQuizId}/questions/${qId}`] = null; });
+                await update(ref(db), updates);
+                exitSelectionMode();
+            }
+        };
+
+        window.exitSelectionMode = () => {
+            selectedQuestions.clear();
+            updateBulkUI();
+        };
 
         // --- دوال عارض الصور (Lightbox) ---
         window.openLightbox = function(src) {

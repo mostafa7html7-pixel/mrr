@@ -13,7 +13,7 @@
             --admin-bg: #020204;
             --admin-surface: #0a0a0f;
             --admin-surface-light: #161b22;
-            --admin-border: #222;
+            --admin-border: #222; 
             --admin-text-primary: #e0e0e0;
             --admin-text-secondary: #888; 
             --admin-accent: #00ff88;
@@ -143,12 +143,12 @@
 
     <script src="main.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js"; // استيراد إعدادات Firebase
 
-        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
         const auth = getAuth(app);
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="مجموعة الكتب العلمية النادرة في علم الأحياء. مراجع عالمية وكتب قيمة للمتوفقين والباحثين في المجال الطبي.">
-    <meta name="keywords" content="كتب علمية, مراجع أحياء, كتب نادرة, كتب طبية, بيولوجيا, مراجع عالمية, كتب للمتفوقين">
+    <meta name="keywords" content="كتب علمية، مراجع أحياء، كتب نادرة، كتب طبية، بيولوجيا، مراجع عالمية، كتب للمتفوقين، تحميل كتاب الامتحان أحياء، كتاب الأضواء، كتاب التفوق، كتاب المرجع، مراجع طبية مترجمة، مكتبة دكتور عبدالله">
     <title>الكتب العلمية النادرة - الدكتور</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -29,7 +29,7 @@
             .sci-books-hero .main-title {
                 font-size: 2.5rem !important;
                 line-height: 1.4;
-            }
+            } 
             .hero-desc {
                 width: 90%;
                 margin: 0 auto;
@@ -96,11 +96,11 @@
         </div>
     </div>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onChildAdded, query, limitToLast } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { firebaseConfig } from "./firebase-config.js"; // استيراد إعدادات Firebase
 
-        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
         
         const notif = document.getElementById('fire-notification');

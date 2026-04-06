@@ -16,7 +16,7 @@
             --admin-surface: #161b22;
             --admin-surface-light: #1c2128;
             --admin-border: #30363d; 
-            --admin-text-primary: #c9d1d9; 
+            --admin-text-primary: #c9d1d9;  
             --admin-text-secondary: #9ca3af;
             --admin-accent: #00ff88;
         }  
@@ -109,9 +109,29 @@
         .admin-user-card.banned { border-color: var(--neon-red); background: rgba(255, 0, 0, 0.05); }
         .admin-user-card.banned .user-main-info .avatar { border-color: var(--neon-red); }
 
+        /* تحسينات إضافية لبطاقة الطالب */
+        .user-grade-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--admin-accent);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        .admin-user-card.banned .user-grade-badge {
+            background: rgba(255, 0, 60, 0.1);
+            color: var(--neon-red);
+            border-color: rgba(255, 0, 60, 0.2);
+        }
+
         .user-main-info { display: flex; align-items: center; gap: 15px; padding-bottom: 15px; border-bottom: 1px solid #30363d; }
         .user-main-info .avatar { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; border: 2px solid var(--admin-accent); cursor: zoom-in; transition: 0.3s; }
-        .user-main-info .avatar:hover { transform: scale(1.1); }
+        .user-main-info .avatar:hover { transform: scale(1.1) rotate(5deg); }
         .user-main-info h3 { margin: 0; font-size: 1.1rem; }
         .user-main-info p { margin: 0; color: var(--admin-text-secondary); font-size: 0.85rem; }
 
@@ -219,15 +239,15 @@
 </head>
 <body>
     <!-- Gatekeeper Overlay (Hidden by Default) -->
-    <div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(circle at center, #0a0a0f 0%, #020204 100%); z-index:99999; display:none; align-items:center; justify-content:center; backdrop-filter: blur(20px); transition: 0.5s;">
+    <div id="loadingOverlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:radial-gradient(circle at center, #0a0a0f 0%, #020204 100%); z-index:99999; display:flex; align-items:center; justify-content:center; backdrop-filter: blur(20px); transition: 0.5s;">
         <div class="auth-card-mini" id="authCard" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 30px; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
-            <i id="lockIcon" class="fa-solid fa-shield-halved main-lock" style="font-size: 3.5rem; color: var(--neon-green); margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(0, 255, 65, 0.4));"></i>
+            <i id="lockIcon" class="fa-solid fa-spinner fa-spin main-lock" style="font-size: 3.5rem; color: var(--neon-green); margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(0, 255, 65, 0.4));"></i>
             <h2 id="lockText" style="font-family: 'Reem Kufi', sans-serif; margin-bottom: 10px; color: #fff;">مرحباً بك يا دكتور</h2>
             <p id="lockSubText" style="color: #888; font-size: 0.9rem; margin-bottom: 25px;">جاري فحص تصريح الدخول...</p>
             
             <div id="passwordArea" style="display: none; animation: fadeInUp 0.4s ease;">
                 <div class="secret-input-wrapper" style="position: relative; margin-bottom: 20px;">
-                    <input type="password" id="secretCode" placeholder="••••" maxlength="4" style="width: 100%; padding: 15px; border-radius: 15px; border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 1.2rem; letter-spacing: 5px; outline: none;">
+                    <input type="password" id="secretCode" placeholder="••••" style="width: 100%; padding: 15px; border-radius: 15px; border: 1px solid #333; background: #000; color: #fff; text-align: center; font-size: 1.2rem; letter-spacing: 5px; outline: none;">
                 </div>
                 <button class="btn-unlock" onclick="activateMaster()" style="width: 100%; padding: 15px; border-radius: 15px; border: none; background: var(--neon-green); color: #000; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;">
                     <i class="fa-solid fa-bolt"></i> فتح لوحة التحكم
@@ -300,12 +320,12 @@
 
     <script src="main.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onValue, get, update, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8", authDomain: "abqarieno.firebaseapp.com", databaseURL: "https://abqarieno-default-rtdb.firebaseio.com", projectId: "abqarieno", storageBucket: "abqarieno.firebasestorage.app", messagingSenderId: "790682500839", appId: "1:790682500839:web:cd50b8e01729f821e06c42" };
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
         const auth = getAuth(app);
 
@@ -323,15 +343,6 @@
             if (cachedTotal) document.getElementById('totalUsersStat').innerText = cachedTotal;
             if (cachedBanned) document.getElementById('bannedUsersStat').innerText = cachedBanned;
             if (cachedGrid) grid.innerHTML = cachedGrid;
-
-            // إذا لم يتم التحقق، نظهر واجهة كلمة المرور فقط
-            if (isVerified !== 'true') {
-                overlay.style.display = 'flex';
-                // إذا لم يتم التحقق، نجهز واجهة كلمة المرور
-                document.getElementById('lockIcon').className = "fa-solid fa-lock-open main-lock";
-                document.getElementById('lockSubText').innerText = "يرجى إدخال كود الوصول السري";
-                document.getElementById('passwordArea').style.display = 'block';
-            }
         };
 
         // استدعاء فحص السرعة فوراً
@@ -365,9 +376,6 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserUid = user.uid;
-                
-                // تشغيل لوحة التحكم فوراً لسرعة الاستجابة
-                initDashboard();
 
                 // التحقق من الصلاحية من قاعدة البيانات
                 const snapshot = await get(ref(db, 'users/' + user.uid));
@@ -376,10 +384,14 @@
                 // التحقق من حالة الأدمن في القاعدة لضمان الأمان
                 if (userData && userData.role === 'admin') { 
                     localStorage.setItem('master_verified_2028', 'true'); 
-                } else if (localStorage.getItem('master_verified_2028') === 'true') {
-                    // حماية: إذا سحب الأدمن منك في القاعدة، نسحبه من جهازك فوراً
-                    localStorage.removeItem('master_verified_2028');
-                    location.reload();
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) overlay.style.display = 'none';
+                    initDashboard(); // تحميل البيانات فقط إذا كان أدمن
+                } else {
+                    // إذا لم يكن أدمن في القاعدة، نظهر طلب الكود السري
+                    document.getElementById('lockIcon').className = "fa-solid fa-lock main-lock";
+                    document.getElementById('lockSubText').innerText = "يرجى إدخال كود الوصول السري لتفعيل لوحة التحكم:";
+                    document.getElementById('passwordArea').style.display = 'block';
                 }
                 
                 document.getElementById('adminPanel').style.opacity = '1';
@@ -388,20 +400,33 @@
             }
         });
 
+        // دعم الضغط على زر Enter لإرسال كلمة المرور
+        document.getElementById('secretCode').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') activateMaster();
+        });
+
         // دالة تفعيل وضع المستر بالكود السري
         window.activateMaster = function() {
+            if (!currentUserUid) return alert("جاري الاتصال بالسيرفر.. انتظر لحظة");
+
             const code = document.getElementById('secretCode').value;
-            if (code === "2028") {
-                // الترقية الفورية في قاعدة البيانات
+            if (!code) return;
+            
+            // الكود السري الثابت المطلوب للدخول
+            const ADMIN_SECRET_CODE = "2029"; 
+            
+            if (code === ADMIN_SECRET_CODE) {
                 update(ref(db, 'users/' + currentUserUid), {
                     role: 'admin'
                 }).then(() => {
                     localStorage.setItem('master_verified_2028', 'true');
-                    alert("تم تفعيل وضع المستر بنجاح! أهلاً بك يا دكتور.");
-                    location.reload(); // إعادة تحميل لتطبيق الصلاحيات الجديدة
+                    location.reload();
+                }).catch((error) => {
+                    console.error("Error updating user role:", error);
+                    alert("حدث خطأ أثناء تحديث صلاحياتك. يرجى المحاولة لاحقاً.");
                 });
             } else {
-                alert("الكود غير صحيح!");
+                alert("Access Denied: كود غير صحيح");
             }
         }
 
@@ -514,8 +539,12 @@
                         const isBanned = user.banned === true;
                         if (isBanned) bannedUsers++;
 
+                        const gradeMap = { '1': 'أولى ثانوي', '2': 'تانية ثانوي', '3': 'تالتة ثانوي' };
+                        const gradeText = gradeMap[user.grade] || 'غير محدد';
+
                         const cardHTML = `
                             <div class="admin-user-card ${isBanned ? 'banned' : ''}" data-name="${user.username}" data-phone="${user.phone}">
+                                <div class="user-grade-badge">${gradeText}</div>
                                 <div class="user-main-info">
                                     <img src="${user.photoURL || '212.png'}" class="avatar" alt="صورة الطالب" onclick="openLightbox('${user.photoURL || '212.png'}')">
                                     <div>
@@ -524,8 +553,8 @@
                                     </div>
                                 </div>
                                 <div class="user-details">
-                                    <span><i class="fa-solid fa-phone"></i> <strong>${user.phone || 'غير مسجل'}</strong></span>
-                                    <span><i class="fa-solid fa-calendar-plus"></i> <strong>انضم ${timeAgo(user.joinedAt)}</strong></span>
+                                    <span><i class="fa-solid fa-phone"></i> <a href="tel:${user.phone}" style="color:var(--admin-accent); text-decoration:none;">${user.phone || 'غير مسجل'}</a></span>
+                                    <span><i class="fa-solid fa-clock-rotate-left"></i> <strong>انضم ${timeAgo(user.joinedAt)}</strong></span>
                                 </div>
                                 <div class="card-actions">
                                     <button onclick="toggleBan('${uid}', ${isBanned})" class="btn-action ${isBanned ? 'unban' : 'ban'}"><i class="fa-solid ${isBanned ? 'fa-unlock' : 'fa-ban'}"></i> ${isBanned ? 'فك الحظر' : 'حظر'}</button>

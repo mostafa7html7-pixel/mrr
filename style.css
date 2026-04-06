@@ -28,7 +28,7 @@
 
 /* إعدادات الوضع النهاري (Light Mode) */
 body.light-mode {
-    --bg-color: #f8fafc;
+    --bg-color: #f8fafc; 
     --card-bg: #ffffff;
     --text-white: #111111;
     --text-gray: #4a5568;
@@ -225,6 +225,7 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 .scroll-animate {
     opacity: 1;
     transform: none;
+    will-change: transform, opacity;
 }
 .scroll-animate.visible {
     opacity: 1;
@@ -451,6 +452,7 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
     border-radius: 30px; 
     overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    content-visibility: auto; /* يحسن سرعة الرسم الأولي للمتصفح */
     box-shadow: 0 30px 60px rgba(0,0,0,0.8);
 }
 
@@ -1739,7 +1741,6 @@ audio::-webkit-media-controls-play-button { background-color: #fff; border-radiu
         background: rgba(255, 255, 255, 0.05);
     }
 }
-
 /* حل مشكلة ضيق مساحة النص في الموبايل في معاينة الأسئلة */
 @media (max-width: 768px) {
     .question-item-content {
@@ -1752,10 +1753,30 @@ audio::-webkit-media-controls-play-button { background-color: #fff; border-radiu
         width: 100% !important;
         max-width: 100% !important;
     }
+} /* <--- هذا القوس كان مفقوداً وهو سبب المشكلة */
 
-    .question-item-img {
-        width: 100% !important;
-        max-width: 350px !important;
-        height: auto !important;
-    }
+/* --- Professional Cache & Footer Buttons --- */
+.btn-clear-cache {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #888;
+    padding: 10px 22px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex; /* تم التغيير لضمان عدم تمدد الزرار بعرض الشاشة إجبارياً */
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.btn-clear-cache:hover {
+    background: rgba(255, 165, 0, 0.1);
+    color: #ffa500;
+    border-color: #ffa500;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 165, 0, 0.1);
 }

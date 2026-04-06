@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
-
-Sitemap: https://abqarieno.firebaseapp.com/sitemap.xml  
+Disallow: /admin.html
+Disallow: /admin-*.html
+Sitemap: https://www.dr-abdullah.com/sitemap.xml

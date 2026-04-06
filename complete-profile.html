@@ -19,7 +19,7 @@
 
         body {
             margin: 0;
-            padding: 0; 
+            padding: 0;  
             min-height: 100vh; 
             width: 100%;
             overflow: hidden;
@@ -238,13 +238,13 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 400; // حجم كافي ليكون واضح جداً في لوحة التحكم
+                        const MAX_WIDTH = 150; // حجم مثالي للأيقونات وسرعة صاروخية في الرفع
                         const scaleSize = MAX_WIDTH / img.width;
                         canvas.width = MAX_WIDTH;
                         canvas.height = img.height * scaleSize;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.7); // جودة عالية 70% للـ Admin
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.5); // جودة متوازنة لسرعة التحميل
                     };
                 };
             });

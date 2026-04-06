@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="تواصل مباشرة مع الدكتور وفريق الدعم الفني. مركز الرسائل والتنبيهات لطلاب الأحياء لمتابعة كل جديد.">
-    <meta name="keywords" content="تواصل معنا, دعم فني, رسائل الدكتور, شات طلاب, استفسارات أحياء, متابعة الطلاب">
+    <meta name="keywords" content="تواصل معنا، دعم فني منصة الدكتور، رقم دكتور عبدالله أحياء، جروب تليجرام أحياء، سكرتارية دكتور عبدالله، حجز دروس أحياء، شكاوى واقتراحات الطلاب">
     <title>مركز رسائل الدكتور - 2028 Edition</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
@@ -18,7 +18,7 @@
     {
       "@context": "https://schema.org",
       "@type": "ContactPage",
-      "name": "تواصل مع الدكتور", 
+      "name": "تواصل مع الدكتور",  
       "description": "مركز الرسائل والدعم الفني لطلاب الدكتور في مادة الأحياء.",
       "url": "https://abqarieno.firebaseapp.com/contact.html"  
     }
@@ -440,8 +440,11 @@
             <a href="admin.html" style="text-decoration: none; background: rgba(255, 0, 0, 0.1); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(255, 0, 0, 0.3); font-size: 0.85rem; color: var(--neon-red); transition: 0.3s; display: flex; align-items: center; gap: 5px;">
                 <i class="fa-solid fa-user-shield"></i> الأدمن
             </a>
-            <button onclick="switchRole()" style="background: transparent; border: 1px solid #444; color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; display: flex; align-items: center; gap: 5px;">
+            <button onclick="switchRole()" class="btn-clear-cache" style="background: transparent; border: 1px solid #444; color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; display: flex; align-items: center; gap: 5px;">
                 <i class="fa-solid fa-user-gear"></i> تبديل كمستر
+            </button>
+            <button onclick="clearSiteCache()" class="btn-clear-cache" title="حل مشاكل التحميل والبيانات" style="display: inline-flex;">
+                <i class="fa-solid fa-broom"></i> مسح الكاش
             </button>
         </div>
     </footer>
@@ -454,9 +457,9 @@
         const sessionRole = sessionStorage.getItem('biology_user_role');
         const localRole = localStorage.getItem('biology_user_role');
         
-        let isMaster = sessionRole === 'master';
+        window.isMaster = sessionRole === 'master';
 
-        if (isMaster) {
+        if (window.isMaster) {
             const panel = document.getElementById('master-panel');
             if(panel) panel.style.display = 'block';
         }
@@ -482,11 +485,7 @@
             } else if(code !== null) alert("الكود غير صحيح");
         }
 
-        if(!localRole && !isMaster) localStorage.setItem('biology_user_role', 'student');
-
-        window.closeModal = function(id) {
-            document.getElementById(id).style.display = 'none';
-        };
+        if(!localRole && !window.isMaster) localStorage.setItem('biology_user_role', 'student');
     </script>
 
     <style>
@@ -535,20 +534,11 @@
     </script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD092yeOowtCLW0fDcIzaEXrnxvrN4X5T8",
-            authDomain: "abqarieno.firebaseapp.com",
-            databaseURL: "https://abqarieno-default-rtdb.firebaseio.com",
-            projectId: "abqarieno",
-            storageBucket: "abqarieno.firebasestorage.app",
-            messagingSenderId: "790682500839",
-            appId: "1:790682500839:web:cd50b8e01729f821e06c42"
-        };
-
-        const app = initializeApp(firebaseConfig);
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
         const messagesRef = ref(db, 'broadcasts');
 
@@ -799,42 +789,31 @@
             closeModal('scheduleModal');
         };
 
-        // عرض الرسائل (نظام سريع جداً)
+        // --- نظام التخزين المحلي والتحميل اللحظي (Persistence System) ---
         const flow = document.getElementById('messages-flow');
-        // إزالة رسالة التحميل عند وصول أول رسالة
-        let firstLoad = true;
+        const CACHE_KEY = 'biology_contact_messages_v3';
+        
+        // جلب الرسائل المخزنة مسبقاً من الذاكرة المحلية
+        let messageCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
 
-        onChildAdded(messagesRef, (snapshot) => {
-            if(firstLoad) {
-                flow.innerHTML = '';
-                firstLoad = false;
-            }
-
-            const m = snapshot.val();
-            const id = snapshot.key;
+        // دالة موحدة لإنشاء هيكل الرسالة (لضمان تطابق الكاش مع السيرفر)
+        function getMessageHTML(id, m) {
             const date = m.timestamp ? new Date(m.timestamp).toLocaleString('ar-EG', { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }) : 'الآن';
-            
-            // تحديث حالة القراءة (آخر ظهور) تلقائياً عند رؤية الرسائل
-            const currentLastSeen = parseInt(localStorage.getItem('biology_last_seen_news') || '0');
-            if (m.timestamp && m.timestamp > currentLastSeen) {
-                localStorage.setItem('biology_last_seen_news', m.timestamp);
-            }
             
             const isImageOnly = !m.text && m.mediaType === 'image';
             const isAudio = m.mediaType === 'audio';
             const isVideo = m.mediaType === 'video';
             const isVideoOnly = (!m.text || m.text.trim() === '') && isVideo;
 
-            let mediaHtml = ''; // سيتم بناء محتوى الميديا هنا
+            let mediaHtml = '';
             if(m.mediaURL) {
                 let content = '';
                 let typeClass = '';
                 
                 if (m.mediaType === 'image') {
-                    content = `<img src="${m.mediaURL}" class="msg-media-img" onclick="openLightbox('${m.mediaURL}', 'image')"><div class="media-date-overlay">${date}</div>`;
+                    content = `<img src="${m.mediaURL}" class="msg-media-img" loading="lazy" decoding="async" onclick="openLightbox('${m.mediaURL}', 'image')"><div class="media-date-overlay">${date}</div>`;
                     typeClass = 'square-media';
                 } else if (m.mediaType === 'video') {
-                    // الفيديوهات تأخذ أبعادها الحقيقية الآن لتناسب الشاشة
                     content = `<video src="${m.mediaURL}" controls class="msg-video" onmouseenter="handleVideoHover(this, true)" onmouseleave="handleVideoHover(this, false)"></video>`;
                     typeClass = 'video-context';
                 } else if (isAudio) {
@@ -848,47 +827,99 @@
                     <div class="media-wrapper ${typeClass}">
                         ${!isAudio ? `
                         <div class="msg-actions-bar">
-                            ${m.mediaType === 'video' ? `<button onclick="openLightbox('${m.mediaURL}', 'video')" class="btn-mini-action zoom" title="تكبير وعرض كامل"><i class="fa-solid fa-expand"></i></button>` : ''}
+                            ${m.mediaType === 'video' ? `<button onclick="openLightbox('${m.mediaURL}', 'video')" class="btn-mini-action zoom" title="تكبير"><i class="fa-solid fa-expand"></i></button>` : ''}
                             <a href="${m.mediaURL}" download="${m.fileName || 'file'}" target="_blank" class="btn-mini-action download" title="تحميل"><i class="fa-solid fa-download"></i></a>
-                            ${isMaster ? `<div onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف الميديا"><i class="fa-solid fa-trash-can"></i></div>` : ''}
+                            ${window.isMaster ? `<div onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف"><i class="fa-solid fa-trash-can"></i></div>` : ''}
                         </div>` : ''}
                         ${content}
                     </div>`;
             }
 
-            // بناء الهيدر مخصص للتسجيل الصوتي لوضع الأزرار في المنتصف
             let headerContent;
             if (isAudio) {
-                headerContent = `
-                    <span><i class="fa-solid fa-microphone" style="color:var(--audio-neon)"></i> تسجيل صوتي</span>
-                    <div class="audio-header-actions">
-                        <a href="${m.mediaURL}" download="${m.fileName || 'audio'}" target="_blank" class="btn-mini-action download" title="تحميل"><i class="fa-solid fa-download"></i></a>
-                        ${isMaster ? `<div onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف"><i class="fa-solid fa-trash-can"></i></div>` : ''}
-                    </div>
-                    <span>${date}</span>
-                `;
+                headerContent = `<span><i class="fa-solid fa-microphone" style="color:var(--audio-neon)"></i> تسجيل صوتي</span><div class="audio-header-actions">${window.isMaster ? `<div onclick="deleteMsg('${id}')" class="btn-mini-action delete"><i class="fa-solid fa-trash-can"></i></div>` : ''}</div><span>${date}</span>`;
             } else {
                 headerContent = `<span><i class="fa-solid fa-bullhorn" style="color:var(--master-neon)"></i> توجيه رسمي</span><span>${date}</span>`;
             }
 
-            const html = `
+            return `
                 <div class="msg-block ${isImageOnly ? 'image-only' : ''} ${isAudio ? 'audio-type' : ''} ${isVideoOnly ? 'video-only' : ''}" id="msg-${id}">
-                    ${isMaster && !m.mediaURL ? `
-                    <div class="msg-actions-bar">
-                        <div onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف الرسالة"><i class="fa-solid fa-trash-can"></i></div>
-                    </div>` : ''}
+                    ${window.isMaster && !m.mediaURL ? `<div class="msg-actions-bar"><div onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف"><i class="fa-solid fa-trash-can"></i></div></div>` : ''}
                     ${!isImageOnly && !isVideoOnly ? `<div class="msg-header" style="${isAudio ? 'display:flex; justify-content:space-between; width:100%; border-bottom:none;' : ''}">${headerContent}</div>` : ''}
                     ${m.text ? `<div class="msg-content">${m.text}</div>` : ''}
                     ${mediaHtml}
-                </div>
-            `;
-            flow.insertAdjacentHTML('afterbegin', html); // إضافة الرسالة الجديدة في الأعلى
+                </div>`;
+        }
+
+        // عرض المحتوى من الكاش فوراً
+        function renderFromCache() {
+            // إذا كانت الجلسة جديدة، نفضل جلب البيانات الطازجة من السيرفر مباشرة
+            if (!sessionStorage.getItem('opened_this_session')) return;
+
+            const sortedIds = Object.keys(messageCache).sort((a, b) => (messageCache[a].timestamp || 0) - (messageCache[b].timestamp || 0));
+            if (sortedIds.length > 0) {
+                flow.innerHTML = '';
+                sortedIds.forEach(id => flow.insertAdjacentHTML('afterbegin', getMessageHTML(id, messageCache[id])));
+            }
+        }
+
+        renderFromCache();
+
+        // تحديث الكاش المحلي وحفظه
+        function updateLocalCache(id, m) {
+            messageCache[id] = m;
+            const keys = Object.keys(messageCache);
+            if (keys.length > 60) { // الاحتفاظ بآخر 60 رسالة فقط للسرعة
+                const oldestKey = keys.sort((a,b) => messageCache[a].timestamp - messageCache[b].timestamp)[0];
+                delete messageCache[oldestKey];
+            }
+            localStorage.setItem(CACHE_KEY, JSON.stringify(messageCache));
+        }
+
+        onChildAdded(messagesRef, (snapshot) => {
+            const m = snapshot.val();
+            const id = snapshot.key;
+
+            // منع التكرار إذا كانت الرسالة معروضة بالفعل من الكاش
+            if (document.getElementById(`msg-${id}`)) return;
+            
+            // تنظيف واجهة "جاري التحميل" عند وصول أول رسالة حقيقية
+            if (flow.innerHTML.includes('جاري')) flow.innerHTML = '';
+
+            updateLocalCache(id, m);
+            
+            // تحديث حالة القراءة (آخر ظهور) تلقائياً عند رؤية الرسائل
+            const currentLastSeen = parseInt(localStorage.getItem('biology_last_seen_news') || '0');
+            if (m.timestamp && m.timestamp > currentLastSeen) {
+                localStorage.setItem('biology_last_seen_news', m.timestamp);
+            }
+
+            flow.insertAdjacentHTML('afterbegin', getMessageHTML(id, m));
         });
 
         onChildRemoved(messagesRef, (snapshot) => {
             const el = document.getElementById(`msg-${snapshot.key}`);
             if(el) el.remove();
+            // إزالة من الكاش أيضاً
+            delete messageCache[snapshot.key];
+            localStorage.setItem(CACHE_KEY, JSON.stringify(messageCache));
         });
+
+        // --- دالة مسح الكاش الاحترافية ---
+        window.clearSiteCache = async function() {
+            const msg = "يا بطل، هل تريد تنظيف ذاكرة الموقع؟\n\nسيؤدي هذا لحل أي تعارض في الصور أو الرسائل وإعادة تحميل أحدث نسخة من المنصة.";
+            if(confirm(msg)) {
+                // التنظيف الشامل
+                localStorage.clear();
+                sessionStorage.clear();
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                }
+                // فرض التحديث من السيرفر وليس من الكاش
+                window.location.replace(window.location.origin + window.location.pathname + '?v=' + Date.now());
+            }
+        };
 
         window.deleteMsg = (id) => { 
             if(confirm("هل أنت متأكد يا دكتور من حذف هذه الرسالة؟ لا يمكن التراجع عن هذا الإجراء.")) {
