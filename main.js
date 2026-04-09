@@ -36,6 +36,9 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // التأكد من معرفة رتبة المستخدم لتفعيل مميزات عبقرينو الخاصة
+    window.isMaster = window.isMaster || (sessionStorage.getItem('biology_user_role') === 'master');
+
     // 1. Menu Toggle
     const menuBtn = document.querySelector('.menu-btn');
     const navLinks = document.querySelector('.nav-links');
@@ -267,20 +270,243 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const viewer = document.getElementById(`model-${id}`);
         const card = document.getElementById(`card-${id}`);
+        const bar = document.getElementById(`bar-${id}`);
+        const progress = document.getElementById(`progress-${id}`);
+        
         if (!viewer) return;
 
         window.activeModelId = id;
 
-        // 1. تعيين المصدر وإظهار الكارت
+        // 1. إظهار شريط التحميل وبدء جلب الملف
+        if (bar) bar.style.display = 'block';
         viewer.src = viewer.dataset.src;
         if (card) card.classList.add('loaded');
 
-        // 2. إعطاء أمر التشغيل وإعادة تفعيل التحكم مع مهلة لضمان استجابة المحرك
-        setTimeout(() => {
-            viewer.dismissPoster();
-            viewer.cameraControls = true; // إجبار تفعيل التحكم باللمس والماوس
-            viewer.focus();
-        }, 150);
+        // 2. نظام الإظهار الذكي (Smart Reveal)
+        viewer.addEventListener('progress', (event) => {
+            const p = event.detail.totalProgress * 100;
+            if (progress) progress.style.width = p + '%';
+        }, { once: false });
+
+        // الإظهار النهائي عند اكتمال التحميل أو وصول النسبة لـ 100%
+        viewer.addEventListener('load', () => {
+            setTimeout(() => {
+                if (bar) bar.style.display = 'none';
+                viewer.dismissPoster();
+                viewer.cameraControls = true;
+                viewer.focus();
+                // إضافة فئة تخبر CSS أن المجسم جاهز تماماً
+                if (card) card.classList.add('ready');
+            }, 300);
+        }, { once: true });
+    };
+
+    // --- نظام حفظ محادثة عبقرينو (Persistence System) ---
+    const CHAT_HISTORY_KEY = 'abqarieno_chat_history';
+    let abqarienoChatHistory = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || '[]');
+
+    // Function to load chat history from localStorage
+    function loadAbqarienoChatHistory() {
+        const box = document.getElementById('ai-chat-box');
+        if (!box) return;
+        box.innerHTML = ''; 
+
+        if (abqarienoChatHistory.length > 0) {
+            abqarienoChatHistory.forEach((msg, idx) => {
+                if (msg.role === 'user') {
+                    box.innerHTML += `<div class="user-msg">${msg.content}</div>`;
+                } else {
+                    // Re-parse markdown for AI messages
+                    const formattedText = typeof marked !== 'undefined' ? marked.parse(msg.content) : msg.content;
+                    const msgId = 'ai-' + Date.now() + '-' + idx; // Generate a unique ID per message
+                    box.innerHTML += `
+                        <div class="ai-msg" style="position:relative; margin-bottom:30px;">
+                            <div id="text-${msgId}">${formattedText}</div>
+                            <button class="copy-btn-ai" onclick="copyAiResponse(this, 'text-${msgId}')">
+                                <i class="fa-regular fa-copy"></i> نسخ الإجابة
+                            </button>
+                        </div>`;
+                }
+            });
+        } else {
+            // If no history, add the initial welcome message
+            box.innerHTML = `
+                <div class="ai-msg">
+                    أهلاً بك يا بطل! أنا <strong>عبقرينو</strong>، مساعدك الذكي المطور بواسطة مصطفى أبو طالب. كيف يمكنني مساعدتك في رحلتك التعليمية اليوم؟ 🚀
+                </div>
+            `;
+            abqarienoChatHistory = [{
+                role: 'assistant',
+                content: 'أهلاً بك يا بطل! أنا **عبقرينو**، مساعدك الذكي المطور بواسطة مصطفى أبو طالب. كيف يمكنني مساعدتك في رحلتك التعليمية اليوم؟ 🚀'
+            }];
+            localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(abqarienoChatHistory));
+        }
+        box.scrollTop = box.scrollHeight;
+    }
+
+    // تنفيذ التحميل الفوري عند تشغيل الموقع لضمان جاهزية البيانات
+    loadAbqarienoChatHistory();
+
+    // Function to save a message to history
+    function saveMessageToHistory(role, content) {
+        abqarienoChatHistory.push({ role, content });
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(abqarienoChatHistory));
+    }
+
+    // --- نظام شات عبقرينو المنبثق ---
+    window.toggleAbqarienoChat = function(mode = 'side') {
+        const win = document.getElementById('abqarienoWindow');
+        if(!win) return;
+        
+        // تحديد وضعية الفتح
+        if(mode === 'center') {
+            win.classList.add('center-mode');
+        } else {
+            win.classList.remove('center-mode');
+        }
+
+        win.classList.toggle('active');
+        if(win.classList.contains('active')) {
+            loadAbqarienoChatHistory(); // Re-render messages when opening to ensure sync
+            document.getElementById('ai-user-input').focus();
+        }
+    };
+
+    // Function to clear chat history
+    window.clearAbqarienoChatHistory = function() {
+        if (confirm("هل أنت متأكد من مسح سجل المحادثة؟ لا يمكن التراجع عن هذا الإجراء.")) {
+            localStorage.removeItem(CHAT_HISTORY_KEY);
+            abqarienoChatHistory = [];
+            const box = document.getElementById('ai-chat-box');
+            box.innerHTML = `
+                <div class="ai-msg">
+                    أهلاً بك يا بطل! أنا <strong>عبقرينو</strong>، مساعدك الذكي المطور بواسطة مصطفى أبو طالب. كيف يمكنني مساعدتك في رحلتك التعليمية اليوم؟ 🚀
+                </div>
+            `;
+            saveMessageToHistory('assistant', 'أهلاً بك يا بطل! أنا **عبقرينو**، مساعدك الذكي المطور بواسطة مصطفى أبو طالب. كيف يمكنني مساعدتك في رحلتك التعليمية اليوم؟ 🚀');
+            box.scrollTop = box.scrollHeight;
+            alert("تم مسح سجل المحادثة بنجاح!");
+        }
+    };
+
+    // وظيفة نسخ الإجابة
+    window.copyAiResponse = function(btn, textId) {
+        const text = document.getElementById(textId).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> تم النسخ';
+            btn.style.color = 'var(--neon-green)';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.color = '';
+            }, 2000);
+        });
+    };
+
+    window.sendAbqarienoMessage = async function() {
+        const input = document.getElementById('ai-user-input');
+        const box = document.getElementById('ai-chat-box');
+        const text = input.value.trim();
+
+        if(!text) return;
+
+        // --- تأمين جلب المفتاح من Firebase إذا لم يكن موجوداً محلياً ---
+        let apiKey = window.GROQ_API_KEY;
+        if (!apiKey || apiKey === "PLACEHOLDER_KEY") {
+            try {
+                const { getDatabase, ref, get } = await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js");
+                const db = getDatabase();
+                const snap = await get(ref(db, 'system_config/groq_key'));
+                if (snap.exists()) apiKey = snap.val();
+                else throw new Error("Key not found in DB");
+            } catch (e) {
+                console.error("Security Fetch Error:", e);
+            }
+        }
+
+        // إضافة رسالة المستخدم
+        const userMsgHTML = `<div class="user-msg">${text}</div>`;
+        box.insertAdjacentHTML('beforeend', userMsgHTML);
+        saveMessageToHistory('user', text);
+        input.value = '';
+        box.scrollTop = box.scrollHeight;
+
+        // إضافة حالة التحميل
+        const msgId = 'ai-' + Date.now();
+        const aiMsgWrapper = document.createElement('div');
+        aiMsgWrapper.className = 'ai-msg thinking';
+        aiMsgWrapper.id = msgId;
+        aiMsgWrapper.innerHTML = `<div id="text-${msgId}"><i class="fa-solid fa-brain fa-fade" style="color:var(--neon-gold)"></i> عبقرينو يحلل سؤالك...</div>`;
+        box.appendChild(aiMsgWrapper);
+        box.scrollTop = box.scrollHeight;
+
+        const messagesForApi = abqarienoChatHistory.map(msg => ({
+            role: msg.role === 'ai' ? 'assistant' : msg.role,
+            content: msg.content
+        }));
+        messagesForApi.push({ role: "user", content: text });
+
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "llama-3.3-70b-versatile",
+                    stream: true, // تفعيل البث المباشر كما في Gemini
+                    messages: [
+                        { role: "system", content: "أنت المساعد الذكي عبقرينو لمنصة الدكتور عبدالله. مطورك هو مصطفى أبو طالب (2009) من بني سويف، طالب متميز وخبير برمجة. أجب عن منهج العلوم المتكاملة بذكاء وفخر بمطورك." },
+                        ...messagesForApi
+                    ],
+                    temperature: 0.7
+                })
+            });
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullAiText = "";
+            const textContainer = document.getElementById(`text-${msgId}`);
+            aiMsgWrapper.classList.remove('thinking');
+            textContainer.innerHTML = ""; // مسح نص التحميل
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                const chunk = decoder.decode(value);
+                const lines = chunk.split("\n");
+                const parsedLines = lines
+                    .map(line => line.replace(/^data: /, "").trim())
+                    .filter(line => line !== "" && line !== "[DONE]")
+                    .map(line => JSON.parse(line));
+
+                for (const parsedLine of parsedLines) {
+                    const content = parsedLine.choices[0].delta.content;
+                    if (content) {
+                        fullAiText += content;
+                        // عرض النص الخام أثناء الكتابة لسرعة الاستجابة
+                        textContainer.innerText = fullAiText; 
+                        box.scrollTop = box.scrollHeight;
+                    }
+                }
+            }
+
+            // بعد اكتمال البث، نقوم بتحويل الـ Markdown إلى HTML منسق
+            const finalHTML = typeof marked !== 'undefined' ? marked.parse(fullAiText) : fullAiText;
+            textContainer.innerHTML = finalHTML;
+            
+            // إضافة زر النسخ وتحديث السجل
+            aiMsgWrapper.innerHTML += `
+                <button class="copy-btn-ai" onclick="copyAiResponse(this, 'text-${msgId}')">
+                    <i class="fa-regular fa-copy"></i> نسخ الإجابة
+                </button>`;
+            saveMessageToHistory('assistant', fullAiText);
+
+        } catch (error) {
+            aiMsgWrapper.innerHTML = `<span style="color:var(--neon-red)">خطأ في الاتصال بالدماغ. حاول ثانية!</span>`;
+        }
     };
 
 }); 

@@ -82,6 +82,22 @@ html, body { /* إضافة html هنا لضمان تطبيق overflow-x على �
     width: 100%; /* ضمان أن الصفحة تأخذ العرض الكامل */
 }
 
+/* تحسينات شاملة لأداء الصور والسرعة */
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    content-visibility: auto; /* تحسين سرعة الرسم في المتصفح */
+    image-rendering: -webkit-optimize-contrast; /* زيادة حدة الصور */
+}
+
+/* تأثير التحميل الذكي (Shimmer) للصور لزيادة الإحساس بالسرعة */
+.doctor-img, .book-img img, .msg-media-img {
+    background: linear-gradient(90deg, var(--card-bg) 25%, #1a1d27 50%, var(--card-bg) 75%);
+    background-size: 200% 100%;
+    animation: image-loading-shimmer 2s infinite linear;
+}
+
 body { 
     background-color: var(--bg-color); 
     color: var(--text-white); 
@@ -101,6 +117,11 @@ body::before {
     z-index: -1;
     pointer-events: none;
     will-change: transform;
+}
+
+@keyframes image-loading-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
 }
 
 a { text-decoration: none; color: inherit; transition: 0.3s; }
@@ -171,6 +192,302 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 }
 .nav-links a.active { color: var(--text-white); text-shadow: 0 0 5px var(--neon-green); }
 .nav-links a:hover { color: var(--text-white); }
+
+/* شعار الذكاء الاصطناعي في الهيدر (أيقونة فقط) */
+.nav-ai-icon-only {
+    font-size: 1.4rem;
+    color: var(--neon-gold) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    transition: 0.4s ease;
+}
+.nav-ai-icon-only:hover {
+    background: var(--neon-gold);
+    color: #000 !important;
+    box-shadow: 0 0 15px var(--neon-gold);
+    transform: rotate(360deg);
+}
+
+/* الأيقونة المتطايرة (Floating AI Widget) */
+.ai-floating-widget {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* تظهر في اليسار لتجنب تعارضها مع أزرار الموبايل الشائعة في اليمين */
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--neon-gold), var(--neon-red));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    animation: ai-hover-bounce 4s ease-in-out infinite;
+    transition: 0.3s;
+    text-decoration: none !important;
+}
+.ai-floating-widget:hover { transform: scale(1.1) rotate(15deg); filter: brightness(1.2); box-shadow: 0 0 30px var(--neon-gold); }
+.ai-floating-widget i { font-size: 1.8rem; color: #000; }
+
+/* --- حاوية شات عبقرينو الاحترافية --- */
+.abqarieno-chat-window {
+    position: fixed;
+    bottom: 100px;
+    left: 30px;
+    width: 380px; /* Default side mode width */
+    height: 550px; /* Default side mode height */
+    background: linear-gradient(165deg, rgba(8, 10, 15, 0.98), rgba(2, 3, 5, 0.99));
+    backdrop-filter: blur(50px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    display: none; /* مخفية افتراضياً */
+    flex-direction: column;
+    z-index: 1000000;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 215, 0, 0.02);
+    overflow: hidden;
+    animation: chat-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* وضعية الفتح في منتصف الصفحة (عند الضغط من الهيدر) */
+.abqarieno-chat-window.center-mode {
+    bottom: auto; /* Remove fixed bottom */
+    top: 50%; /* Center vertically */
+    left: 50%;
+    transform: translate(-50%, -50%); /* تم التعديل: لتمركز النافذة تماماً في المنتصف */
+    width: 95vw;
+    max-width: 800px; /* جعلها أعرض لتشبه لوحة التحكم */
+    height: 80vh;
+    max-height: 750px;
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    box-shadow: 0 0 0 100vw rgba(0,0,0,0.8), 0 30px 100px rgba(0,0,0,1);
+    border-radius: 40px;
+    animation: chat-fade-up 0.4s ease forwards;
+}
+
+.abqarieno-chat-window.active { display: flex; }
+
+@keyframes chat-slide-in {
+    from { opacity: 0; transform: translateY(30px) scale(0.9); } /* هذا خاص بوضع الفتح الجانبي */
+    to { opacity: 1; transform: translateY(0) scale(1); } /* هذا خاص بوضع الفتح الجانبي */
+}
+
+@keyframes chat-fade-up {
+    from { opacity: 0; transform: translate(-50%, -60%) scale(0.95); } /* تم التعديل: لتبدأ من أعلى قليلاً */
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); } /* تم التعديل: لتنتهي في المنتصف تماماً */
+}
+
+.chat-header-pro {
+    padding: 25px 30px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* زر الإغلاق الاحترافي */
+.chat-close-btn-pro {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--admin-text-secondary);
+    cursor: pointer;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+/* New CSS for Clear History Button */
+.chat-clear-history-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    padding: 8px 15px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.chat-clear-history-btn:hover {
+    background: rgba(255, 0, 0, 0.1);
+    color: var(--neon-red);
+    border-color: var(--neon-red);
+}
+
+.chat-close-btn-pro:hover {
+    background: var(--neon-red);
+    color: white;
+    transform: rotate(90deg);
+    border-color: var(--neon-red);
+    box-shadow: 0 0 15px var(--neon-red);
+}
+
+.chat-header-pro .info { display: flex; align-items: center; gap: 12px; }
+.chat-header-pro .logo-mini {
+    width: 35px; height: 35px;
+    background: var(--neon-gold);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #000; font-size: 1.1rem;
+}
+
+#ai-chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-gold) transparent;
+}
+#ai-chat-box::-webkit-scrollbar { width: 5px; }
+#ai-chat-box::-webkit-scrollbar-thumb { background: var(--neon-gold); border-radius: 10px; }
+
+.ai-msg, .user-msg {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    position: relative;
+}
+
+.ai-msg {
+    align-self: flex-start;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(255, 215, 0, 0.15);
+    border-radius: 25px 25px 25px 8px;
+    color: #f0f0f0;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    padding: 18px 22px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* تأثير الشيمر (Gemini Loading Style) */
+.ai-msg.thinking {
+    background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+    background-size: 200% 100%;
+    animation: shimmer-load 1.5s infinite;
+}
+
+@keyframes shimmer-load {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* تنسيقات Markdown داخل الرسائل */
+.ai-msg strong { color: var(--neon-gold); }
+.ai-msg ul, .ai-msg ol { padding-right: 20px; margin: 10px 0; }
+.ai-msg li { margin-bottom: 5px; color: #ddd; }
+.ai-msg h1, .ai-msg h2, .ai-msg h3 { 
+    color: var(--neon-green); 
+    font-family: 'Reem Kufi', sans-serif; 
+    margin: 15px 0 10px;
+    border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+    padding-bottom: 5px;
+}
+
+/* ميزة زر النسخ الاحترافي */
+.copy-btn-ai {
+    position: absolute;
+    bottom: -25px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    color: var(--admin-text-secondary);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.copy-btn-ai:hover { color: var(--neon-gold); }
+
+.user-msg {
+    align-self: flex-end;
+    background: linear-gradient(135deg, var(--neon-green), #00cc33);
+    color: #000;
+    font-weight: 800;
+    border-radius: 25px 25px 8px 25px;
+    box-shadow: 0 10px 25px rgba(0, 255, 65, 0.2);
+    padding: 15px 20px;
+}
+
+.ai-input-area {
+    padding: 20px 30px;
+    background: rgba(0, 0, 0, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    gap: 10px;
+}
+
+.ai-input-area input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+    padding: 15px 25px;
+    color: #fff;
+    outline: none;
+    transition: 0.3s;
+    font-size: 1rem;
+}
+.ai-input-area input:focus { 
+    border-color: var(--neon-green); 
+    background: rgba(0, 255, 65, 0.05);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1); 
+}
+
+.ai-send-btn {
+    background: var(--neon-gold);
+    border: none;
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #000; transition: 0.3s;
+}
+.ai-send-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
+
+@media (max-width: 480px) {
+    .abqarieno-chat-window {
+        width: calc(100% - 20px);
+        left: 10px;
+        bottom: 90px;
+        height: 70vh;
+    }
+    .abqarieno-chat-window.center-mode {
+        width: 95vw;
+        height: 95vh;
+        max-width: none;
+        max-height: none;
+        border-radius: 15px; /* Smaller border-radius for mobile */
+    }
+    .chat-clear-history-btn { padding: 6px 10px; font-size: 0.7rem; }
+    .chat-close-btn-pro { width: 30px; height: 30px; font-size: 1rem; }
+}
+
+@keyframes ai-hover-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
 
 .nav-links a { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .nav-links a::after {
@@ -1160,11 +1477,23 @@ footer {
     aspect-ratio: 4 / 5;
 }
 .model-card:hover { transform: translateY(-10px); border-color: #ffd700; box-shadow: 0 20px 40px rgba(255, 0, 60, 0.15); }
+
+/* تأثير النبض أثناء تحميل المجسم */
+.model-card.loaded:not(.ready) .model-overlay {
+    background: rgba(0, 255, 65, 0.05);
+    animation: model-pulse 1.5s infinite ease-in-out;
+}
+
 model-viewer { width: 100% !important; height: 100% !important; background-color: transparent; outline: none; }
 
 .info-panel { padding: 20px; background: rgba(0, 0, 0, 0.2); border-top: 1px solid rgba(128, 128, 128, 0.1); display: flex; justify-content: space-between; align-items: center; }
 .ar-button { background: transparent; color: #ffd700; border: 1px solid #ffd700; padding: 10px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
 .ar-button:hover { background: #ff003c; color: white; border-color: #ff003c; }
+
+@keyframes model-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+}
 
 .fullscreen-btn {
     position: absolute; top: 15px; left: 15px; width: 40px; height: 40px;

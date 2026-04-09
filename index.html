@@ -33,6 +33,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -117,10 +118,10 @@
             <li><a href="quizzes.html">الاختبارات</a></li>
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li>
-            <li><a href="lab.html">المعرض</a></li>
             <li><a href="contact.html">تواصل معنا</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
+            <a href="javascript:void(0)" onclick="toggleAbqarienoChat('center')" class="nav-ai-icon-only" title="عبقرينو AI"><i class="fa-solid fa-brain"></i></a>
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
             <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
             <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
@@ -145,7 +146,7 @@
 
         <div class="hero-content">
             <div class="hero-image scroll-animate" style="transition-delay: 0.2s;">
-                <img src="212.png" alt="دكتور عبدالله" class="doctor-img" fetchpriority="high" decoding="async">
+                <img src="212.png" alt="دكتور عبدالله" class="doctor-img" fetchpriority="high" decoding="async" width="450" height="600" onload="this.style.animation='none'">
             </div>
 
             <div class="hero-text scroll-animate" style="transition-delay: 0.5s;">
@@ -213,7 +214,7 @@
                     <i class="fa-solid fa-cubes-stacked icon-3d"></i>
                     <h3>تجربة بصرية 3D</h3>
                     <p>انتقل من التلقين إلى التجسيد مع مجسمات تفاعلية للخلية، وتقنية Nano Banana 2 لرؤية فائقة الجودة مريحة للعين.</p>
-                    <a href="lab.html" class="btn-card-3d"><i class="fa-solid fa-vr-cardboard"></i> دخول المعرض</a>
+                    <!-- <a href="lab.html" class="btn-card-3d"><i class="fa-solid fa-vr-cardboard"></i> دخول المعرض</a> -->
                 </div>
                 <div class="feature-card">
                     <i class="fa-solid fa-chart-line icon-eval"></i>
@@ -258,6 +259,44 @@
         </div>
     </footer>
 
+    <!-- أيقونة الذكاء الاصطناعي المتطايرة -->
+    <a href="javascript:void(0)" onclick="toggleAbqarienoChat()" class="ai-floating-widget" title="تحدث مع عبقرينو">
+        <i class="fa-solid fa-robot"></i>
+    </a>
+
+    <!-- نافذة شات عبقرينو المنبثقة -->
+    <div class="abqarieno-chat-window" id="abqarienoWindow">
+        <div class="chat-header-pro">
+            <div class="info">
+                <div class="logo-mini"><i class="fa-solid fa-brain"></i></div>
+                <div>
+                    <h4 style="margin:0; color:#fff; font-size:0.9rem;">عبقرينو AI</h4>
+                    <small style="color:var(--neon-green); font-size:0.7rem;"><i class="fa-solid fa-circle" style="font-size:0.5rem;"></i> متصل الآن</small>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button class="chat-clear-history-btn" onclick="clearAbqarienoChatHistory()">
+                    <i class="fa-solid fa-trash-can"></i> مسح المحادثة
+                </button>
+                <div class="chat-close-btn-pro" onclick="toggleAbqarienoChat()">
+                    <i class="fa-solid fa-xmark"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div id="ai-chat-box">
+            <div class="ai-msg">
+                أهلاً بك يا بطل! أنا <strong>عبقرينو</strong>، مساعدك الذكي المطور بواسطة مصطفى أبو طالب. كيف يمكنني مساعدتك في رحلتك التعليمية اليوم؟ 🚀
+            </div>
+        </div>
+
+        <div class="ai-input-area">
+            <input type="text" id="ai-user-input" placeholder="اسأل عبقرينو أي شيء..." onkeypress="if(event.key==='Enter') sendAbqarienoMessage()">
+            <button class="ai-send-btn" onclick="sendAbqarienoMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script src="env-config.js"></script>
     <script type="module" src="main.js"></script>
 
     <!-- زر الأخبار العائم -->

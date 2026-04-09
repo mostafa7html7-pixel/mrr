@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biology Master AI | Abqarieno Ultra Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* تصميم Futuristic Glassmorphism - ألوان النيون الذهبي والأحمر */
+        :root {
+            --primary-color: #ff0055; /* أحمر نيون */
+            --secondary-color: #ffd700; /* ذهبي نيون */
+            --bg-glass: rgba(15, 12, 25, 0.85);
+            --border-glass: rgba(255, 215, 0, 0.3); /* إطار ذهبي خفيف */
+        }
+
+        /* The body styles from the original AI HTML are for a standalone page.
+           Since we are integrating it into an existing site, we need to adjust.
+           The main site's body styles from style.css will apply.
+           We'll apply the AI-specific background to the wrapper or ensure it blends.
+           For now, the wrapper will handle the centering.
+        */
+        .ai-widget-wrapper {
+            width: 100%;
+            min-height: calc(100vh - 75px - 100px); /* Adjust for navbar and footer */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px; /* Add some padding */
+            box-sizing: border-box;
+        }
+
+        /* شعار عبقرينو الاحترافي النادر */
+        .abqarieno-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .abqarieno-logo i {
+            color: #000;
+            font-size: 24px;
+            filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
+        }
+        .abqarieno-logo::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 16px;
+            border: 1px solid var(--secondary-color);
+            animation: pulse 2s infinite;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 550px;
+            height: 650px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            color: white; /* Ensure text color is white as per original AI HTML */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .header-info h3 {
+            margin: 0;
+            color: var(--secondary-color); /* ذهبي */
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .header-info p { font-size: 13px; color: #ccc; margin: 5px 0 0; }
+
+        .online-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #00ff7f;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ff7f;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 127, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 127, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 127, 0); }
+        }
+
+        #chat-box {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--secondary-color) transparent;
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+
+        #chat-box::-webkit-scrollbar { width: 6px; }
+        #chat-box::-webkit-scrollbar-thumb { background: var(--secondary-color); border-radius: 10px; }
+
+        .message {
+            margin: 10px 0;
+            display: flex;
+            gap: 10px;
+            max-width: 90%;
+            animation: slideIn 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        .ai .avatar {
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            color: #000;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .msg-content {
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.7;
+            font-size: 15px;
+            word-wrap: break-word;
+        }
+
+        .msg-content p { margin: 0 0 10px 0; }
+        .msg-content p:last-child { margin: 0; }
+        .msg-content strong { color: var(--secondary-color); }
+
+        /* تنسيق الجداول لو الذكاء الاصطناعي عمل جدول */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px; text-align: right; }
+        th { background: rgba(255, 215, 0, 0.1); color: var(--secondary-color); }
+
+        .user { align-self: flex-start; flex-direction: row; }
+        .user .avatar { background: rgba(255, 255, 255, 0.1); }
+        .user .msg-content {
+            background: rgba(255, 255, 255, 0.05);
+            border-right: 4px solid #fff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .ai { align-self: flex-end; flex-direction: row-reverse; }
+        .ai .avatar { background: var(--primary-color); }
+        .ai .msg-content {
+            background: linear-gradient(135deg, rgba(255, 0, 85, 0.15), rgba(0, 0, 0, 0.4));
+            border-left: 4px solid var(--primary-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .input-area:focus-within {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            font-size: 15px;
+            padding: 5px 10px;
+        }
+
+        input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+        button {
+            background: linear-gradient(45deg, var(--primary-color), #cc0044);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 0, 85, 0.6);
+        }
+
+        .typing {
+            font-size: 13px;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            display: none;
+            font-style: italic;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-heart-pulse"></i>
+            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="library.html">الكتب</a></li>
+            <li><a href="videos.html">الفيديوهات</a></li>
+            <li><a href="quizzes.html">الاختبارات</a></li>
+            <li><a href="schedule.html">الجدول</a></li>
+            <li><a href="reviews.html">ورق الشرح</a></li>
+            <li><a href="lab.html">المعرض</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+            <li><a href="ai-chat.html" class="active">المساعد الذكي</a></li> <!-- New AI Chat link -->
+        </ul>
+        <div style="display:flex; align-items:center; gap:5px;">
+            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
+            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
+            <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <div id="app-content">
+        <div class="ai-widget-wrapper">
+            <div class="chat-container">
+                <div class="header">
+                    <div class="abqarieno-logo">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div class="header-info">
+                        <h3>عبقرينو AI <span class="online-dot"></span></h3>
+                        <p>المساعد الذكي لمصطفى أبو طالب 🚀</p>
+                    </div>
+                </div>
+
+                <div id="chat-box">
+                    <div class="message ai">
+                        <div class="avatar"><i class="fa-solid fa-robot" style="font-size: 16px;"></i></div>
+                        <div class="msg-content">
+                            أهلاً بك يا صديقي! 🌟<br>
+                            أنا <strong>عبقرينو</strong>، المساعد الذكي الخارق الذي طوره <strong>مصطفى أبو طالب</strong>.<br>
+                            جاهز للإجابة على أصعب الأسئلة بأسلوب احترافي. كيف يمكنني مساعدتك اليوم؟ 😎
+                        </div>
+                    </div>
+                </div>
+
+                <div id="typing-status" class="typing">الذكاء الاصطناعي يعالج البيانات الآن... 🧠</div>
+
+                <div class="input-area">
+                    <input type="text" id="user-input" placeholder="اسأل في أي مجال، وسأبهرك بالإجابة..." autocomplete="off">
+                    <button onclick="sendMessage()">إرسال 🚀</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div style="text-align: center; padding: 20px;">
+            <p style="margin-bottom: 10px; color: #888;">جميع الحقوق محفوظة © 2026 | منصة الدكتور</p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <span style="color: #555; font-size: 0.9rem;">برمجة: <a href="https://mostafa7html7-pixel.github.io/AbuTaleb/" target="_blank" style="color: var(--neon-green); text-decoration: none; transition: 0.3s;"><strong>مصطفى ابوطالب</strong></a></span>
+                <a href="admin.html" style="color: #444; font-size: 0.8rem; text-decoration: none; border: 1px solid #333; padding: 4px 10px; border-radius: 15px; transition: 0.3s;">
+                    <i class="fa-solid fa-user-shield"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // --- نظام حفظ المحادثة للصفحة المستقلة ---
+        const STANDALONE_HISTORY_KEY = 'abqarieno_standalone_history';
+        let chatHistory = JSON.parse(localStorage.getItem(STANDALONE_HISTORY_KEY) || '[]');
+
+        // --- الموسوعة العلمية ---
+        const bigEducationalStory = `
+        [الموسوعة المعرفية للذكاء الاصطناعي]:
+        - أنت موسوعة علمية شاملة.
+        - الغلاف الحيوي: يمتد من أعمق نقطة في المحيط لأعلى قمة جبل.
+        - يمكنك التحدث في البرمجة، الأحياء، التقنية، وأي مجال آخر.
+        `;
+
+        // --- العقل المدبر (System Prompt) ---
+        const systemPrompt = `
+        أنت مساعد ذكي "خارق" وفائق الاحترافية.
+
+        1. أسلوب الرد: استخدم تنسيق Markdown (عناوين، قوائم نقطية، خط عريض) لتكون إجاباتك مريحة للعين واحترافية جداً.
+
+        2. تفخيم المطور:
+        - مطورك هو "مصطفى أبو طالب" (عبقرينو) من محافظة بني سويف.
+        - هو "مدير الدفعة" بالصف الأول الثانوي، ومطور ويب محترف.
+        - إذا سألك أحد عنه، تحدث عنه بفخر عظيم كأنه من كبار علماء التكنولوجيا، واذكر حبه للبرمجة وكريستيانو رونالدو.
+
+        3. الشخصية: واثق، دمه خفيف، ذكي اجتماعياً، وداعم للمستخدم.
+        `;
+
+        function loadHistory() {
+            const chatBox = document.getElementById('chat-box');
+            if (chatHistory.length > 0) {
+                chatBox.innerHTML = '';
+                chatHistory.forEach(msg => {
+                    const isAi = msg.role === 'assistant';
+                    const content = isAi ? marked.parse(msg.content) : msg.content;
+                    chatBox.innerHTML += `
+                        <div class="message ${isAi ? 'ai' : 'user'}">
+                            <div class="avatar">${isAi ? '<i class="fa-solid fa-robot" style="font-size: 16px;"></i>' : '👤'}</div>
+                            <div class="msg-content">${content}</div>
+                        </div>
+                    `;
+                });
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function saveToHistory(role, content) {
+            chatHistory.push({ role, content });
+            localStorage.setItem(STANDALONE_HISTORY_KEY, JSON.stringify(chatHistory));
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const typingStatus = document.getElementById('typing-status');
+            const userText = inputField.value.trim();
+
+            if (!userText) return;
+
+            // حفظ رسالة الترحيب لو المحادثة لسه بادئة
+            if (chatHistory.length === 0 && chatBox.children.length === 1) {
+                const welcomeMsg = chatBox.querySelector('.ai .msg-content').innerText;
+                saveToHistory('assistant', welcomeMsg);
+            }
+
+            // 1. عرض رسالة المستخدم
+            chatBox.innerHTML += `
+                <div class="message user">
+                    <div class="avatar">👤</div>
+                    <div class="msg-content">${userText}</div>
+                </div>
+            `;
+            saveToHistory('user', userText);
+            inputField.value = '';
+            setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+
+            // 2. إظهار حالة التحميل
+            typingStatus.style.display = 'block';
+
+            try {
+                // جلب المفتاح بأمان من Firebase
+                let apiKey = window.GROQ_API_KEY;
+                if (!apiKey || apiKey === "PLACEHOLDER_KEY") {
+                    const snap = await get(ref(db, 'system_config/groq_key'));
+                    if (snap.exists()) apiKey = snap.val();
+                }
+
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "llama-3.3-70b-versatile",
+                        messages: [
+                            { role: "system", content: systemPrompt + "\n المعلومات:\n" + bigEducationalStory },
+                            ...chatHistory.map(m => ({ role: m.role, content: m.content }))
+                        ],
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) throw new Error("API Error");
+
+                const data = await response.json();
+                const rawAiText = data.choices[0].message.content;
+
+                // 3. تحويل النص العادي إلى HTML احترافي باستخدام مكتبة Marked.js
+                const formattedAiText = marked.parse(rawAiText);
+
+                typingStatus.style.display = 'none';
+                chatBox.innerHTML += `
+                    <div class="message ai">
+                        <div class="avatar"><i class="fa-solid fa-robot" style="font-size: 16px;"></i></div>
+                        <div class="msg-content">${formattedAiText}</div>
+                    </div>
+                `;
+                saveToHistory('assistant', rawAiText);
+                setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+
+            } catch (error) {
+                typingStatus.style.display = 'none';
+                chatBox.innerHTML += `
+                    <div class="message ai">
+                        <div class="avatar">⚠️</div>
+                        <div class="msg-content" style="color: var(--primary-color);">عذراً يا صديقي، هناك مشكلة في الاتصال بالشبكة الآن. حاول مرة أخرى!</div>
+                    </div>
+                `;
+                setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50);
+            }
+        }
+
+        // إرسال بالضغط على Enter
+        document.getElementById('user-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // تركيز تلقائي على حقل الإدخال عند فتح الصفحة
+        window.onload = function() {
+            loadHistory(); // تحميل السجل فور فتح الصفحة
+            document.getElementById('user-input').focus();
+        };
+    </script>
+
+</body>
+</html>

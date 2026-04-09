@@ -20,6 +20,7 @@ const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل ج
     './reviews.html',
     './contact.html',
     './admin.html', // إضافة صفحة الأدمن الرئيسية
+    './ai-chat.html', // إضافة صفحة المساعد الذكي
     './admin-quizzes.html', // إضافة صفحة إدارة الاختبارات
     './admin-scores.html', // إضافة صفحة نتائج الطلاب
     './admin-payments.html', // إضافة صفحة طلبات الدفع

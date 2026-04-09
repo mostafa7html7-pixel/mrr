@@ -1,7 +1,7 @@
 {
   "name": "منصة الدكتور التعليمية",
   "short_name": "الدكتور",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#020202",
   "theme_color": "#00ff41",
