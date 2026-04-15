@@ -37,7 +37,7 @@
             <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
             <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
         </div> 
-    </nav>
+    </nav> 
  
     <div class="page-header">  
         <p class="subtitle">PREMIUM ACCESS</p>
@@ -109,11 +109,9 @@
         let currentUser = null;
 
         onAuthStateChanged(auth, (user) => {
+            document.getElementById('page-loader').classList.add('loader-hidden');
             if (user) {
                 currentUser = user;
-                document.getElementById('page-loader').classList.add('loader-hidden');
-            } else {
-                window.location.href = "auth.html";
             }
         });
 

@@ -14,7 +14,7 @@
             --admin-bg: #050508; /* خلفية الصفحة الأغمق */
             --admin-surface: #0f111a; /* خلفية الحاويات أفتح */
             --admin-surface-light: #1a1d27; /* أفتح درجة للتمييز */ 
-            --admin-border: rgba(255, 255, 255, 0.1);
+            --admin-border: rgba(255, 255, 255, 0.1); 
             --admin-text-primary: #f7fafc;
             --admin-text-secondary: #a0aec0; 
             --admin-accent: #00ff88;
@@ -537,7 +537,7 @@
             <li><a href="admin-scores.html">النتائج</a></li>
             <li><a href="admin-payments.html">المدفوعات</a></li>
             <li><a href="index.html" style="color: var(--admin-accent);"><i class="fa-solid fa-eye"></i> الموقع</a></li>
-            <li><a href="#" onclick="logout()" class="logout-link"><i class="fa-solid fa-power-off"></i> خروج</a></li>
+            <li><a href="javascript:void(0)" onclick="logout()" class="logout-link"><i class="fa-solid fa-power-off"></i> خروج</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
@@ -724,7 +724,14 @@
 
         window.logout = () => {
             if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-                signOut(auth).then(() => window.location.href = "auth.html");
+                signOut(auth).then(() => {
+                    localStorage.removeItem('isRegistered');
+                    localStorage.removeItem('master_verified_2028');
+                    localStorage.removeItem('student_gender');
+                    localStorage.removeItem('force_registration');
+                    sessionStorage.removeItem('biology_user_role');
+                    window.location.replace("index.html");
+                }).catch(console.error);
             }
         };
 

@@ -24,7 +24,7 @@
             border-radius: 30px;
             padding: 50px 30px;
             max-width: 600px;
-            width: 100%;
+            width: 100%; 
             box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
         .glass-info-box i { font-size: 4rem; color: var(--neon-green); margin-bottom: 25px; opacity: 0.8; }
@@ -74,5 +74,25 @@
     </div>
 
     <script src="main.js"></script>
+    <script type="module">
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { firebaseConfig } from "./firebase-config.js";
+
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'index.html'; return; }
+            
+            const unlockedSnap = await get(ref(db, `users/${user.uid}/unlocked_packages/1`));
+            if (!unlockedSnap.exists() || unlockedSnap.val() !== true) {
+                alert("عذراً، لم يتم تفعيل هذا الباكيدج لحسابك بعد.");
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
 </body>
 </html>

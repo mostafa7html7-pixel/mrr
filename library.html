@@ -13,10 +13,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
+    <!-- التحميل المسبق لأغلفة الكتب لسرعة البرق -->
+    <link rel="preload" as="image" href="12.jpg">
+    <link rel="preload" as="image" href="232.png">
+    <link rel="preload" as="image" href="13.jpg">
+    <link rel="preload" as="image" href="14.png">
+
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
+      "@context": "https://schema.org", 
       "@type": "ItemList",
       "name": "مكتبة الأحياء الرقمية",
       "description": "كتب وملازم مجانية في مادة الأحياء للصف الأول الثانوي.",
@@ -311,7 +317,7 @@
                 <div class="book-img">
                     <span class="badge">الصف الأول الثانوي</span>
                     <!-- ضع رابط صورة الكتاب هنا في src -->
-                    <img src="12.jpg" alt="غلاف الكتاب" loading="lazy" decoding="async" onload="this.style.animation='none'">
+                    <img src="12.jpg" alt="غلاف الكتاب" fetchpriority="high" decoding="async" onload="this.style.animation='none'">
                 </div>
                 <div class="book-info">
                     <span class="free-tag"><i class="fa-solid fa-check-circle"></i> متاح مجاناً</span>
@@ -332,7 +338,7 @@
                 <div class="book-img">
                     <span class="badge">الصف الأول الثانوي</span>
                     <!-- صورة افتراضية للكتاب الجديد -->
-                    <img src="232.png" alt="غلاف الكتاب" loading="lazy" decoding="async" onload="this.style.animation='none'">
+                    <img src="232.png" alt="غلاف الكتاب" fetchpriority="high" decoding="async" onload="this.style.animation='none'">
                 </div>
                 <div class="book-info">
                     <span class="free-tag"><i class="fa-solid fa-check-circle"></i> متاح مجاناً</span>
@@ -350,7 +356,7 @@
                 <div class="book-img">
                     <span class="badge">الصف الأول الثانوي</span>
                     <!-- ضع رابط صورة الكتاب هنا في src -->
-                    <img src="13.jpg" alt="غلاف الكتاب" loading="lazy" decoding="async" onload="this.style.animation='none'">
+                    <img src="13.jpg" alt="غلاف الكتاب" fetchpriority="high" decoding="async" onload="this.style.animation='none'">
                 </div>
                 <div class="book-info">
                     <span class="free-tag"><i class="fa-solid fa-check-circle"></i> متاح مجاناً</span>
@@ -368,7 +374,7 @@
                 <div class="book-img">
                     <span class="badge">الصف الأول الثانوي</span>
                     <!-- ضع رابط صورة الكتاب هنا في src -->
-                    <img src="14.png" alt="غلاف الكتاب" loading="lazy" decoding="async" onload="this.style.animation='none'">
+                    <img src="14.png" alt="غلاف الكتاب" fetchpriority="high" decoding="async" onload="this.style.animation='none'">
                 </div>
                 <div class="book-info">
                     <span class="free-tag"><i class="fa-solid fa-check-circle"></i> متاح مجاناً</span>

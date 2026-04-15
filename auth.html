@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - الدكتور</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- منع خطأ 404 للأيقونة -->
+    <link rel="icon" href="data:,">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <!-- تحضير الصفحة القادمة لسرعة الانتقال -->
@@ -18,7 +22,7 @@
         }
  
         body {
-            background: #050505;
+            background: #050505; 
             display: flex; justify-content: center; align-items: center;
             min-height: 100vh; overflow: hidden; position: relative;
         }
@@ -164,12 +168,15 @@
                     return;
                 }
                 
-                // منطق الربط الذكي: إذا لم يكمل البيانات يذهب فوراً لصفحة الإكمال
-                if (userData.role === 'admin') window.location.href = "admin.html";
-                else if (!userData.username) window.location.href = "complete-profile.html";
-                else window.location.href = "index.html";
+                // تعديل: منع التوجيه التلقائي المزعج
+                // إذا وجدنا بيانات الطالب، نعطيه خيار الدخول يدوياً
+                const btn = document.getElementById('loginBtn');
+                btn.disabled = false;
+                btn.style.background = "#fff";
+                btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> دخول للمنصة (أنت مسجل بالفعل)';
+                btn.onclick = () => window.location.href = "index.html";
             } else {
-                // مستخدم جديد تماماً -> لصفحة الإكمال فوراً
+                // مستخدم جديد تماماً (لم يكمل بياناته) -> لصفحة الإكمال فوراً بعد الضغط
                 window.location.href = "complete-profile.html";
             }
         }

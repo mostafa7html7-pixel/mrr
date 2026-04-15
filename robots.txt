@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 Disallow: /admin-*.html
-Sitemap: https://www.dr-abdullah.com/sitemap.xml
+Sitemap: https://www.dr-abdullah.com/sitemap.xml 

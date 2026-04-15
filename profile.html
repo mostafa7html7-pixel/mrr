@@ -29,7 +29,7 @@
             <li><a href="quizzes.html">الاختبارات</a></li>  
             <li><a href="schedule.html">الجدول</a></li>
             <li><a href="reviews.html">ورق الشرح</a></li> 
-            <li><a href="lab.html">المعرض</a></li>
+            <li><a href="lab.html">المعرض</a></li> 
             <li><a href="contact.html">تواصل معنا</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
@@ -94,6 +94,7 @@
         let currentUserUid = null;
 
         onAuthStateChanged(auth, async (user) => {
+            document.getElementById('page-loader').classList.add('loader-hidden');
             if (user) {
                 currentUserUid = user.uid;
                 const snapshot = await get(ref(db, 'users/' + user.uid));
@@ -113,9 +114,6 @@
                     }
                     avatarContainer.innerHTML += '<div class="upload-overlay"><i class="fa-solid fa-camera"></i> تغيير</div>';
                 }
-                document.getElementById('page-loader').classList.add('loader-hidden');
-            } else {
-                window.location.href = "auth.html";
             }
         });
 
@@ -171,7 +169,12 @@
 
         window.logout = () => {
             if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
-                signOut(auth);
+                signOut(auth).then(() => {
+                    localStorage.removeItem('isRegistered');
+                    localStorage.removeItem('student_gender');
+                    localStorage.removeItem('force_registration');
+                    window.location.href = "index.html";
+                });
             }
         };
 

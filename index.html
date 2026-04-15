@@ -6,6 +6,10 @@
     
     <!-- التحسين الأقصى لمحركات البحث SEO -->
     <title>منصة الدكتور عبدالله | أقوى منصة أحياء للثانوية العامة (أولى، تانية، تالتة ثانوي)</title>
+    
+    <!-- منع خطأ 404 للأيقونة -->
+    <link rel="icon" href="data:,">
+
     <meta name="description" content="المنصة الرسمية للدكتور عبدالله خبير الأحياء. شرح شامل لمنهج الصف الأول والثاني والثالث الثانوي بأحدث التقنيات. مذكرات PDF، اختبارات إلكترونية، ومتابعة دقيقة.">
     <meta name="keywords" content="دكتور عبدالله, أحياء أولى ثانوي, أحياء تانية ثانوي, أحياء تالتة ثانوي, منهج الأحياء 2026, دكتور عبدالله أحياء، ثانوية عامة، منصة تعليمية، مراجعة نهائية أحياء، شرح درس الخلية، الوراثة، التكاثر، الدعامة والحركة، الهرمونات، المناعة، البيولوجيا الجزيئية، امتحانات أحياء نظام جديد، مذكرات أحياء PDF، بنك أسئلة أحياء">
     <meta name="author" content="دكتور عبدالله">
@@ -16,7 +20,7 @@
     <!-- Meta Tags لظهور الموقع باحترافية في جوجل وسوشيال ميديا -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="منصة الدكتور">
-    <meta property="og:title" content="منصة الدكتور عبدالله التعليمية - خبير الأحياء">
+    <meta property="og:title" content="منصة الدكتور عبدالله التعليمية - خبير الأحياء"> 
     <meta property="og:description" content="انضم الآن لأقوى تجربة تعليمية في الأحياء للمرحلة الثانوية.">
     <meta property="og:image" content="https://www.dr-abdullah.com/212.png">
     <meta property="og:image:width" content="1200">
@@ -121,12 +125,36 @@
             <li><a href="contact.html">تواصل معنا</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
-            <a href="javascript:void(0)" onclick="toggleAbqarienoChat('center')" class="nav-ai-icon-only" title="عبقرينو AI"><i class="fa-solid fa-brain"></i></a>
+            <a href="auth.html" id="headerLoginBtn" class="nav-login-btn" title="تسجيل الانضمام"><i class="fa-solid fa-user-plus"></i></a>
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
             <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
             <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
         </div>
     </nav>
+
+    <!-- نافذة اختيار نوع الطالب (تظهر لمرة واحدة) -->
+    <div class="features-modal-overlay" id="genderSelectionOverlay" style="z-index: 2000000;">
+        <div class="features-modal" style="max-width: 450px;">
+            <div class="gender-selection-card">
+                <div style="width: 70px; height: 70px; background: rgba(0, 255, 65, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 1px solid var(--neon-green);">
+                    <i class="fa-solid fa-venus-mars" style="font-size: 2rem; color: var(--neon-green);"></i>
+                </div>
+                <h2 style="font-family: 'Reem Kufi', sans-serif; color: #fff; margin-bottom: 10px;">أهلاً بك يا بطل</h2>
+                <p style="color: #aaa; font-size: 0.95rem;">يسعدنا انضمامك لمنصة الدكتور، أنت:</p>
+                
+                <div class="gender-btns-container">
+                    <button onclick="setStudentGender('boy')" class="gender-option-btn boy">
+                        <i class="fa-solid fa-mars"></i>
+                        <span>طالب (ولد)</span>
+                    </button>
+                    <button onclick="setStudentGender('girl')" class="gender-option-btn girl">
+                        <i class="fa-solid fa-venus"></i>
+                        <span>طالبة (بنت)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- الحاوية التي سيتم تبديل محتواها فقط -->
     <div id="app-content">
@@ -163,6 +191,46 @@
     </section>
 
     <section class="container" style="padding-top: 0;">
+        <!-- عداد المراجعات النهائية التنازلي -->
+        <div class="review-timer-wrapper">
+            <div class="timer-title">
+                <i class="fa-solid fa-clock-rotate-left fa-spin"></i>
+                <span>متبقي على انطلاق المراجعات النهائية</span>
+            </div>
+            <div class="countdown-flex">
+                <div class="cd-item"><span class="cd-val" id="cd-days">00</span><span class="cd-lbl">يوم</span></div>
+                <div class="timer-sep">:</div>
+                <div class="cd-item"><span class="cd-val" id="cd-hours">00</span><span class="cd-lbl">ساعة</span></div>
+                <div class="timer-sep">:</div>
+                <div class="cd-item"><span class="cd-val" id="cd-mins">00</span><span class="cd-lbl">دقيقة</span></div>
+                <div class="timer-sep">:</div>
+                <div class="cd-item"><span class="cd-val" id="cd-secs">00</span><span class="cd-lbl">ثانية</span></div>
+            </div>
+        </div>
+
+        <!-- قسم باكيدجات الصفوف الدراسية -->
+        <div class="grid-container grid-3" style="margin-bottom: 60px;">
+            <!-- أولى ثانوي -->
+            <div class="package-glass-card scroll-animate" style="transition-delay: 0.1s;">
+                <div class="free-ribbon-top">مجانى لطلاب المستر</div>
+                <img src="photvid1.png" alt="باكيدج أولى ثانوي" class="package-banner" fetchpriority="high">
+                <button class="btn-package-pro btn-grade-1" onclick="openPackage(1)"><i class="fa-solid fa-bolt"></i> دخول باكيدج أولى ثانوي</button>
+            </div>
+
+            <!-- تانية ثانوي -->
+            <div class="package-glass-card scroll-animate" style="transition-delay: 0.2s;">
+                <img src="photvid2.png" alt="باكيدج تانية ثانوي" class="package-banner">
+                <button class="btn-package-pro btn-grade-2" onclick="openPackage(2)"><i class="fa-solid fa-unlock-keyhole"></i> دخول باكيدج تانية ثانوي</button>
+            </div>
+
+            <!-- تالتة ثانوي -->
+            <div class="package-glass-card special-gold scroll-animate" style="transition-delay: 0.3s;">
+                <img src="photvid3.png" alt="باكيدج تالتة ثانوي" class="package-banner">
+                <button class="btn-package-pro btn-grade-3" onclick="openPackage(3)"><i class="fa-solid fa-crown"></i> محتوى أبطال تالتة ثانوي</button>
+            </div>
+        </div>
+
+        <!-- قسم المميزات الحالي -->
         <div class="grid-container grid-3">
             <div class="feature-box scroll-animate" style="transition-delay: 0.1s;">
                 <i class="fa-solid fa-book-open" style="color:var(--neon-red)"></i>
@@ -251,7 +319,7 @@
         <div style="text-align: center; padding: 20px;">
             <p style="margin-bottom: 10px; color: #888;">جميع الحقوق محفوظة © 2026 | منصة الدكتور</p>
             <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="color: #555; font-size: 0.9rem;">برمجة: <strong style="color: var(--neon-green);">مصطفى ابوطالب</strong></span>
+                <span style="color: #555; font-size: 0.9rem;">برمجة: <a href="https://mostafa7html7-pixel.github.io/AbuTaleb/" target="_blank" style="color: var(--neon-green); text-decoration: none;"><strong>مصطفى ابوطالب</strong></a></span>
                 <a href="admin.html" style="color: #444; font-size: 0.8rem; text-decoration: none; border: 1px solid #333; padding: 4px 10px; border-radius: 15px; transition: 0.3s;">
                     <i class="fa-solid fa-user-shield"></i>
                 </a>
@@ -337,12 +405,101 @@
     <script type="module">
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getDatabase, ref, query, limitToLast, onValue, get, onChildAdded } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, query, limitToLast, onValue, get, onChildAdded, update, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { firebaseConfig } from "./firebase-config.js"; // استيراد إعدادات Firebase
 
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
         const auth = getAuth(app);
+
+        // --- نظام حماية الباكيدجات بالأكواد ---
+        window.openPackage = async (num) => {
+            if (!auth.currentUser) {
+                alert("يرجى تسجيل الدخول أو الانضمام للمنصة أولاً للوصول للمحتوى.");
+                window.location.href = 'auth.html';
+                return;
+            }
+
+            try {
+                // 1. فحص هل الباكيدج مفتوح بالفعل لهذا الطالب لضمان السرعة
+                const unlockedSnap = await get(ref(db, `users/${auth.currentUser.uid}/unlocked_packages/${num}`));
+                if (unlockedSnap.exists() && unlockedSnap.val() === true) {
+                    window.location.href = `video-package-${num}.html`;
+                    return;
+                }
+
+                // 2. طلب كود التفعيل
+                const codeInput = prompt("هذا الباكيدج محمي. يرجى إدخال كود التفعيل المكون من 5 أرقام:");
+                if (!codeInput) return;
+                
+                // تأمين: تنظيف الكود من أي مسافات زائدة
+                const code = codeInput.trim();
+
+                // --- منطق كود الماستر الثابت (01234) لفتح أي باكيدج ---
+                if (code === '01234') {
+                    await update(ref(db, `users/${auth.currentUser.uid}/unlocked_packages`), { [num]: true });
+                    alert("تم استخدام كود الماستر. تم تفعيل الباكيدج بنجاح! استمتع بالمشاهدة يا بطل.");
+                    window.location.href = `video-package-${num}.html`;
+                    return;
+                }
+
+                const codeRef = ref(db, `package_codes/${code}`);
+                const codeSnap = await get(codeRef);
+
+                if (codeSnap.exists()) {
+                    const codeData = codeSnap.val();
+                    if (codeData.used) {
+                        alert("عذراً، هذا الكود تم استخدامه مسبقاً ولا يمكن تفعيله مرة أخرى.");
+                    } else {
+                        // 3. تفعيل الباكيدج وحرق الكود العادي
+                        const updates = {};
+                        updates[`package_codes/${code}`] = { used: true, usedBy: auth.currentUser.uid, packageNum: num, activatedAt: serverTimestamp() };
+                        updates[`users/${auth.currentUser.uid}/unlocked_packages/${num}`] = true;
+
+                        await update(ref(db), updates);
+                        alert("مبروك! تم تفعيل الباكيدج بنجاح. استمتع بالمشاهدة يا بطل.");
+                        window.location.href = `video-package-${num}.html`;
+                    }
+                } else {
+                    alert("الكود الذي أدخلته غير صحيح. يرجى التأكد من الكود والمحاولة مرة أخرى.");
+                }
+            } catch (err) {
+                console.error("Activation Error:", err);
+                alert("حدث خطأ أثناء التفعيل. يرجى مراجعة اتصالك بالإنترنت.");
+            }
+        };
+
+        // --- نظام العداد التنازلي المتجدد (7 أيام) ---
+        function initCountdown() {
+            let target = localStorage.getItem('final_review_target');
+            const now = new Date().getTime();
+
+            // إذا لم يوجد تاريخ أو انتهى الوقت، حدد موعداً جديداً بعد أسبوع
+            if (!target || now > parseInt(target)) {
+                target = now + (7 * 24 * 60 * 60 * 1000);
+                localStorage.setItem('final_review_target', target.toString());
+            }
+
+            const updateTimer = () => {
+                const currentTime = new Date().getTime();
+                const diff = parseInt(target) - currentTime;
+
+                if (diff <= 0) {
+                    clearInterval(timerInt);
+                    initCountdown(); // إعادة التشغيل
+                    return;
+                }
+
+                document.getElementById('cd-days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                document.getElementById('cd-hours').innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                document.getElementById('cd-mins').innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                document.getElementById('cd-secs').innerText = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+            };
+
+            const timerInt = setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+        initCountdown();
 
         // --- 1. الدوال الأساسية ---
         window.openLightbox = function(src, type) {
@@ -443,20 +600,60 @@
         fireToast.onclick = () => { window.location.href = 'contact.html'; };
 
         // --- 3. نظام الصلاحيات والتوجيه ---
+        window.setStudentGender = function(type) {
+            localStorage.setItem('student_gender', type);
+            document.getElementById('genderSelectionOverlay').classList.remove('open');
+            if (type === 'girl') {
+                localStorage.setItem('force_registration', 'true');
+                // توجيه فوري للبنات غير المسجلات
+                if (!auth.currentUser || !localStorage.getItem('isRegistered')) {
+                    window.location.href = 'auth.html';
+                }
+            } else {
+                localStorage.setItem('force_registration', 'false');
+            }
+        };
+
+        // ظهور النافذة فوراً دون أي انتظار (Zero Delay)
+        if (!localStorage.getItem('student_gender')) {
+            document.getElementById('genderSelectionOverlay').classList.add('open');
+        }
+
+        // إخفاء زر التسجيل فوراً إذا كانت العلامة موجودة
+        if(localStorage.getItem('isRegistered') === 'true') {
+            if(document.getElementById('headerLoginBtn')) document.getElementById('headerLoginBtn').style.display = 'none';
+        }
+
         onAuthStateChanged(auth, (user) => {
+            // فحص الإجبار على التسجيل للبنات
+            const forceReg = localStorage.getItem('force_registration') === 'true';
+            if (!user && forceReg) {
+                window.location.href = 'auth.html';
+                return;
+            }
+
             if (user) {
                 get(ref(db, 'users/' + user.uid)).then((snapshot) => {
                     const userData = snapshot.val();
+                    const loginIcon = document.getElementById('headerLoginBtn');
+
                     if (userData && userData.banned) {
                         alert("تم حظر حسابك من قبل الإدارة بسبب مخالفة السياسات.");
                         signOut(auth).then(() => window.location.href = 'auth.html');
                         return;
                     }
-                    if (!userData || !userData.username) { 
-                        window.location.href = 'complete-profile.html';
+                    // التحقق من وجود اسم مستخدم يعني أنه أكمل التسجيل
+                    if (userData && (userData.username || userData.name)) {
+                        localStorage.setItem('isRegistered', 'true');
+                        if (loginIcon) loginIcon.style.display = 'none';
                     }
                 });
-            } else { window.location.href = 'auth.html'; }
+            } else {
+                // في حالة تسجيل الخروج أو عدم وجود مستخدم، نحذف العلامة ونظهر الأيقونة
+                localStorage.removeItem('isRegistered');
+                const loginIcon = document.getElementById('headerLoginBtn');
+                if (loginIcon) loginIcon.style.display = 'flex';
+            }
         });
     </script>
 </body>

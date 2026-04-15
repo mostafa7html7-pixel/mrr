@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <!-- التحميل المسبق الذكي لصور الباكيدجات -->
+    <link rel="preload" as="image" href="photvid1.png">
+    <link rel="preload" as="image" href="photvid2.png">
+    <link rel="preload" as="image" href="photvid3.png">
+
     <style>
         .video-hub-container {
             display: grid;
@@ -18,11 +23,11 @@
         }
 
         .package-glass-card {
-            background: rgba(10, 10, 15, 0.85);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.03); /* شفافية أكثر للزجاج */
+            backdrop-filter: blur(40px) saturate(200%); /* ضبابية فائقة */
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.3); /* حافة علوية مضيئة */
             border-radius: 35px;
             padding: 25px;
             text-align: center;
@@ -32,7 +37,7 @@
             flex-direction: column;
             align-items: center;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255,255,255,0.02);
         }
  
         .package-glass-card:hover {
@@ -43,7 +48,7 @@
 
         .free-ribbon-top {
             position: absolute;
-            top: 0;
+            top: 0; 
             right: 0;
             background: var(--neon-green);
             color: #000;
@@ -164,19 +169,19 @@
         <!-- الصف الأول الثانوي -->
         <div class="package-glass-card" style="animation: fadeInUp 0.6s ease;">
             <div class="free-ribbon-top">مجانى لطلاب المستر</div>
-            <img src="photvid1.png" alt="باكيدج أولى ثانوي" class="package-banner">
+            <img src="photvid1.png" alt="باكيدج أولى ثانوي" class="package-banner" fetchpriority="high" decoding="async">
             <button class="btn-package-pro btn-grade-1" onclick="openPackage(1)"><i class="fa-solid fa-bolt"></i> دخول الباكيدج المجاني</button>
         </div>
 
         <!-- الصف الثاني الثانوي -->
         <div class="package-glass-card" style="animation: fadeInUp 0.8s ease;">
-            <img src="photvid2.png" alt="باكيدج تانية ثانوي" class="package-banner">
+            <img src="photvid2.png" alt="باكيدج تانية ثانوي" class="package-banner" fetchpriority="high" decoding="async">
             <button class="btn-package-pro btn-grade-2" onclick="openPackage(2)"><i class="fa-solid fa-unlock-keyhole"></i> فتح باكيدج تانية ثانوي</button>
         </div>
 
         <!-- الصف الثالث الثانوي -->
         <div class="package-glass-card special-gold" style="animation: fadeInUp 1s ease;">
-            <img src="photvid3.png" alt="باكيدج تالتة ثانوي" class="package-banner">
+            <img src="photvid3.png" alt="باكيدج تالتة ثانوي" class="package-banner" fetchpriority="high" decoding="async">
             <button class="btn-package-pro btn-grade-3" onclick="openPackage(3)"><i class="fa-solid fa-crown"></i> محتوى أبطال تالتة ثانوي</button>
         </div>
 
@@ -195,10 +200,6 @@
 
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const auth = getAuth(app);
-
-        onAuthStateChanged(auth, (user) => {
-            if (!user) window.location.href = "auth.html";
-        });
 
         window.openPackage = (num) => {
             window.location.href = `video-package-${num}.html`;

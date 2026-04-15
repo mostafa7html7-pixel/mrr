@@ -2,32 +2,21 @@
 
 // --- 0. نظام التنظيف التلقائي للكاش (كل ساعة) ---
 (function() {
-    const WIPE_INTERVAL = 0; // تم التعديل ليتم الفحص في كل فتح للمنصة
+    const CURRENT_VERSION = 'v50'; // يجب أن يطابق CACHE_NAME في sw.js
     const WIPE_KEY = 'platform_last_auto_wipe';
-    const lastWipe = localStorage.getItem(WIPE_KEY);
-    const now = Date.now();
+    const lastVersion = localStorage.getItem('platform_version');
 
-    // التحقق من الجلسة الحالية (Session) لضمان التحديث عند كل فتح جديد
-    if (!sessionStorage.getItem('opened_this_session')) {
+    if (lastVersion !== CURRENT_VERSION) {
         console.log("جاري تحديث بيانات المنصة تلقائياً...");
         
         (async () => {
-            // حفظ التفضيلات الهامة قبل المسح
-            const currentTheme = localStorage.getItem('theme');
-            
-            // مسح ملفات الـ Service Worker المخزنة
             if ('caches' in window) {
                 const keys = await caches.keys();
                 for (const key of keys) await caches.delete(key);
             }
             
-            // مسح كاش الرسائل فقط لضمان السرعة مع تحديث البيانات
             localStorage.removeItem('biology_contact_messages_v3');
-            
-            // إعادة التوقيت الجديد والتفضيلات
-            localStorage.setItem(WIPE_KEY, now.toString());
-            sessionStorage.setItem('opened_this_session', 'true');
-            if (currentTheme) localStorage.setItem('theme', currentTheme);
+            localStorage.setItem('platform_version', CURRENT_VERSION);
             
             console.log("تم تحديث الكاش بنجاح");
         })();
@@ -525,8 +514,8 @@ window.toggleFeaturesModal = function() {
 if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            // إجبار السيرفس وركر على التحديث فوراً عند الفتح
-            reg.update();
+            // إجبار السيرفس وركر على التحديث فوراً مع معالجة الأخطاء المحتملة
+            reg.update().catch(err => console.warn("SW update skipped: ", err.message));
             
             // مراقبة التحديثات
             reg.addEventListener('updatefound', () => {
