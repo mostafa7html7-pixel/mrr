@@ -76,7 +76,7 @@
     <script src="main.js"></script>
     <script type="module">
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { firebaseConfig } from "./firebase-config.js";
 
@@ -87,10 +87,23 @@
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'index.html'; return; }
             
-            const unlockedSnap = await get(ref(db, `users/${user.uid}/unlocked_packages/1`));
-            if (!unlockedSnap.exists() || unlockedSnap.val() !== true) {
-                alert("عذراً، لم يتم تفعيل هذا الباكيدج لحسابك بعد.");
+            const userSnap = await get(ref(db, `users/${user.uid}`));
+            const userData = userSnap.val() || {};
+            const unlocked = userData.unlocked_packages && userData.unlocked_packages['1'];
+            const activeDeviceId = userData.active_device_id;
+            const currentDeviceId = localStorage.getItem('biology_device_id');
+
+            if (!unlocked) {
+                alert("هذا الباكيدج غير مفعل لحسابك.");
                 window.location.href = 'index.html';
+                return;
+            }
+
+            // فحص قفل الجهاز
+            if (activeDeviceId && activeDeviceId !== currentDeviceId) {
+                alert("تنبيه أمني: لا يمكنك فتح الباكيدج إلا من جهاز التفعيل الأساسي.");
+                signOut(auth);
+                window.location.href = 'auth.html';
             }
         });
     </script>

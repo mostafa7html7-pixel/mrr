@@ -319,7 +319,7 @@
         <div style="text-align: center; padding: 20px;">
             <p style="margin-bottom: 10px; color: #888;">جميع الحقوق محفوظة © 2026 | منصة الدكتور</p>
             <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="color: #555; font-size: 0.9rem;">برمجة: <a href="https://mostafa7html7-pixel.github.io/AbuTaleb/" target="_blank" style="color: var(--neon-green); text-decoration: none;"><strong>مصطفى ابوطالب</strong></a></span>
+                <span style="color: #555; font-size: 0.9rem;">برمجة: <a href="https://mostafa7html7-pixel.github.io/AbuTaleb/" target="_blank" class="developer-btn">مصطفى ابوطالب</a></span>
                 <a href="admin.html" style="color: #444; font-size: 0.8rem; text-decoration: none; border: 1px solid #333; padding: 4px 10px; border-radius: 15px; transition: 0.3s;">
                     <i class="fa-solid fa-user-shield"></i>
                 </a>
@@ -412,6 +412,16 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
+        // وظيفة جلب/إنشاء معرف الجهاز الفريد
+        const getDeviceId = () => {
+            let id = localStorage.getItem('biology_device_id');
+            if (!id) {
+                id = 'dev-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('biology_device_id', id);
+            }
+            return id;
+        };
+
         // --- نظام حماية الباكيدجات بالأكواد ---
         window.openPackage = async (num) => {
             if (!auth.currentUser) {
@@ -421,14 +431,30 @@
             }
 
             try {
-                // 1. فحص هل الباكيدج مفتوح بالفعل لهذا الطالب لضمان السرعة
-                const unlockedSnap = await get(ref(db, `users/${auth.currentUser.uid}/unlocked_packages/${num}`));
-                if (unlockedSnap.exists() && unlockedSnap.val() === true) {
+                const currentDeviceId = getDeviceId();
+                const userSnap = await get(ref(db, `users/${auth.currentUser.uid}`));
+                const userData = userSnap.val() || {};
+                const unlockedPackages = userData.unlocked_packages || {};
+                const activeDeviceId = userData.active_device_id;
+
+                // 1. فحص هل الباكيدج مفتوح بالفعل (مع فحص الجهاز)
+                if (unlockedPackages[num] === true) {
+                    if (activeDeviceId && activeDeviceId !== currentDeviceId) {
+                        alert("عذراً، هذا الحساب مفعل على جهاز آخر. لا يمكنك استخدامه من هنا.");
+                        return;
+                    }
                     window.location.href = `video-package-${num}.html`;
                     return;
                 }
 
-                // 2. طلب كود التفعيل
+                // 2. فحص هل هناك باكيدج آخر مفعل (مسموح بباكيدج واحد فقط)
+                const alreadyUnlocked = Object.keys(unlockedPackages).find(k => unlockedPackages[k] === true);
+                if (alreadyUnlocked) {
+                    alert("يا بطل، نظام المنصة يسمح بتفعيل باكيدج واحد فقط لكل حساب. أنت مفعل بالفعل باكيدج آخر.");
+                    return;
+                }
+
+                // 3. طلب كود التفعيل
                 const codeInput = prompt("هذا الباكيدج محمي. يرجى إدخال كود التفعيل المكون من 5 أرقام:");
                 if (!codeInput) return;
                 
@@ -437,8 +463,11 @@
 
                 // --- منطق كود الماستر الثابت (01234) لفتح أي باكيدج ---
                 if (code === '01234') {
-                    await update(ref(db, `users/${auth.currentUser.uid}/unlocked_packages`), { [num]: true });
-                    alert("تم استخدام كود الماستر. تم تفعيل الباكيدج بنجاح! استمتع بالمشاهدة يا بطل.");
+                    const updates = {};
+                    updates[`users/${auth.currentUser.uid}/unlocked_packages/${num}`] = true;
+                    updates[`users/${auth.currentUser.uid}/active_device_id`] = currentDeviceId;
+                    await update(ref(db), updates);
+                    alert("تم استخدام كود الماستر. تم تفعيل الباكيدج وربطه بهذا الجهاز بنجاح!");
                     window.location.href = `video-package-${num}.html`;
                     return;
                 }
@@ -451,13 +480,14 @@
                     if (codeData.used) {
                         alert("عذراً، هذا الكود تم استخدامه مسبقاً ولا يمكن تفعيله مرة أخرى.");
                     } else {
-                        // 3. تفعيل الباكيدج وحرق الكود العادي
+                        // تفعيل الباكيدج وحرق الكود وربط الجهاز
                         const updates = {};
                         updates[`package_codes/${code}`] = { used: true, usedBy: auth.currentUser.uid, packageNum: num, activatedAt: serverTimestamp() };
                         updates[`users/${auth.currentUser.uid}/unlocked_packages/${num}`] = true;
+                        updates[`users/${auth.currentUser.uid}/active_device_id`] = currentDeviceId;
 
                         await update(ref(db), updates);
-                        alert("مبروك! تم تفعيل الباكيدج بنجاح. استمتع بالمشاهدة يا بطل.");
+                        alert("مبروك! تم تفعيل الباكيدج وربطه بجهازك الحالي بنجاح.");
                         window.location.href = `video-package-${num}.html`;
                     }
                 } else {
