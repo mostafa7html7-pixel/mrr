@@ -1,4 +1,4 @@
-const CACHE_NAME = 'abqarieno-v52'; // نسخة جديدة لدعم الصور أوفلاين بالكامل
+const CACHE_NAME = 'abqarieno-v53'; // تحديث النسخة لضمان تحميل الصور والملفات الجديدة أوفلاين
 const ASSETS = [ // تأكد من تحديث هذه القائمة لتشمل جميع الملفات الجديدة أو المعدلة
     './',
     './index.html',
@@ -95,14 +95,18 @@ self.addEventListener('fetch', (e) => {
     } else { // استراتيجية Cache First للموارد الأخرى (CSS, JS, صور)
         e.respondWith(
             caches.match(e.request).then(response => {
-                if (response) return response;
-                return fetch(e.request).then(networkResponse => {
-                    if (networkResponse.ok) {
-                        const cacheCopy = networkResponse.clone();
-                        caches.open(CACHE_NAME).then(cache => cache.put(e.request, cacheCopy));
-                    }
-                    return networkResponse;
-                }).catch(() => null);
+                // العودة للكاش فوراً إذا وجد، وإلا جلبه من الشبكة وتخزينه
+                return response || fetch(e.request).then(networkResponse => {
+                    return caches.open(CACHE_NAME).then(cache => {
+                        if (networkResponse.ok) {
+                            cache.put(e.request, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    });
+                }).catch(() => {
+                    // في حالة الفشل التام (أوفلاين والصورة مش في الكاش)
+                    return null;
+                });
             })
         );
     }

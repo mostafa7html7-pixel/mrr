@@ -2,7 +2,7 @@
 
 // --- 0. نظام التنظيف التلقائي للكاش (كل ساعة) ---
 (function() {
-    const CURRENT_VERSION = 'v50'; // يجب أن يطابق CACHE_NAME في sw.js
+    const CURRENT_VERSION = 'v53'; // يجب أن يطابق CACHE_NAME تماماً لمنع مسح الكاش المتكرر
     const WIPE_KEY = 'platform_last_auto_wipe';
     const lastVersion = localStorage.getItem('platform_version');
 
