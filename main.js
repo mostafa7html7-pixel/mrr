@@ -2,7 +2,7 @@
 
 // --- 0. نظام التنظيف التلقائي للكاش (كل ساعة) ---
 (function() {
-    const CURRENT_VERSION = 'v53'; // يجب أن يطابق CACHE_NAME تماماً لمنع مسح الكاش المتكرر
+    const CURRENT_VERSION = 'v54'; // يجب أن يطابق CACHE_NAME تماماً لمنع مسح الكاش المتكرر
     const WIPE_KEY = 'platform_last_auto_wipe';
     const lastVersion = localStorage.getItem('platform_version');
 
@@ -178,7 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             document.querySelectorAll('.nav-links a').forEach(link => {
                 link.classList.remove('active');
-                if (url.includes(link.getAttribute('href'))) link.classList.add('active');
+                const href = link.getAttribute('href');
+                const urlPath = url.split('/').pop() || 'index.html';
+                // مطابقة دقيقة لمنع تفعيل "الفيديوهات" عند الدخول لصفحة باكيدج
+                if (href === urlPath) {
+                    link.classList.add('active');
+                } else if (urlPath === 'index.html' && (href === './' || href === 'index.html')) {
+                    link.classList.add('active');
+                }
             });
 
             if (pushState) history.pushState({ url }, '', url);
@@ -194,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             appContent.classList.remove('page-fade-out');
             window.scrollTo(0, 0);
-        }, 300);
+        }, 200); // تسريع الانتقال بين الصفحات
     };
 
     // اعتراض جميع الضغطات على الروابط الداخلية
@@ -223,21 +230,20 @@ document.addEventListener('DOMContentLoaded', () => {
             !link.getAttribute('target') && 
             !link.href.includes('#')) {
             const url = link.href;
-            if (!window.prefetchedUrls) window.prefetchedUrls = new Set();
-            if (!window.prefetchedUrls.has(url)) {
-                const prefetchLink = document.createElement('link');
-                prefetchLink.rel = 'prefetch';
-                prefetchLink.href = url;
-                document.head.appendChild(prefetchLink);
-                window.prefetchedUrls.add(url);
+            if (!pageCache.has(url)) {
+                fetch(url).then(res => res.text()).then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const content = doc.getElementById('app-content')?.innerHTML;
+                    const title = doc.querySelector('title')?.innerText;
+                    if (content) pageCache.set(url, { content, title });
+                }).catch(() => {});
             }
         }
     }, { passive: true });
 
-    // 6. My Results Modal Logic
-    // التعامل مع أزرار الرجوع والتقدم في المتصفح
     window.addEventListener('popstate', (e) => {
-        window.activeModelId = null;
+        window.activeModelId = null; 
         if (e.state && e.state.url) {
             handleNavigation(e.state.url, false);
         }
@@ -466,18 +472,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const chunk = decoder.decode(value);
                 const lines = chunk.split("\n");
-                const parsedLines = lines
-                    .map(line => line.replace(/^data: /, "").trim())
-                    .filter(line => line !== "" && line !== "[DONE]")
-                    .map(line => JSON.parse(line));
-
-                for (const parsedLine of parsedLines) {
-                    const content = parsedLine.choices[0].delta.content;
-                    if (content) {
-                        fullAiText += content;
-                        // عرض النص الخام أثناء الكتابة لسرعة الاستجابة
-                        textContainer.innerText = fullAiText; 
-                        box.scrollTop = box.scrollHeight;
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    if (!trimmedLine || trimmedLine === "data: [DONE]") continue;
+                    const jsonStr = trimmedLine.replace(/^data: /, "");
+                    try {
+                        const parsedLine = JSON.parse(jsonStr);
+                        const content = parsedLine.choices[0].delta.content;
+                        if (content) {
+                            fullAiText += content;
+                            textContainer.innerText = fullAiText; 
+                            box.scrollTop = box.scrollHeight;
+                        }
+                    } catch (e) {
+                        console.warn("Error parsing stream chunk", e);
                     }
                 }
             }

@@ -6,52 +6,54 @@
     <title>فيديوهات ثانية ثانوي - الدكتور</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        .empty-package-container { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        .glass-info-box {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 50px 30px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        /* تحسينات السرعة والنصوص الرفيعة */
+        #app-content { font-weight: 300; }
+        .main-title { font-weight: 400; font-size: 1.5rem; letter-spacing: 0; }
+        .subtitle { font-size: 0.7rem; opacity: 0.8; color: var(--gemini-blue); }
+        .video-card h3 { font-size: 0.95rem; font-weight: 400; color: #fff; }
+        .video-card p { font-size: 0.7rem; font-weight: 300; line-height: 1.4; color: #888; }
+        .vid-cat { font-size: 0.6rem; text-transform: uppercase; font-weight: 400; opacity: 0.7; }
+        
+        /* زر العودة الاحترافي */
+        .btn-return-home {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 15px; border-radius: 50px;
+            background: rgba(66, 133, 244, 0.03); border: 1px solid rgba(66, 133, 244, 0.1);
+            color: var(--gemini-blue); font-size: 0.75rem; font-weight: 400;
+            transition: 0.3s; margin-bottom: 20px; text-decoration: none;
         }
-        .glass-info-box i { font-size: 4rem; color: #4285f4; margin-bottom: 25px; opacity: 0.8; }
-        .glass-info-box h2 { font-size: 2rem; margin-bottom: 15px; color: #fff; }
-        .glass-info-box p { color: #888; line-height: 1.8; margin-bottom: 30px; }
-        .btn-back-visible {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff; padding: 8px 15px; border-radius: 12px; font-weight: bold; font-size: 0.85rem;
-            display: flex; align-items: center; gap: 8px; transition: 0.3s;
-        }
-        .btn-back-visible:hover { background: #4285f4; color: #fff; border-color: #4285f4; }
+        .btn-return-home:hover { background: var(--gemini-blue); color: #fff; transform: translateX(5px); }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo"> 
-            <i class="fa-solid fa-heart-pulse"></i>
-            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
-        </div> 
-        <div style="display:flex; align-items:center; gap:5px;">
-            <a href="videos.html" class="btn-back-visible"><i class="fa-solid fa-arrow-right"></i> العودة</a>
-            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
-            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
-        </div>
-    </nav>
-
     <div id="app-content">
-        <div class="empty-package-container">
-            <div class="glass-info-box">
-                <i class="fa-solid fa-dna fa-bounce"></i>
-                <h2>باكيدج الصف الثاني الثانوي</h2>
-                <p>يا بطل، نحن نجهز لك حالياً شروحات تفصيلية لأجهزة الجسم والتركيبات الحيوية المعقدة بأسلوب بصري فريد. <br> المحتوى قيد المراجعة النهائية ليظهر لك بأفضل صورة.</p>
-                <div style="background: rgba(66, 133, 244, 0.1); padding: 15px; border-radius: 15px; color: #4285f4; font-weight: bold; border: 1px dashed #4285f4;">
-                    <i class="fa-solid fa-hourglass-half"></i> جاري العمل على رفع الفيديوهات.. انتظرونا!
+        <div class="page-header">
+            <a href="index.html" class="btn-return-home"><i class="fa-solid fa-arrow-right"></i> العودة للرئيسية</a>
+            <p class="subtitle">ADVANCED BIOLOGY EXPLORATION</p>
+            <h2 class="main-title">محاضرات الصف الثاني الثانوي</h2>
+            <p style="color:#555; margin-top: 5px; font-size: 0.8rem;">محتوى تعليمي خفيف مخصص لطلاب تانية ثانوي.</p>
+        </div>
+
+        <section class="container" style="padding-top: 10px;">
+            <div class="grid-container grid-3">
+                
+                <div class="video-card scroll-animate">
+                    <div class="vid-thumb" style="aspect-ratio: 16/9; overflow: hidden; position: relative; border-radius: 12px;">
+                        <img src="photvid2.png" alt="المحاضرة الأولى" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;">
+                            <button class="play-btn" style="width: 35px; height: 35px; font-size: 0.8rem; background: var(--gemini-blue); color:#fff; box-shadow: 0 0 15px rgba(66, 133, 244, 0.4);" onclick="window.openLightbox('رابط_الفيديو_هنا', 'video')">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="vid-info">
+                        <span class="vid-cat">التغذية والهضم</span>
+                        <h3 style="margin: 5px 0;">آلية امتصاص الغذاء</h3>
+                        <p>شرح تفصيلي لعملية الامتصاص في الأمعاء الدقيقة.</p>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>

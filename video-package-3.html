@@ -6,71 +6,57 @@
     <title>فيديوهات المحطة الأخيرة - الدكتور</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        .empty-package-container { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-        .glass-info-box {
-            background: rgba(15, 10, 5, 0.9);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            border-radius: 35px;
-            padding: 60px 40px;
-            max-width: 650px;
-            width: 100%;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+        /* تحسينات السرعة والنصوص الرفيعة */
+        #app-content { font-weight: 300; }
+        .main-title { font-weight: 400; font-size: 1.5rem; letter-spacing: 0; }
+        .subtitle { font-size: 0.7rem; opacity: 0.8; color: var(--neon-gold); }
+        .video-card h3 { font-size: 0.95rem; font-weight: 400; color: #fff; }
+        .video-card p { font-size: 0.7rem; font-weight: 300; line-height: 1.4; color: #888; }
+        .vid-cat { font-size: 0.6rem; text-transform: uppercase; font-weight: 400; opacity: 0.7; }
+        
+        /* زر العودة الاحترافي */
+        .btn-return-home {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 15px; border-radius: 50px;
+            background: rgba(255, 215, 0, 0.03); border: 1px solid rgba(255, 215, 0, 0.1);
+            color: var(--neon-gold); font-size: 0.75rem; font-weight: 400;
+            transition: 0.3s; margin-bottom: 20px; text-decoration: none;
         }
-        .glass-info-box i { font-size: 4.5rem; color: var(--neon-gold); margin-bottom: 30px; filter: drop-shadow(0 0 15px var(--neon-gold)); }
-        .glass-info-box h2 { font-size: 2.2rem; margin-bottom: 20px; color: #fff; font-weight: 900; }
-        .emotional-text { 
-            font-size: 1.1rem; color: #eee; line-height: 1.9; margin-bottom: 35px; font-style: italic;
-            background: rgba(255, 215, 0, 0.05); padding: 20px; border-radius: 20px; border-right: 4px solid var(--neon-gold);
-        }
-
-        .btn-back-visible {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 0.85rem; 
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-        } 
-        .btn-back-visible:hover { background: var(--neon-gold); color: #000; border-color: var(--neon-gold); }
+        .btn-return-home:hover { background: var(--neon-gold); color: #000; transform: translateX(5px); }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fa-solid fa-heart-pulse"></i>
-            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
-        </div>
-        <div style="display:flex; align-items:center; gap:5px;">
-            <a href="videos.html" class="btn-back-visible"><i class="fa-solid fa-arrow-right"></i> العودة</a>
-            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
-            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
-        </div>
-    </nav>
-
     <div id="app-content">
-        <div class="empty-package-container">
-            <div class="glass-info-box">
-                <i class="fa-solid fa-star-half-stroke fa-spin"></i>
-                <h2>أبطال الثانوية العامة</h2>
-                <div class="emotional-text">
-                    "إلى أبطالنا في المحطة الأخيرة.. الطلاب المتعوبين الذين يسطرون ملاحم النجاح، أنتم فخرنا وقوة غدنا.. صبراً فالحلم اقترب والنجاح يليق بكم."
-                </div>
-                <p style="color:#888; margin-bottom: 20px;">نحن نعد لكم حالياً أقوى محتوى مراجعة وشرح نهائي في تاريخ مادة الأحياء.</p>
-                <div style="color: var(--neon-gold); font-weight: bold; border: 1px solid var(--neon-gold); padding: 12px; border-radius: 12px;">
-                    قريباً جداً.. انتظروا المفاجأة الكبرى لطلاب تالتة ثانوي
-                </div>
-            </div>
+        <div class="page-header">
+            <a href="index.html" class="btn-return-home"><i class="fa-solid fa-arrow-right"></i> العودة للرئيسية</a>
+            <p class="subtitle">THE FINAL DESTINATION</p>
+            <h2 class="main-title">محاضرات الصف الثالث الثانوي</h2>
+            <p style="color:#555; margin-top: 5px; font-size: 0.8rem;">محتوى تعليمي خفيف مخصص لأبطال الثانوية العامة.</p>
         </div>
+
+        <section class="container" style="padding-top: 10px;">
+            <div class="grid-container grid-3">
+                
+                <div class="video-card scroll-animate">
+                    <div class="vid-thumb" style="aspect-ratio: 16/9; overflow: hidden; position: relative; border-radius: 12px;">
+                        <img src="photvid3.png" alt="المحاضرة الأولى" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;">
+                            <button class="play-btn" style="width: 35px; height: 35px; font-size: 0.8rem; background: var(--neon-gold); color:#000; box-shadow: 0 0 15px var(--neon-gold);" onclick="window.openLightbox('رابط_الفيديو_هنا', 'video')">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="vid-info">
+                        <span class="vid-cat">الفصل الأول</span>
+                        <h3 style="margin: 5px 0;">الدعامة في الكائنات الحية</h3>
+                        <p>نظرة شاملة ورفيعة المستوى على أجهزة الدعامة.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
     </div>
-    <script src="main.js"></script>
     <script type="module">
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";

@@ -212,7 +212,7 @@
 
     <script type="module">
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, update } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getDatabase, ref, update, query, orderByChild, equalTo, get, remove } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
 
@@ -303,8 +303,38 @@
                 if (name.length < 5) throw new Error("اكتب اسمك الثلاثي بالكامل");
                 if (phone.length < 11) throw new Error("رقم الهاتف غير صحيح");
 
-                let photoURL = "212.png"; // افتراضي
+                // --- نظام استعادة الحساب التلقائي (Account Recovery) ---
+                const usersRef = ref(db, 'users');
+                const phoneQuery = query(usersRef, orderByChild('phone'), equalTo(phone));
+                const querySnap = await get(phoneQuery);
                 
+                let restoredData = {};
+                if (querySnap.exists()) {
+                    const results = querySnap.val();
+                    // البحث عن اسم مطابق داخل نتائج رقم الهاتف
+                    const match = Object.entries(results).find(([oldUid, data]) => 
+                        (data.name || data.username || "").trim().toLowerCase() === name.toLowerCase()
+                    );
+
+                    if (match) {
+                        const [oldUid, oldData] = match;
+                        if (oldData.banned) throw new Error("عذراً، هذا الحساب محظور من دخول المنصة.");
+                        
+                        console.log("تم العثور على حساب قديم، جاري استعادة البيانات...");
+                        // استعادة الباكيدجات وتاريخ الانضمام
+                        restoredData = {
+                            unlocked_packages: oldData.unlocked_packages || {},
+                            joinedAt: oldData.joinedAt || new Date().toISOString(),
+                            active_device_id: oldData.active_device_id || null
+                        };
+
+                        // حذف السجل القديم لمنع تكرار الطلاب في لوحة الأدمن
+                        await remove(ref(db, 'users/' + oldUid));
+                        await remove(ref(db, 'students_registry/' + oldUid));
+                    }
+                }
+
+                let photoURL = "212.png"; 
                 if (selectedFile) {
                     try {
                         const compressedBlob = await compressImage(selectedFile);
@@ -327,7 +357,8 @@
                     role: 'student',
                     grade: '1',
                     joinedAt: new Date().toISOString(),
-                    registration_v: 2 // علامة لضمان الحفظ الجديد
+                    registration_v: 2,
+                    ...restoredData // دمج البيانات المستعادة (مثل الباكيدجات) إن وجدت
                 };
 
                 // مسح الكاش القديم للأدمن في هذا الجهاز

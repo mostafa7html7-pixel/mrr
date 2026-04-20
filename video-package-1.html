@@ -3,77 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فيديوهات أولى ثانوي - الدكتور</title>
+    <title>باكيدج أولى ثانوي | منصة الدكتور عبدالله</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        .empty-package-container {
-            min-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
+        /* تحسينات خاصة بالسرعة والنصوص الرفيعة */
+        #app-content { font-weight: 300; }
+        .main-title { font-weight: 400; font-size: 1.5rem; letter-spacing: 0; }
+        .subtitle { font-size: 0.7rem; opacity: 0.8; }
+        .video-card h3 { font-size: 1rem; font-weight: 400; }
+        .video-card p { font-size: 0.75rem; font-weight: 300; line-height: 1.4; color: #aaa; }
+        .vid-cat { font-size: 0.65rem; text-transform: uppercase; font-weight: 400; }
+        
+        /* زر العودة الاحترافي */
+        .btn-return-home {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 15px; border-radius: 50px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff; font-size: 0.8rem; font-weight: 400;
+            transition: 0.3s; margin-bottom: 20px; text-decoration: none;
         }
-        .glass-info-box {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 50px 30px;
-            max-width: 600px;
-            width: 100%; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
-        .glass-info-box i { font-size: 4rem; color: var(--neon-green); margin-bottom: 25px; opacity: 0.8; }
-        .glass-info-box h2 { font-size: 2rem; margin-bottom: 15px; color: #fff; }
-        .glass-info-box p { color: #888; line-height: 1.8; margin-bottom: 30px; }
-
-        .btn-back-visible {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff; 
-            padding: 8px 15px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-        }
-        .btn-back-visible:hover { background: var(--neon-green); color: #000; border-color: var(--neon-green); }
+        .btn-return-home:hover { background: var(--neon-green); color: #000; border-color: var(--neon-green); transform: translateX(5px); }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">
-            <i class="fa-solid fa-heart-pulse"></i>
-            <div class="logo-text"><span>الدكتور</span><small>BIOLOGY MASTER</small></div>
-        </div>
-        <div style="display:flex; align-items:center; gap:5px;">
-            <a href="videos.html" class="btn-back-visible"><i class="fa-solid fa-arrow-right"></i> العودة</a>
-            <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
-            <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
-        </div>
-    </nav>
-
     <div id="app-content">
-        <div class="empty-package-container">
-            <div class="glass-info-box">
-                <i class="fa-solid fa-clapperboard fa-beat-fade"></i>
-                <h2>باكيدج الصف الأول الثانوي</h2>
-                <p>يا بطل، نحن نعمل حالياً على رفع شروحات الوحدات بأعلى جودة (4K). <br> قريباً ستجد هنا مكتبة فيديوهات سينمائية تشرح لك المنهج بمنظور مختلف تماماً.</p>
-                <div style="background: rgba(0, 255, 65, 0.1); padding: 15px; border-radius: 15px; color: var(--neon-green); font-weight: bold; border: 1px dashed var(--neon-green);">
-                    <i class="fa-solid fa-hourglass-half"></i> لا توجد فيديوهات متاحة حالياً.. ترقب الانطلاق!
-                </div>
-            </div>
+        <div class="page-header">
+            <a href="index.html" class="btn-return-home"><i class="fa-solid fa-arrow-right"></i> العودة للرئيسية</a>
+            <p class="subtitle">PREMIUM BIOLOGY CONTENT</p>
+            <h2 class="main-title">محاضرات الصف الأول الثانوي</h2>
+            <p style="color:#666; margin-top: 5px; font-size: 0.85rem;">محتوى تعليمي خفيف وسريع الوصول.</p>
         </div>
+
+        <section class="container" style="padding-top: 10px;">
+            <div class="grid-container grid-3">
+                
+                <div class="video-card scroll-animate">
+                    <div class="vid-thumb" style="aspect-ratio: 16/9; overflow: hidden; position: relative;">
+                        <img src="photvid1.png" alt="المحاضرة الأولى" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;">
+                            <button class="play-btn" style="width: 40px; height: 40px; font-size: 0.9rem;" onclick="window.openLightbox('رابط_الفيديو_هنا', 'video')">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="vid-info">
+                        <span class="vid-cat">المحاضرة 01</span>
+                        <h3 style="margin: 5px 0;">الكيمياء الحيوية</h3>
+                        <p>شرح الكربوهيدرات والليبيدات بأسلوب مبسط.</p>
+                    </div>
+                </div>
+
+                <div class="video-card scroll-animate">
+                    <div class="vid-thumb" style="aspect-ratio: 16/9; overflow: hidden; position: relative;">
+                        <img src="photvid2.png" alt="المحاضرة الثانية" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;">
+                            <button class="play-btn" style="width: 40px; height: 40px; font-size: 0.9rem;" onclick="window.openLightbox('رابط_الفيديو_هنا', 'video')">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="vid-info">
+                        <span class="vid-cat"><i class="fa-solid fa-circle-play" style="color: var(--neon-green);"></i> المحاضرة الثانية</span>
+                        <h3 style="margin: 10px 0 5px; font-size: 1.2rem;">البروتينات والأحماض النووية</h3>
+                        <p style="color: #888; font-size: 0.85rem; line-height: 1.4;">نظرة شاملة على بناء الخلية ومكوناتها الحيوية الأساسية.</p>
+                    </div>
+                </div>
+
+                <div class="video-card scroll-animate">
+                    <div class="vid-thumb" style="aspect-ratio: 16/9; overflow: hidden; position: relative;">
+                        <img src="photvid3.png" alt="المحاضرة الثالثة" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;">
+                            <button class="play-btn" style="width: 40px; height: 40px; font-size: 0.9rem;" onclick="window.openLightbox('رابط_الفيديو_هنا', 'video')">
+                                <i class="fa-solid fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="vid-info">
+                        <span class="vid-cat">المحاضرة 03</span>
+                        <h3 style="margin: 10px 0 5px; font-size: 1.2rem;">الإنزيمات والتمثيل الغذائي</h3>
+                        <p style="color: #888; font-size: 0.85rem; line-height: 1.4;">كيف تعمل الإنزيمات؟ شرح تفاعلي لعمليات الأيض في جسم الإنسان.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
     </div>
 
-    <script src="main.js"></script>
     <script type="module">
         import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -87,24 +103,25 @@
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'index.html'; return; }
             
-            const userSnap = await get(ref(db, `users/${user.uid}`));
-            const userData = userSnap.val() || {};
-            const unlocked = userData.unlocked_packages && userData.unlocked_packages['1'];
-            const activeDeviceId = userData.active_device_id;
-            const currentDeviceId = localStorage.getItem('biology_device_id');
+            try {
+                const userSnap = await get(ref(db, `users/${user.uid}`));
+                const userData = userSnap.val() || {};
+                const unlocked = userData.unlocked_packages && userData.unlocked_packages['1'];
+                const activeDeviceId = userData.active_device_id;
+                const currentDeviceId = localStorage.getItem('biology_device_id');
 
-            if (!unlocked) {
-                alert("هذا الباكيدج غير مفعل لحسابك.");
-                window.location.href = 'index.html';
-                return;
-            }
+                if (!unlocked) {
+                    alert("هذا الباكيدج غير مفعل لحسابك.");
+                    window.location.href = 'index.html';
+                    return;
+                }
 
-            // فحص قفل الجهاز
-            if (activeDeviceId && activeDeviceId !== currentDeviceId) {
-                alert("تنبيه أمني: لا يمكنك فتح الباكيدج إلا من جهاز التفعيل الأساسي.");
-                signOut(auth);
-                window.location.href = 'auth.html';
-            }
+                if (activeDeviceId && activeDeviceId !== currentDeviceId) {
+                    alert("تنبيه أمني: لا يمكنك فتح الباكيدج إلا من جهاز التفعيل الأساسي.");
+                    signOut(auth);
+                    window.location.href = 'auth.html';
+                }
+            } catch (e) { console.error("Security check failed"); }
         });
     </script>
 </body>
