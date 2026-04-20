@@ -239,37 +239,25 @@
         window.goToStep = (step) => {
             if (step === 2 && !selectedFile) return alert("يا بطل، لازم تختار صورتك الأول عشان تظهر في لوحة الشرف!");
             document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
-            document.getElementById(`card${step}`).classList.add('active');
+            const target = document.getElementById(`card${step}`);
+            target.classList.add('active');
             document.getElementById('stepIndicator').innerText = `خطوة ${step} من 2`;
             updateBackdropColors(step);
+            if(step === 2) setTimeout(() => document.getElementById('nameInput').focus(), 100);
         };
 
-        // ضغط احترافي: موازنة ذكية بين سرعة الرفع والجودة الفائقة للأدمن
+        // تحسين الضغط للسرعة القصوى
         async function compressImage(file) {
             return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const MAX_WIDTH = 1024; // زيادة الأبعاد لضمان وضوح عالي جداً في لوحة الأدمن
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        // استخدام جودة 0.85 (85%) تعطي وضوحاً يقارب الأصل مع حجم ملف صغير جداً للرفع السريع
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.85); 
-                    };
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const scale = Math.min(800 / img.width, 1);
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob(resolve, 'image/jpeg', 0.7);
                 };
             });
         }
@@ -303,39 +291,36 @@
                 if (name.length < 5) throw new Error("اكتب اسمك الثلاثي بالكامل");
                 if (phone.length < 11) throw new Error("رقم الهاتف غير صحيح");
 
-                // --- نظام استعادة الحساب التلقائي (Account Recovery) ---
-                const usersRef = ref(db, 'users');
-                const phoneQuery = query(usersRef, orderByChild('phone'), equalTo(phone));
-                const querySnap = await get(phoneQuery);
-                
+                // تشغيل العمليات بالتوازي لسرعة فائقة
                 let restoredData = {};
-                if (querySnap.exists()) {
-                    const results = querySnap.val();
-                    // البحث عن اسم مطابق داخل نتائج رقم الهاتف
-                    const match = Object.entries(results).find(([oldUid, data]) => 
-                        (data.name || data.username || "").trim().toLowerCase() === name.toLowerCase()
-                    );
-
-                    if (match) {
-                        const [oldUid, oldData] = match;
-                        if (oldData.banned) throw new Error("عذراً، هذا الحساب محظور من دخول المنصة.");
-                        
-                        console.log("تم العثور على حساب قديم، جاري استعادة البيانات...");
-                        // استعادة الباكيدجات وتاريخ الانضمام
-                        restoredData = {
-                            unlocked_packages: oldData.unlocked_packages || {},
-                            joinedAt: oldData.joinedAt || new Date().toISOString(),
-                            active_device_id: oldData.active_device_id || null
-                        };
-
-                        // حذف السجل القديم لمنع تكرار الطلاب في لوحة الأدمن
-                        await remove(ref(db, 'users/' + oldUid));
-                        await remove(ref(db, 'students_registry/' + oldUid));
-                    }
-                }
+                const recoveryTask = (async () => {
+                    try {
+                        const phoneQuery = query(ref(db, 'users'), orderByChild('phone'), equalTo(phone));
+                        const querySnap = await get(phoneQuery);
+                        if (querySnap.exists()) {
+                            const results = querySnap.val();
+                            const match = Object.entries(results).find(([_, data]) => 
+                                (data.name || data.username || "").trim().toLowerCase() === name.toLowerCase()
+                            );
+                            if (match) {
+                                const [oldUid, oldData] = match;
+                                restoredData = {
+                                    unlocked_packages: oldData.unlocked_packages || {},
+                                    joinedAt: oldData.joinedAt || new Date().toISOString(),
+                                    active_device_id: oldData.active_device_id || null
+                                };
+                                await Promise.all([
+                                    remove(ref(db, 'users/' + oldUid)),
+                                    remove(ref(db, 'students_registry/' + oldUid))
+                                ]);
+                            }
+                        }
+                    } catch (e) { console.warn("Index missing, skipped recovery for speed."); }
+                })();
 
                 let photoURL = "212.png"; 
-                if (selectedFile) {
+                const uploadTask = (async () => {
+                    if (!selectedFile) return;
                     try {
                         const compressedBlob = await compressImage(selectedFile);
                         const formData = new FormData();
@@ -346,7 +331,10 @@
                             photoURL = data.data.url;
                         }
                     } catch (e) { console.error("Image upload failed, using default."); }
-                }
+                })();
+
+                // انتظار كل المهام معاً (Parallelism)
+                await Promise.all([recoveryTask, uploadTask]);
 
                 const registrationData = {
                     username: name,
