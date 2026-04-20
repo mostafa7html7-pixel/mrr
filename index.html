@@ -706,15 +706,9 @@
         window.setStudentGender = function(type) {
             localStorage.setItem('student_gender', type);
             document.getElementById('genderSelectionOverlay').classList.remove('open');
-            if (type === 'girl') {
-                localStorage.setItem('force_registration', 'true');
-                // توجيه فوري للبنات غير المسجلات
-                if (!auth.currentUser || !localStorage.getItem('isRegistered')) {
-                    window.location.href = 'auth.html';
-                }
-            } else {
-                localStorage.setItem('force_registration', 'false');
-            }
+            // تم إلغاء الإجبار على التسجيل الفوري للسماح لجميع الطلاب (بنين وبنات) بالتصفح الحر
+            // سيتم مطالبتهم بالتسجيل فقط عند محاولة الدخول للمحتوى التعليمي المحمي
+            localStorage.setItem('force_registration', 'false');
         };
 
         // ظهور النافذة فوراً دون أي انتظار (Zero Delay)
@@ -728,24 +722,15 @@
         }
 
         onAuthStateChanged(auth, (user) => {
-            // فحص الإجبار على التسجيل للبنات
-            const forceReg = localStorage.getItem('force_registration') === 'true';
-            if (!user && forceReg) {
-                window.location.href = 'auth.html';
-                return;
-            }
-
             if (user) {
                 get(ref(db, 'users/' + user.uid)).then((snapshot) => {
                     const userData = snapshot.val();
 
-                    // تأمين: إذا كان المستخدم محظوراً أو بياناته غير موجودة (تم حذفه)
-                    if (!userData || userData.banned) {
-                        if (userData && userData.banned) {
-                            alert("عذراً، هذا الحساب محظور من دخول المنصة نهائياً.");
-                        }
+                    // التحقق فقط من الحظر، أما إذا كان المستخدم جديداً (بدون بيانات) فيسمح له بالتصفح كضيف
+                    if (userData && userData.banned) {
+                        alert("عذراً، هذا الحساب محظور من دخول المنصة نهائياً.");
                         signOut(auth).then(() => {
-                            localStorage.clear(); // حذف كل البيانات المحلية
+                            localStorage.clear();
                             window.location.href = 'auth.html';
                         });
                         return;

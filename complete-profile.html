@@ -105,11 +105,12 @@
             width: 150px; height: 150px;
             border-radius: 50%;
             border: 2px solid rgba(255, 255, 255, 0.2);
-            display: flex; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; overflow: hidden; position: relative;
             transition: 0.3s;
             background: rgba(255,255,255,0.03);
             box-shadow: inset 0 0 30px rgba(0,0,0,0.6), 0 0 0 4px rgba(0, 255, 65, 0.1);
+            gap: 10px;
         }
         .avatar-upload:hover {
             border-color: var(--neon-green);
@@ -117,6 +118,7 @@
         }
         .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-upload i { font-size: 2.5rem; color: var(--neon-green); }
+        .avatar-upload span { font-size: 0.75rem; color: #aaa; font-weight: bold; text-align: center; padding: 0 10px; }
 
         /* Input Steps */
         .input-wrapper { width: 100%; position: relative; margin-bottom: 15px; }
@@ -201,10 +203,19 @@
 
             <!-- الخطوة 2: الصورة الشخصية -->
             <div class="step-card" id="card2">
-                <h2>صورتك الشخصية</h2>
-                <p>ارفع صورتك عشان تظهر في لوحة الشرف</p>
+                <h2 style="color: var(--neon-gold);"><i class="fa-solid fa-user-shield"></i> تعليمات الهوية</h2>
+                <div style="background: rgba(255, 215, 0, 0.05); padding: 15px; border-radius: 15px; border: 1px dashed var(--neon-gold); margin-bottom: 20px;">
+                    <p style="color: #fff; font-size: 0.85rem; line-height: 1.6; margin: 0;">
+                        يا بطل/بطلة، يرجى الالتزام التام بتعليمات التسجيل. <br>
+                        يجب رفع <strong>صورة واضحة للوجه</strong> ليتم قبول حسابك.
+                    </p>
+                    <p style="color: var(--neon-red); font-weight: 900; font-size: 0.8rem; margin-top: 10px;">
+                        <i class="fa-solid fa-ban"></i> رفع صور وهمية أو غير واضحة يعرض حسابك للحظر النهائي.
+                    </p>
+                </div>
                 <label for="avatarInput" class="avatar-upload" id="avatarPreview">
                     <i class="fa-solid fa-camera"></i>
+                    <span>اضغط لرفع الصورة الشخصية</span>
                 </label>
                 <input type="file" id="avatarInput" accept="image/*" hidden required>
                 <div style="display: flex; gap: 10px; width: 100%; margin-top: 20px;">
