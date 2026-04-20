@@ -50,7 +50,7 @@
             position: relative;
             width: calc(100% - 40px); /* يضمن وجود مساحة على الأطراف في الموبايل */
             max-width: 420px;
-            min-height: 460px; /* زيادة بسيطة لراحة المحتوى */
+            min-height: 500px; 
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -71,7 +71,7 @@
             padding: 30px;
             text-align: center;
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0; pointer-events: none; transform: translate(-50%, -40%) scale(0.9);
+            opacity: 0; pointer-events: none; transform: translate(-50%, -45%) scale(0.9);
             z-index: 5;
         }
         .step-card.active { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
@@ -87,6 +87,18 @@
 
         h2 { color: #fff; margin: 0 0 10px; font-size: 1.5rem; font-weight: 900; }
         p { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
+
+        /* Gender Selection Styles */
+        .gender-grid { display: flex; gap: 15px; width: 100%; margin-top: 10px; }
+        .gender-card {
+            flex: 1; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.3s;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .gender-card i { font-size: 2rem; }
+        .gender-card span { font-weight: bold; font-size: 0.9rem; }
+        .gender-card.boy:hover, .gender-card.boy.selected { border-color: var(--neon-green); background: rgba(0, 255, 65, 0.05); color: var(--neon-green); }
+        .gender-card.girl:hover, .gender-card.girl.selected { border-color: var(--neon-gold); background: rgba(255, 215, 0, 0.05); color: var(--neon-gold); }
 
         /* Avatar Step */
         .avatar-upload {
@@ -170,19 +182,39 @@
 
     <div class="profile-card">
         <form id="completeProfileForm" style="flex: 1; position: relative;">
-            <!-- البطاقة الأولى: الصورة (تم نقلها للأول كما كانت) -->
+            <!-- الخطوة 1: اختيار النوع -->
             <div class="step-card active" id="card1">
+                <h2>أهلاً بك يا بطل</h2>
+                <p>يسعدنا انضمامك، أخبرنا من أنت؟</p>
+                <div class="gender-grid">
+                    <div class="gender-card boy" onclick="selectGender('boy')">
+                        <i class="fa-solid fa-mars"></i>
+                        <span>طالب (ولد)</span>
+                    </div>
+                    <div class="gender-card girl" onclick="selectGender('girl')">
+                        <i class="fa-solid fa-venus"></i>
+                        <span>طالبة (بنت)</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-action btn-next" style="margin-top: 25px;" onclick="goToStep(2)" id="genderNextBtn" disabled>ابدأ الرحلة <i class="fa-solid fa-chevron-left"></i></button>
+            </div>
+
+            <!-- الخطوة 2: الصورة الشخصية -->
+            <div class="step-card" id="card2">
                 <h2>صورتك الشخصية</h2>
                 <p>ارفع صورتك عشان تظهر في لوحة الشرف</p>
                 <label for="avatarInput" class="avatar-upload" id="avatarPreview">
                     <i class="fa-solid fa-camera"></i>
                 </label>
                 <input type="file" id="avatarInput" accept="image/*" hidden required>
-                <button type="button" class="btn-action btn-next" style="margin-top: 20px;" onclick="goToStep(2)">التالي <i class="fa-solid fa-arrow-left"></i></button>
+                <div style="display: flex; gap: 10px; width: 100%; margin-top: 20px;">
+                    <button type="button" class="btn-action" style="background: #222; color: #fff; flex: 1;" onclick="goToStep(1)">رجوع</button>
+                    <button type="button" class="btn-action btn-next" style="flex: 2;" onclick="goToStep(3)">التالي <i class="fa-solid fa-chevron-left"></i></button>
+                </div>
             </div>
 
-            <!-- البطاقة الأولى: البيانات -->
-            <div class="step-card" id="card2">
+            <!-- الخطوة 3: البيانات -->
+            <div class="step-card" id="card3">
                 <h2>البيانات الأساسية</h2>
                 <p>أدخل اسمك ورقمك لإنهاء التسجيل</p>
                 <div class="input-wrapper">
@@ -194,7 +226,7 @@
                     <input type="tel" id="phoneInput" class="custom-input" placeholder="رقم الموبايل" required>
                 </div>
                 <div style="display: flex; gap: 10px; width: 100%;">
-                    <button type="button" class="btn-action" style="background: #222; color: #fff; flex: 1;" onclick="goToStep(1)">رجوع</button>
+                    <button type="button" class="btn-action" style="background: #222; color: #fff; flex: 1;" onclick="goToStep(2)">رجوع</button>
                     <button type="submit" class="btn-action btn-next" id="submitBtn" style="flex: 2;">إنهاء <i class="fa-solid fa-check"></i></button>
                 </div>
             </div>
@@ -207,7 +239,7 @@
             <p>أهلاً بك يا بطل في منصة الدكتور. جاري توجيهك الآن...</p>
         </div>
 
-        <div class="step-indicator" id="stepIndicator">خطوة 1 من 2</div>
+        <div class="step-indicator" id="stepIndicator">خطوة 1 من 3</div>
     </div>
 
     <script type="module">
@@ -225,25 +257,38 @@
 
         let currentUserUid = null;
         let selectedFile = null;
+        let studentGender = null;
 
         // تغيير ألوان الخلفية ديناميكياً لزيادة الحماس
         const updateBackdropColors = (step) => {
             const orbs = [document.querySelector('.orb-1'), document.querySelector('.orb-2'), document.querySelector('.orb-3')];
             if (step === 2) {
-                orbs[0].style.background = '#4285f4'; // Blue
-                orbs[1].style.background = '#9b72f3'; // Purple
-                orbs[2].style.background = '#34a853'; // Green
+                orbs[0].style.background = 'var(--neon-green)';
+                orbs[1].style.background = 'var(--neon-gold)';
+            } else if (step === 3) {
+                orbs[0].style.background = '#4285f4';
+                orbs[1].style.background = '#9b72f3';
             }
         };
 
+        window.selectGender = (gender) => {
+            studentGender = gender;
+            document.querySelectorAll('.gender-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`.gender-card.${gender}`).classList.add('selected');
+            document.getElementById('genderNextBtn').disabled = false;
+            localStorage.setItem('student_gender', gender);
+        };
+
         window.goToStep = (step) => {
-            if (step === 2 && !selectedFile) return alert("يا بطل، لازم تختار صورتك الأول عشان تظهر في لوحة الشرف!");
+            if (step === 2 && !studentGender) return;
+            if (step === 3 && !selectedFile) return alert("يا بطل، لازم تختار صورتك الأول عشان تظهر في لوحة الشرف!");
+            
             document.querySelectorAll('.step-card').forEach(c => c.classList.remove('active'));
             const target = document.getElementById(`card${step}`);
             target.classList.add('active');
-            document.getElementById('stepIndicator').innerText = `خطوة ${step} من 2`;
+            document.getElementById('stepIndicator').innerText = `خطوة ${step} من 3`;
             updateBackdropColors(step);
-            if(step === 2) setTimeout(() => document.getElementById('nameInput').focus(), 100);
+            if(step === 3) setTimeout(() => document.getElementById('nameInput').focus(), 100);
         };
 
         // تحسين الضغط للسرعة القصوى
@@ -291,31 +336,23 @@
                 if (name.length < 5) throw new Error("اكتب اسمك الثلاثي بالكامل");
                 if (phone.length < 11) throw new Error("رقم الهاتف غير صحيح");
 
-                // تشغيل العمليات بالتوازي لسرعة فائقة
                 let restoredData = {};
                 const recoveryTask = (async () => {
                     try {
-                        const phoneQuery = query(ref(db, 'users'), orderByChild('phone'), equalTo(phone));
+                        // الفحص الصامت: إذا كان الفهرس مفقوداً سيتجاهل الخطأ ويكمل
+                        const usersRef = ref(db, 'users');
+                        const phoneQuery = query(usersRef, orderByChild('phone'), equalTo(phone));
                         const querySnap = await get(phoneQuery);
                         if (querySnap.exists()) {
                             const results = querySnap.val();
-                            const match = Object.entries(results).find(([_, data]) => 
-                                (data.name || data.username || "").trim().toLowerCase() === name.toLowerCase()
-                            );
+                            const match = Object.entries(results).find(([_, data]) => (data.name || data.username || "").trim().toLowerCase() === name.toLowerCase());
                             if (match) {
                                 const [oldUid, oldData] = match;
-                                restoredData = {
-                                    unlocked_packages: oldData.unlocked_packages || {},
-                                    joinedAt: oldData.joinedAt || new Date().toISOString(),
-                                    active_device_id: oldData.active_device_id || null
-                                };
-                                await Promise.all([
-                                    remove(ref(db, 'users/' + oldUid)),
-                                    remove(ref(db, 'students_registry/' + oldUid))
-                                ]);
+                                restoredData = { unlocked_packages: oldData.unlocked_packages || {}, joinedAt: oldData.joinedAt || new Date().toISOString(), active_device_id: oldData.active_device_id || null };
+                                await Promise.all([ remove(ref(db, 'users/' + oldUid)), remove(ref(db, 'students_registry/' + oldUid)) ]);
                             }
                         }
-                    } catch (e) { console.warn("Index missing, skipped recovery for speed."); }
+                    } catch (e) { console.warn("Index not defined yet, skipping recovery."); }
                 })();
 
                 let photoURL = "212.png"; 
@@ -343,6 +380,7 @@
                     photoURL: photoURL,
                     email: auth.currentUser.email || "طالب جديد",
                     role: 'student',
+                    gender: studentGender,
                     grade: '1',
                     joinedAt: new Date().toISOString(),
                     registration_v: 2,
