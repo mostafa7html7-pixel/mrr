@@ -11,7 +11,7 @@
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700;900&family=Reem+Kufi:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="manifest" href="manifest.json">
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
@@ -533,8 +533,8 @@
     </script>
 
     <script type="module">
-        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
         import { firebaseConfig } from "./firebase-config.js";
 
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
@@ -810,7 +810,7 @@
                 let typeClass = '';
                 
                 if (m.mediaType === 'image') {
-                    content = `<img src="${m.mediaURL}" class="msg-media-img" loading="lazy" decoding="async" onclick="openLightbox('${m.mediaURL}', 'image')"><div class="media-date-overlay">${date}</div>`;
+                    content = `<img src="${m.mediaURL}" class="msg-media-img" style="opacity:1 !important; visibility:visible !important;" onclick="openLightbox('${m.mediaURL}', 'image')"><div class="media-date-overlay">${date}</div>`;
                     typeClass = 'square-media';
                 } else if (m.mediaType === 'video') {
                     content = `<video src="${m.mediaURL}" controls class="msg-video" onmouseenter="handleVideoHover(this, true)" onmouseleave="handleVideoHover(this, false)"></video>`;

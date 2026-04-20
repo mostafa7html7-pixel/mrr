@@ -126,13 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.handleNavigation = async (url, pushState = true) => {
         if (!appContent) return;
-        
-        // بدء تأثير التلاشي للخروج
         appContent.classList.add('page-fade-out');
+        const startTime = Date.now();
 
-        // استرجاع الصفحة من الذاكرة إذا زارها المستخدم سابقاً في نفس الجلسة
         if (pageCache.has(url)) {
-            renderPage(pageCache.get(url), url, pushState);
+            setTimeout(() => renderPage(pageCache.get(url), url, pushState), Math.max(0, 50 - (Date.now() - startTime)));
             return;
         }
         
@@ -143,25 +141,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const doc = parser.parseFromString(html, 'text/html');
             const newContent = doc.getElementById('app-content').innerHTML;
             const newTitle = doc.querySelector('title')?.innerText || document.title;
-
-            // تصفير حالة المجسمات النشطة عند الانتقال لصفحة جديدة لضمان استجابتها عند العودة
             window.activeModelId = null;
 
             const pageData = { content: newContent, title: newTitle };
-            pageCache.set(url, pageData); // تخزين الصفحة للرجوع إليها فوراً
-            renderPage(pageData, url, pushState);
+            pageCache.set(url, pageData);
             
-            // تنفيذ السكربتات الموجودة في الصفحة المحملة (Crucial SPA Fix)
+            setTimeout(() => renderPage(pageData, url, pushState), Math.max(0, 50 - (Date.now() - startTime)));
+            
             const scripts = doc.querySelectorAll('script');
             scripts.forEach(oldScript => {
-                // Only execute non-module scripts to avoid re-initializing Firebase or other module-specific logic
-                if (!oldScript.type || oldScript.type !== 'module') {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                // تحسين: منع إعادة تحميل المكتبات الخارجية لزيادة السرعة
+                if (oldScript.src && (oldScript.src.includes('firebasejs') || oldScript.src.includes('model-viewer'))) return;
+                const newScript = document.createElement('script');
+                Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                if (oldScript.innerHTML) {
                     newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    document.body.appendChild(newScript);
-                    newScript.parentNode.removeChild(newScript);
                 }
+                document.body.appendChild(newScript);
+                newScript.parentNode.removeChild(newScript);
             });
 
         } catch (err) {
@@ -201,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             appContent.classList.remove('page-fade-out');
             window.scrollTo(0, 0);
-        }, 200); // تسريع الانتقال بين الصفحات
+        }, 50); // تقليل وقت الانتظار ليكون الانتقال فورياً
     };
 
     // اعتراض جميع الضغطات على الروابط الداخلية
@@ -409,8 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let apiKey = window.GROQ_API_KEY;
         if (!apiKey || apiKey === "PLACEHOLDER_KEY") {
             try {
-                const { getDatabase, ref, get } = await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js");
-                const db = getDatabase();
+                const { getDatabase, ref, get } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js");
+                const db = getDatabase(getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]);
                 const snap = await get(ref(db, 'system_config/groq_key'));
                 if (snap.exists()) apiKey = snap.val();
                 else throw new Error("Key not found in DB");
@@ -522,8 +519,10 @@ window.toggleFeaturesModal = function() {
 if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            // إجبار السيرفس وركر على التحديث فوراً مع معالجة الأخطاء المحتملة
-            reg.update().catch(err => console.warn("SW update skipped: ", err.message));
+            // تحديث ذكي: لا نقوم بالتحديث إلا إذا كان هناك سجل متاح فعلاً
+            if (reg.active) {
+                reg.update().catch(() => {}); 
+            }
             
             // مراقبة التحديثات
             reg.addEventListener('updatefound', () => {

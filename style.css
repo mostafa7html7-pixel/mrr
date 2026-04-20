@@ -56,9 +56,8 @@ body.sepia-mode .q-textarea { background: #fffdf5; color: #433422; border-color:
     0% {
         transform: scale(1) translate(0, 0);
     }
-    100% {
-        /* تقليل مسافة التحرك لتقليل ضغط الرندر */
-        transform: scale(1.02) translate(-0.2%, -0.2%);
+    100% { /* تحسين الحركة لتكون أخف على الموبايل */
+        transform: scale(1.01);
     }
 }
 
@@ -112,13 +111,12 @@ body::before {
     content: '';
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.8)), url('6.jpeg');
-    background-size: cover;
-    background-position: center;
-    animation: kenburns-blur 30s linear infinite alternate;
+    background: #020204; /* لون خلفية ثابت وسريع بدلاً من الصورة المفقودة */
     z-index: -1;
     pointer-events: none;
-    will-change: transform;
+    /* تحسين: إيقاف الأنيميشن الثقيل في الخلفية لزيادة سرعة الموبايل */
+    transform: translateZ(0); 
+    backface-visibility: hidden;
 }
 
 @keyframes image-loading-shimmer {
@@ -227,6 +225,15 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 }
 .nav-login-btn:hover::before { left: 100%; }
 .nav-login-btn i { font-size: 1rem; }
+
+/* تأثير التوهج للفت الانتباه عند الحاجة للتسجيل */
+.login-glow-trigger {
+    animation: login-attention 0.5s ease-in-out 4 !important; /* 0.5 * 4 = 2 seconds */
+}
+@keyframes login-attention {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); transform: scale(1); }
+    50% { box-shadow: 0 0 50px rgba(0, 255, 65, 1), 0 0 20px #fff; transform: scale(1.15); }
+}
 
 /* الأيقونة المتطايرة (Floating AI Widget) */
 .ai-floating-widget {
@@ -614,12 +621,11 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 
 .scroll-animate {
     opacity: 0;
-    /* استخدام translate3d يجبر المتصفح على استخدام الـ GPU مباشرة */
-    transform: translate3d(0, 5px, 0);
-    transition: opacity 0.25s cubic-bezier(0, 0, 0.2, 1), transform 0.25s cubic-bezier(0, 0, 0.2, 1);
+    transform: translateY(15px);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, opacity;
     backface-visibility: hidden;
-    content-visibility: auto; /* تحسين سرعة الرسم للأجزاء غير الظاهرة */
+    content-visibility: auto; 
     perspective: 1000px;
 }
 .scroll-animate.visible {
@@ -839,7 +845,7 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 .feature-box { 
     position: relative;
     background: rgba(10, 10, 15, 0.94); /* تعتيم أعلى لزيادة الفخامة والثبات والقوة */
-    backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px); /* تقليل حدة الضبابية لزيادة سرعة التمرير */
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.12); 
     padding: 45px 30px; 
@@ -880,6 +886,15 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 .play-btn { width: 50px; height: 50px; background: var(--neon-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 1.2rem; box-shadow: 0 0 15px var(--neon-green); }
 .vid-info { padding: 20px; }
 .vid-cat { color: var(--neon-green); font-size: 0.8rem; }
+
+/* --- ستايلات النصوص الرفيعة الموحدة للسرعة --- */
+.thin-layout { font-weight: 300; }
+.thin-layout .main-title { font-weight: 400; font-size: 1.5rem; letter-spacing: 0; }
+.thin-layout .subtitle { font-size: 0.7rem; opacity: 0.8; }
+.thin-layout .video-card h3 { font-size: 1rem; font-weight: 400; }
+.thin-layout .video-card p { font-size: 0.75rem; font-weight: 300; line-height: 1.4; color: #aaa; }
+.thin-layout .vid-cat { font-size: 0.65rem; text-transform: uppercase; font-weight: 400; }
+/* ------------------------------------------- */
 
 .review-card { background: #080808; border: 1px solid #222; padding: 30px; border-radius: 15px; position: relative; }
 .user-head { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }

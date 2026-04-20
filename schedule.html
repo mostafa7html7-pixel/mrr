@@ -487,7 +487,7 @@
         onValue(ref(db, 'schedule'), (snapshot) => {
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                if(data.card1) {
+                if(data.card1 && data.card1.groups) {
                     document.getElementById('days1').innerText = data.card1.days;
                     Object.keys(data.card1.groups).forEach((gKey, idx) => {
                         const g = data.card1.groups[gKey];
@@ -502,7 +502,7 @@
                         }
                     });
                 }
-                if(data.card2) {
+                if(data.card2 && data.card2.groups) {
                     if(document.getElementById('days2')) document.getElementById('days2').innerText = data.card2.days;
                     Object.keys(data.card2.groups).forEach((gKey, idx) => {
                         const g = data.card2.groups[gKey];
@@ -517,7 +517,7 @@
                         }
                     });
                 }
-                if(data.card3) {
+                if(data.card3 && data.card3.groups) {
                     if(document.getElementById('days3')) document.getElementById('days3').innerText = data.card3.days;
                     Object.keys(data.card3.groups).forEach((gKey, idx) => {
                         const g = data.card3.groups[gKey];

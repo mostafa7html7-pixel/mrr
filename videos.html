@@ -121,6 +121,7 @@
             <li><a href="contact.html">تواصل معنا</a></li>
         </ul>
         <div style="display:flex; align-items:center; gap:5px;">
+            <a href="auth.html" id="headerLoginBtn" class="nav-login-btn" title="تسجيل الانضمام"><i class="fa-solid fa-user-plus"></i></a>
             <button id="themeToggle" class="theme-toggle" title="تبديل الوضع"><i class="fa-solid fa-moon"></i></button>
             <button id="installAppBtn" class="btn-nav-install" style="display: none;" title="تثبيت التطبيق"><i class="fa-solid fa-download"></i></button>
             <div class="menu-btn"><i class="fa-solid fa-bars"></i></div>
@@ -234,8 +235,13 @@
         // نفس المنطق المستخدم في الصفحة الرئيسية للربط الكامل
         window.openPackage = async (num) => {
             if (!auth.currentUser) {
-                showProNotify("يرجى تسجيل الدخول أولاً للوصول للمحتوى الحصري.", "error");
-                setTimeout(() => window.location.href = 'auth.html', 1500);
+                showProNotify("يا بطل، سجل دخولك أولاً من هنا!", "error");
+                const loginBtn = document.getElementById('headerLoginBtn');
+                if (loginBtn) {
+                    loginBtn.classList.add('login-glow-trigger');
+                    setTimeout(() => loginBtn.classList.remove('login-glow-trigger'), 2000);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
                 return;
             }
 
