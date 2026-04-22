@@ -407,8 +407,10 @@
         const checkLocalAccess = () => {
             const overlay = document.getElementById('loadingOverlay');
             const grid = document.getElementById('usersGridContainer');
-            const isVerified = localStorage.getItem('master_verified_2028');
+            const isVerified = localStorage.getItem('biology_user_role') === 'master';
             
+            if (isVerified && overlay) overlay.style.display = 'none';
+
             // --- تحضير البيانات المخزنة مسبقاً للعرض الفوري ---
             const cachedTotal = localStorage.getItem('admin_cache_total');
             const cachedBanned = localStorage.getItem('admin_cache_banned');
@@ -455,16 +457,16 @@
                 const snapshot = await get(ref(db, 'users/' + user.uid));
                 const userData = snapshot.val();
                 
-                // تأمين فائق: لا يسمح بظهور حقل الباسورد إلا لشخص مسجل بالفعل كطالب في المنصة
-                if (!userData) {
-                    alert("عذراً، الدخول لهذه المنطقة يتطلب أن تكون عضواً مسجلاً في المنصة أولاً.");
-                    signOut(auth).then(() => window.location.href = "auth.html");
+                // تأمين فائق: يجب أن يكون مسجلاً وله اسم في القاعدة للدخول
+                if (!userData || (!userData.name && !userData.username)) {
+                    alert("عذراً يا دكتور، يجب إكمال بياناتك الشخصية كطالب أولاً قبل محاولة تفعيل لوحة التحكم.");
+                    window.location.href = "complete-profile.html";
                     return;
                 }
 
                 // التحقق من حالة الأدمن في القاعدة لضمان الأمان
                 if (userData && userData.role === 'admin') { 
-                    localStorage.setItem('master_verified_2028', 'true'); 
+                    localStorage.setItem('biology_user_role', 'master'); 
                     const overlay = document.getElementById('loadingOverlay');
                     if (overlay) overlay.style.display = 'none';
                     initDashboard(); // تحميل البيانات فقط إذا كان أدمن
@@ -501,7 +503,7 @@
                 update(ref(db, 'users/' + currentUserUid), {
                     role: 'admin'
                 }).then(() => {
-                    localStorage.setItem('master_verified_2028', 'true');
+                    localStorage.setItem('biology_user_role', 'master');
                     location.reload();
                 }).catch((error) => {
                     console.error("Error updating user role:", error);
@@ -516,7 +518,7 @@
             if (confirm("هل أنت متأكد من تسجيل الخروج؟")) {
                 signOut(auth).then(() => {
                     localStorage.removeItem('isRegistered');
-                    localStorage.removeItem('master_verified_2028');
+                    localStorage.removeItem('biology_user_role');
                     localStorage.removeItem('student_gender');
                     localStorage.removeItem('force_registration');
                     sessionStorage.removeItem('biology_user_role');
@@ -658,7 +660,8 @@
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
                         const user = childSnapshot.val();
-                        if (!user) return;
+                        // منع ظهور الطلاب "الأشباح" الذين ليس لديهم اسم أو بيانات مكتملة
+                        if (!user || (!user.name && !user.username)) return;
 
                         const uid = childSnapshot.key;
                         const lastSeen = user.lastSeen || 0;
