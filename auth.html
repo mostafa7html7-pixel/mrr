@@ -172,9 +172,7 @@
                 // إذا وجدنا بيانات الطالب، نعطيه خيار الدخول يدوياً
                 const btn = document.getElementById('loginBtn');
                 btn.disabled = false;
-                btn.style.background = "#fff";
-                btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> دخول للمنصة (أنت مسجل بالفعل)';
-                btn.onclick = () => window.location.href = "index.html";
+                window.location.href = "index.html"; // توجيه مباشر للمسجلين
             } else {
                 // مستخدم جديد تماماً (لم يكمل بياناته) -> لصفحة الإكمال فوراً بعد الضغط
                 window.location.href = "complete-profile.html";

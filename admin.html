@@ -653,6 +653,7 @@
                 let usersArray = [];
                 let totalUsers = 0;
                 let bannedUsers = 0;
+                let fullGridHTML = ''; // بناء النص البرمجي بالكامل للسرعة
 
                 if (snapshot.exists()) {
                     snapshot.forEach((childSnapshot) => {
@@ -695,7 +696,7 @@
 
                         totalUsers++;
 
-                        const cardHTML = `
+                        fullGridHTML += `
                             <div class="admin-user-card ${isBanned ? 'banned' : ''}" data-name="${(user.name || user.username || '').toLowerCase()}" data-phone="${user.phone || ''}">
                                 <div class="user-main-info">
                                     <img src="${user.photoURL || '212.png'}" class="avatar" alt="صورة الطالب" onerror="this.src='212.png'" onclick="window.openLightbox(this.src)">
@@ -718,9 +719,10 @@
                                 </div>
                             </div>
                         `;
-                        grid.innerHTML += cardHTML;
                     });
                 }
+
+                grid.innerHTML = fullGridHTML; // تحديث الواجهة مرة واحدة فقط
 
                 // Update stat cards
                 document.getElementById('totalUsersStat').innerText = totalUsers;
@@ -734,8 +736,10 @@
                     localStorage.setItem('admin_last_sync', Date.now());
                 }
 
-                // تحديث البحث فوراً لضمان ظهور الطلاب الجدد
-                filterUsers();
+                // لا تشغل الفلتر إلا إذا كان هناك نص مكتوب فعلاً لتجنب إخفاء الطلاب الجدد
+                if(document.getElementById('searchInput').value.trim() !== "") {
+                    filterUsers();
+                }
 
                 if(totalUsers === 0) {
                     grid.innerHTML = '<p style="color:var(--admin-text-secondary); text-align:center; grid-column: 1 / -1;">لا يوجد طلاب مسجلين حتى الآن.</p>';

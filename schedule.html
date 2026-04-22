@@ -383,21 +383,9 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        let isMaster = false;
+        let isMaster = window.isMaster; // استخدام القيمة العالمية المحملة مسبقاً
         let localScheduleData = {};
         let tempEditData = {}; // نسخة مؤقتة للتعديل دون التأثير على الشاشة فوراً
-
-        // --- التحقق من هوية المستر لإظهار أزرار التعديل ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const snap = await get(ref(db, 'users/' + user.uid));
-                if (snap.exists() && snap.val().role === 'admin') {
-                    isMaster = true;
-                    sessionStorage.setItem('biology_user_role', 'master');
-                }
-            }
-            renderScheduleUI();
-        });
 
         // --- نظام التخزين المؤقت للسرعة الفائقة (Instant Hydration) ---
         const SCHEDULE_CACHE_KEY = 'biology_schedule_data_v1';

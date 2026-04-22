@@ -11,6 +11,9 @@
     --neon-green: #00ff41;
     --neon-red: #ff0000;
     --neon-gold: #ffd700;
+    --cute-pink: #ff85a2;
+    --cute-rose: #ff4d6d;
+    --cute-gradient: linear-gradient(135deg, #ff85a2, #ff4d6d);
     --text-white: #ffffff;
     --text-gray: #a0aec0; /* تفتيح الرمادي للوضوح */
     --border-color: rgba(255, 255, 255, 0.12); /* حدود واضحة في الظلام */
@@ -1454,7 +1457,7 @@ footer {
 .quiz-player-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* تغيير للبدء من الأعلى لضمان عدم قص المحتوى الطويل */
+    align-items: center; /* التوسيط يعطي شعوراً بالفخامة والاحترافية */
     min-height: calc(100vh - 150px);
     padding: clamp(10px, 3vw, 20px); /* حشو متجاوب للحاوية الكبرى */
     width: 100%; /* ضمان أن الحاوية تأخذ العرض الكامل */
@@ -1465,10 +1468,11 @@ footer {
 .quiz-card-player {
     width: 100%;
     max-width: 850px;
-    min-height: auto; /* السماح للحاوية بالتكيف مع المحتوى */
-    background: rgba(15, 15, 25, 0.85);
-    backdrop-filter: blur(25px); /* زيادة حدة الضبابية */
-    border: 1px solid rgba(255, 255, 255, 0.15); /* حدود أكثر وضوحاً */
+    min-height: 500px;
+    background: rgba(10, 12, 18, 0.95);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: clamp(20px, 4vw, 35px); /* حواف متجاوبة */
     padding: clamp(15px, 5vw, 40px); /* تقليل الحشو في الموبايل لزيادة المساحة */
     position: relative;
@@ -1505,7 +1509,7 @@ footer {
     border: 1px solid rgba(255,255,255,0.05);
 }
 
-.info-item i { color: var(--neon-gold); font-size: 1.5rem; margin-bottom: 10px; display: block; }
+.info-item i { color: var(--neon-gold); font-size: 1.5rem; margin-bottom: 10px; display: block; text-shadow: 0 0 10px var(--neon-gold); }
 .info-item span { color: var(--text-gray); font-size: 0.9rem; }
 .info-item h4 { font-size: 1.2rem; color: #fff; }
 
@@ -1551,18 +1555,19 @@ footer {
 }
 
 .option-btn {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: clamp(12px, 3vw, 20px); /* حشو متجاوب */
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 18px 25px;
     border-radius: 15px;
     text-align: right;
     color: #ddd;
     cursor: pointer;
-    transition: 0.3s;
-    font-size: clamp(0.9rem, 2.5vw, 1.1rem); /* حجم خط متجاوب */
-    font-weight: 500;
+    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    font-weight: 600;
+    user-select: none;
 }
-.option-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--neon-gold); color: #fff; }
+.option-btn:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--neon-gold); color: #fff; transform: translateX(-5px); }
 .option-btn.selected { background: rgba(0, 255, 65, 0.1); border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 20px rgba(0,255,65,0.1); }
 
 /* --- نظام التنقل الاحترافي (Native App Transitions) --- */
@@ -2291,6 +2296,59 @@ audio::-webkit-media-controls-play-button { background-color: #fff; border-radiu
     box-shadow: 0 0 30px rgba(255, 215, 0, 0.2), inset 0 0 15px rgba(255, 215, 0, 0.1);
     transform: translateY(-10px) scale(1.02);
 }
+
+/* ثيم البنات الكيوت */
+.girl-mode-active {
+    --neon-green: #ff85a2 !important;
+    --neon-gold: #ff4d6d !important;
+    --neon-red: #ff0055 !important;
+    --glass-border: rgba(255, 133, 162, 0.3);
+}
+
+.girl-mode-active .profile-card, 
+.girl-mode-active .step-card {
+    border-color: var(--cute-pink) !important;
+    box-shadow: 0 20px 50px rgba(255, 77, 109, 0.3), inset 0 0 20px rgba(255, 133, 162, 0.1) !important;
+}
+
+.girl-mode-active .custom-input:focus {
+    border-color: var(--cute-rose) !important;
+    box-shadow: 0 0 20px rgba(255, 77, 109, 0.2) !important;
+}
+
+.girl-mode-active .avatar-upload {
+    border-color: var(--cute-pink) !important;
+    background: rgba(255, 133, 162, 0.05) !important;
+}
+
+.girl-mode-active .avatar-upload i {
+    color: var(--cute-rose) !important;
+}
+
+.girl-mode-active .btn-next {
+    background: var(--cute-gradient) !important;
+    color: #fff !important;
+    box-shadow: 0 10px 25px rgba(255, 77, 109, 0.4) !important;
+}
+
+.girl-mode-active h2 { color: var(--cute-pink) !important; }
+.girl-mode-active i { color: var(--cute-pink) !important; }
+
+/* أنيميشن اللمعان السحري */
+.sparkle {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: white;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 0 10px #fff, 0 0 20px var(--cute-pink);
+    animation: sparkle-fade 1s linear forwards;
+}
+@keyframes sparkle-fade { 0% { transform: scale(0) rotate(0deg); opacity: 1; } 100% { transform: scale(1.5) rotate(180deg); opacity: 0; } }
+
+/* أنيميشن القلوب المتطايرة */
+@keyframes cute-float { 0% { transform: translateY(0) scale(1); opacity: 0; } 50% { opacity: 0.8; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
 
 .gender-option-btn span {
     font-weight: 900;

@@ -1,5 +1,8 @@
 // --- Global Main Script ---
 
+// تعريف رتبة المستخدم فوراً من التخزين المحلي لسرعة التنقل
+window.isMaster = localStorage.getItem('biology_user_role') === 'master';
+
 // --- 0. نظام التنظيف التلقائي للكاش (كل ساعة) ---
 (function() {
     const CURRENT_VERSION = 'v54'; // يجب أن يطابق CACHE_NAME تماماً لمنع مسح الكاش المتكرر
@@ -24,9 +27,6 @@
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // التأكد من معرفة رتبة المستخدم لتفعيل مميزات عبقرينو الخاصة
-    window.isMaster = window.isMaster || (sessionStorage.getItem('biology_user_role') === 'master');
 
     // 1. Menu Toggle
     const menuBtn = document.querySelector('.menu-btn');
@@ -163,11 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (oldScript.src && (oldScript.src.includes('firebasejs') || oldScript.src.includes('model-viewer'))) return;
                 const newScript = document.createElement('script');
                 Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                if (oldScript.innerHTML) {
-                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                }
+                newScript.textContent = oldScript.textContent;
                 document.body.appendChild(newScript);
-                newScript.parentNode.removeChild(newScript);
+                
+                // تأخير بسيط لحذف السكريبت لضمان تنفيذه بالكامل خاصة في صفحات الاختبارات
+                setTimeout(() => {
+                    if (newScript.parentNode) newScript.parentNode.removeChild(newScript);
+                }, 100);
             });
 
         } catch (err) {

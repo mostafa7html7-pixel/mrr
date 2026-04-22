@@ -547,6 +547,7 @@
                 // 1. فحص هل الباكيدج مفتوح بالفعل (مع فحص الجهاز)
                 if (unlockedPackages[num] === true) {
                     handleNavigation(`video-package-${num}.html`);
+                    document.getElementById('app-content').classList.remove('loading'); // إزالة حالة التحميل فوراً
                     return;
                 }
 
@@ -740,9 +741,14 @@
         window.setStudentGender = function(type) {
             localStorage.setItem('student_gender', type);
             document.getElementById('genderSelectionOverlay').classList.remove('open');
-            // تم إلغاء الإجبار على التسجيل الفوري للسماح لجميع الطلاب (بنين وبنات) بالتصفح الحر
-            // سيتم مطالبتهم بالتسجيل فقط عند محاولة الدخول للمحتوى التعليمي المحمي
-            localStorage.setItem('force_registration', 'false');
+            
+            // إذا اختارت بنت، يجب عليها التسجيل إجبارياً
+            if (type === 'girl') {
+                localStorage.setItem('force_registration', 'true');
+            } else {
+                // للبنين، لا يوجد إجبار على التسجيل الفوري
+                localStorage.setItem('force_registration', 'false');
+            }
         };
 
         // ظهور النافذة فوراً دون أي انتظار (Zero Delay)
@@ -764,15 +770,37 @@
                     if (userData && userData.banned) {
                         alert("عذراً، هذا الحساب محظور من دخول المنصة نهائياً.");
                         signOut(auth).then(() => {
-                            localStorage.clear();
+                            localStorage.removeItem('isRegistered');
+                            localStorage.removeItem('biology_user_role');
+                            localStorage.removeItem('student_gender');
+                            localStorage.removeItem('force_registration');
                             window.location.href = 'auth.html';
                         });
                         return;
                     }
 
+                    // --- التحقق من التسجيل الإجباري للبنات ---
+                    const forceRegistration = localStorage.getItem('force_registration') === 'true';
+                    const isRegistered = userData && (userData.username || userData.name);
+
+                    if (forceRegistration && !isRegistered) {
+                        // إذا كانت بنت ولم تكمل تسجيلها، توجه لصفحة إكمال البيانات
+                        window.location.href = "complete-profile.html";
+                        return; // منع استكمال باقي المنطق
+                    }
+
+
                     // تحديث "آخر ظهور" للطالب في قاعدة البيانات
                     update(ref(db, 'users/' + user.uid), { lastSeen: serverTimestamp() });
                     update(ref(db, 'students_registry/' + user.uid), { lastSeen: serverTimestamp() });
+
+                    // حفظ رتبة الأدمن بشكل دائم للسرعة في التنقل
+                    if (userData && userData.role === 'admin') {
+                        localStorage.setItem('biology_user_role', 'master');
+                        window.isMaster = true;
+                    } else {
+                        localStorage.removeItem('biology_user_role');
+                    }
 
                     const loginIcon = document.getElementById('headerLoginBtn');
 

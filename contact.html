@@ -593,32 +593,13 @@
         const messagesRef = ref(db, 'broadcasts');
         const flow = document.getElementById('messages-flow');
         const CACHE_KEY = 'biology_contact_messages_v3';
+        
+        window.isMaster = window.isMaster || localStorage.getItem('biology_user_role') === 'master';
 
-        // --- إظهار فوري للوحة التحكم إذا كان مسجلاً مسبقاً ---
-        const sessionRole = sessionStorage.getItem('biology_user_role');
-        if (sessionRole === 'master') {
-            window.isMaster = true;
+        // إظهار فوري للوحة التحكم من التخزين المحلي
+        if (window.isMaster) {
             document.getElementById('master-panel').style.display = 'block';
         }
-
-        window.isMaster = window.isMaster || false;
-
-        // 2. التحقق من صلاحيات الأدمن لإظهار لوحة التحكم
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const snap = await get(ref(db, `users/${user.uid}`));
-                if (snap.exists() && snap.val().role === 'admin') {
-                    window.isMaster = true;
-                    sessionStorage.setItem('biology_user_role', 'master');
-                    document.getElementById('master-panel').style.display = 'block';
-                    // إعادة رندر الكاش لإظهار أزرار الحذف للأدمن
-                    renderFromCache();
-                } else {
-                    window.isMaster = false;
-                    document.getElementById('master-panel').style.display = 'none';
-                }
-            }
-        });
 
         // جلب الرسائل المخزنة مسبقاً
         let messageCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
