@@ -85,22 +85,102 @@
         }
 
         #master-panel {
-            display: none; background: rgba(255, 255, 255, 0.02);
-            padding: clamp(15px, 3vw, 25px); 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
+            background: transparent;
+            z-index: 1000;
+        }
+
+        /* حاوية الإدخال الاحترافية (Gemini Style) */
+        .gemini-input-wrapper {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center; /* التوسيط الرأسي يضمن توازن الشكل مع النصوص الطويلة */
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px); /* تقليل القيمة لزيادة السرعة في الموبايل */
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .gemini-input-wrapper:focus-within {
+            border-color: var(--master-neon);
+            background: rgba(15, 23, 42, 0.9);
         }
 
         .master-input {
-            width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
-            color: #fff; padding: 15px; border-radius: 15px; outline: none; margin-bottom: 15px; resize: none;
-            font-size: 1rem; transition: 0.3s;
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            padding: 8px 5px;
+            outline: none;
+            resize: none;
+            font-size: 0.95rem;
+            max-height: 120px; 
+            line-height: 1.5;
+            font-family: inherit;
+            min-width: 0; /* ضروري جداً لمنع النص من دفع الأزرار خارج الشاشة */
         }
-        .master-input:focus { border-color: var(--master-neon); background: rgba(0,0,0,0.6); }
 
-        .upload-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .file-btn { background: rgba(0, 242, 255, 0.1); color: var(--master-neon); padding: 10px 20px; border-radius: 12px; cursor: pointer; border: 1px solid var(--master-neon); font-size: 0.9rem; transition: 0.3s; font-weight: bold; }
-        .file-btn:hover { background: var(--master-neon); color: #000; }
+        .input-tools {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0; /* يمنع انضغاط الأزرار مهما كان حجم النص */
+        }
+
+        .tool-btn {
+            padding: 0 10px; height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 242, 255, 0.1); 
+            background: rgba(0, 242, 255, 0.03);
+            color: #888; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; font-size: 0.9rem; font-weight: bold; gap: 8px;
+        }
+        .tool-btn:hover { background: rgba(0, 242, 255, 0.1); color: var(--master-neon); border-color: var(--master-neon); }
+        
+        /* إخفاء النص في الشاشات الصغيرة جداً لترك مساحة */
+        @media (max-width: 400px) {
+            .tool-btn span { display: none; }
+            .tool-btn { width: 38px; padding: 0; }
+        }
+
+        .send-btn-pro {
+            height: 38px;
+            padding: 0 15px;
+            border-radius: 12px;
+            border: none;
+            background: var(--master-neon);
+            color: #000;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 242, 255, 0.3);
+            gap: 6px;
+        }
+        .send-btn-pro:hover:not(:disabled) { background: #fff; transform: translateY(-2px); }
+        .send-btn-pro:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+
+        .upload-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px 15px; background: rgba(255, 69, 0, 0.05); 
+            border-radius: 12px; border: 1px solid rgba(255, 69, 0, 0.1);
+            margin: 10px 0; animation: fadeIn 0.3s ease;
+        }
+        .btn-cancel-upload { 
+            background: var(--neon-red); color: #fff; border: none;
+            padding: 6px 15px; border-radius: 50px; font-weight: 900;
+            cursor: pointer; font-size: 0.75rem; transition: 0.3s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-cancel-upload:hover { background: #fff; color: #ff0000; transform: scale(1.05); }
 
         #messages-flow { 
             flex: 1; padding: 20px; overflow-y: auto; 
@@ -116,6 +196,7 @@
             grid-column: span 12; /* الافتراضي للرسائل النصية */
             height: fit-content; position: relative;
             transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; flex-direction: column;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -151,7 +232,12 @@
             object-fit: contain; 
             display: block; 
             border-radius: 10px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            /* حل مشكلة الجودة: منع التغبيش عند التحريك */
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            will-change: transform;
+            image-rendering: -webkit-optimize-contrast;
         }
 
         /* حاوية الفيديو المرنة (تأخذ حجم الفيديو الحقيقي) */
@@ -179,6 +265,10 @@
             box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.4); /* ظل صلب لإيحاء المكعبات */
             position: relative;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            content-visibility: auto; /* تحسين الأداء الفائق: معالجة الرسائل الظاهرة فقط */
+            contain-intrinsic-size: 1px 300px; /* حجم تقديري للمساعدة في سرعة السكرول */
+            /* ضمان عدم تداخل الطبقات في الموبايل */
+            transform: translateZ(0);
         }
         .msg-block:hover {
             transform: translateY(-5px);
@@ -187,7 +277,8 @@
 
         /* تأثير البوردر العائم عند تحريك الماوس (لبني نيون) */
         .msg-media-img:hover {
-            transform: scale(0.96); /* تصغير خفيف جداً ليعطي مساحة للبوردر */
+            /* استخدام scale خفيف جداً مع translateZ لضمان الثبات */
+            transform: scale(0.98) translateZ(0); 
             outline: 2px solid var(--master-neon);
             outline-offset: 10px; /* البوردر بعيد عن الصورة (غير لاصق) */
             box-shadow: 0 0 25px rgba(0, 242, 255, 0.2);
@@ -210,11 +301,17 @@
             background: rgba(162, 155, 254, 0.05); border-radius: 12px;
             padding: 12px;
         }
-        .msg-audio {
-            width: 100%; max-width: none !important; height: 40px; margin-top: 10px;
-            filter: hue-rotate(240deg) brightness(1.2);
+        
+        /* تحسينات الميديا لتعمل فوراً على الموبايل */
+        .msg-video, .msg-audio {
+            width: 100%; 
             display: block;
+            position: relative;
+            z-index: 5; /* لضمان ظهور أزرار التحكم فوق أي حاوية */
+            pointer-events: auto !important; /* التأكد من استقبال النقرات */
         }
+        .msg-audio { height: 40px; margin-top: 10px; filter: hue-rotate(240deg) brightness(1.2); }
+        .msg-video { max-height: 400px; outline: none; background: #000; border-radius: 8px; }
         
         /* أزرار التحكم داخل هيدر التسجيل الصوتي لضمان عدم التداخل */
         .audio-header-actions {
@@ -225,22 +322,20 @@
             pointer-events: auto;
         }
 
-        /* --- شريط الإجراءات الموحد (اليسار العلوي) --- */
-        .msg-actions-bar {
-            position: absolute; top: 8px; left: 8px;
-            display: flex; flex-direction: row; gap: 6px; z-index: 100;
-            opacity: 0; transition: 0.3s;
-            pointer-events: none;
+        /* --- شريط الإجراءات السفلي الجديد --- */
+        .msg-footer-actions {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            opacity: 0.6;
+            transition: 0.3s;
         }
-        .msg-block:hover .msg-actions-bar { opacity: 1; }
-        /* في حالة وجود ميديا، نريد الأزرار فوق الميديا مباشرة */
-        .media-wrapper .msg-actions-bar { opacity: 0; top: 10px; left: 10px; }
-        .media-wrapper:hover .msg-actions-bar { opacity: 1; }
-        .msg-actions-bar > * { pointer-events: auto; } 
+        .msg-block:hover .msg-footer-actions { opacity: 1; }
 
-        .media-actions-overlay {
-            display: none; /* تم الاستغناء عنها لصالح شريط موحد */
-        }
+        .msg-top-bar { display: flex; justify-content: flex-end; margin-bottom: 8px; }
         
         /* دعم اللمس في الموبايل والتابلت حتى حجم كبير */
         @media (max-width: 1200px) {
@@ -268,25 +363,41 @@
             margin: 5vh auto;
             background: #0f131a;
             border: 1px solid var(--master-neon);
-            padding: 30px;
+            padding: 0;
             border-radius: 20px;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
             width: 95%;
             animation: fadeInUp 0.4s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal-header-pro {
+            padding: 20px 25px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body-pro {
+            padding: 25px;
         }
 
         .group-edit-row {
             display: grid;
-            grid-template-columns: 1.5fr 1.2fr 100px;
+            grid-template-columns: 1fr 1fr 120px;
             gap: 10px;
             margin-bottom: 15px;
             background: rgba(255,255,255,0.02);
             padding: 12px;
             border-radius: 12px;
-            border: 1px solid #222;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
         }
+        .group-edit-row:hover { border-color: var(--master-neon); background: rgba(0,242,255,0.03); }
 
         .sch-in {
             background: #000;
@@ -316,16 +427,32 @@
         }
         .media-wrapper:hover .media-date-overlay { opacity: 1; }
 
-        .preview-img { max-width: 150px; max-height: 150px; width: auto; height: auto; object-fit: contain; border-radius: 8px; border: 1px solid var(--master-neon); display: none; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); background: rgba(0,0,0,0.3); margin: 0 10px; }
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-
-        /* ستايل زر الإلغاء الجديد */
-        .btn-cancel-upload {
-            background: rgba(255, 51, 102, 0.1); color: #ff3366; border: 1px solid #ff3366;
-            padding: 10px 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; display: none;
-            font-weight: bold;
+        /* تحسين مظهر المعاينة المتعددة قبل الرفع */
+        .preview-wrapper { position: relative; display: inline-block; margin: 10px 5px; vertical-align: top; }
+        .preview-img { 
+            display: block; /* تم تغييرها من none لضمان الظهور */
+            max-width: 80px; 
+            max-height: 80px; 
+            width: auto; 
+            height: auto; 
+            object-fit: cover; 
+            border-radius: 10px; 
+            border: 2px solid var(--master-neon); 
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            background: rgba(0,0,0,0.3); 
+            box-shadow: 0 5px 15px rgba(0, 242, 255, 0.2);
         }
-        .btn-cancel-upload:hover { background: #ff3366; color: #fff; }
+        .remove-preview-btn {
+            position: absolute; top: -10px; right: -10px;
+            background: #ff3366; color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%; width: 24px; height: 24px;
+            font-size: 12px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            transition: 0.2s;
+        }
+        .remove-preview-btn:hover { background: #ff0000; transform: scale(1.15) rotate(90deg); }
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
 
         /* --- الفوتر الجديد --- */
         footer {
@@ -384,23 +511,31 @@
 
         <div class="chat-container">
             <div id="master-panel">
-                <textarea id="msgInput" class="master-input" rows="2" placeholder="اكتب تعليماتك هنا يا دكتور..."></textarea>
+                <div class="gemini-input-wrapper">
+                    <textarea id="msgInput" class="master-input" rows="1" placeholder="بماذا تفكر يا دكتور؟ ..." oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                    <div class="input-tools">
+                        <label class="tool-btn">
+                            <i class="fa-solid fa-image"></i>
+                            <span>رفع صور فقط</span>
+                            <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect()">
+                        </label>
+                        <button onclick="pushMessage()" id="publishBtn" class="send-btn-pro" title="نشر الآن">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span style="font-weight: 900; font-size: 0.95rem;">نشر</span>
+                        </button>
+                    </div>
+                </div>
+
                 <!-- شريط تقدم الرفع -->
                 <div class="upload-progress-container" id="uploadProgressContainer" style="display:none; height:8px; background:#1a2332; border-radius:10px; margin-bottom:10px; overflow:hidden;">
                     <div id="uploadProgressBar" style="width:0%; height:100%; background:var(--master-neon); transition:0.3s;"></div>
                 </div>
-                <div class="upload-row">
-                    <div id="previewsContainer" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
-                    <span id="fileName" style="font-size: 0.7rem; color: #888; display:none;"></span>
-                    <div style="margin-right: auto; display: flex; gap: 10px; align-items: center;">
-                        <label class="file-btn" style="margin-bottom: 0;">
-                            <i class="fa-solid fa-paperclip"></i> رفع ملفات/صور
-                            <input type="file" id="fileInput" hidden multiple onchange="handleFileSelect()">
-                        </label>
-                        <button id="cancelUploadBtn" class="btn-cancel-upload" onclick="cancelCurrentAction()">إلغاء الرفع</button>
-                        <button onclick="pushMessage()" id="publishBtn" style="padding:10px 30px; background:var(--master-neon); border:none; border-radius:12px; font-weight:900; cursor:pointer; box-shadow: 0 0 15px rgba(0, 242, 255, 0.3); transition: 0.3s;">نشر التعليمات</button>
-                    </div>
+                
+                <div class="upload-row" id="cancelBar" style="display:none;">
+                    <span id="fileName" style="font-size: 0.85rem; color: #fff; font-weight: bold; opacity: 0.8;"><i class="fa-solid fa-paperclip"></i> (0) صور مختارة</span>
+                    <button id="cancelUploadBtn" class="btn-cancel-upload" onclick="cancelCurrentAction()"><i class="fa-solid fa-trash-can"></i> مسح الكل</button>
                 </div>
+                <div id="previewsContainer" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top:10px;"></div>
             </div>
 
             <div id="messages-flow">
@@ -411,14 +546,16 @@
     <!-- Schedule Editor Modal -->
     <div id="scheduleModal" class="modal" style="display: none;">
         <div class="modal-content schedule-modal-content">
-            <span class="close-modal" onclick="closeModal('scheduleModal')" style="cursor:pointer; float:left; font-size:2rem;">&times;</span>
-            <h2 style="margin-bottom: 20px; color: var(--master-neon);">تعديل جدول المواعيد</h2>
-            
-            <div id="scheduleEditorContent" style="text-align:right;">
-                <p style="text-align: center;">جاري تحميل بيانات الجدول...</p>
+            <div class="modal-header-pro">
+                <h2 style="margin: 0; color: var(--master-neon); font-family: 'Reem Kufi', sans-serif;"><i class="fa-solid fa-calendar-check"></i> إدارة المواعيد</h2>
+                <span class="close-modal" onclick="closeModal('scheduleModal')" style="cursor:pointer; font-size:1.5rem; color: #888;">&times;</span>
             </div>
-
-            <div class="modal-footer-btns" style="margin-top: 25px; display: flex; gap: 10px;">
+            <div class="modal-body-pro">
+                <div id="scheduleEditorContent" style="text-align:right;">
+                    <p style="text-align: center;">جاري تحميل بيانات الجدول...</p>
+                </div>
+            </div>
+            <div class="modal-footer-btns" style="padding: 20px 25px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px;">
                 <button class="btn-green" style="flex: 2; padding:15px; border-radius:10px; cursor:pointer;" onclick="saveScheduleChanges()">حفظ التعديلات ونشر خبر</button>
                 <button style="flex: 1; background:transparent; border:1px solid #444; color:#888; border-radius:10px; cursor:pointer;" onclick="closeModal('scheduleModal')">إلغاء</button>
             </div>
@@ -436,12 +573,6 @@
             <div style="background: rgba(255,255,255,0.03); padding: 8px 20px; border-radius: 30px; border: 1px solid #333; font-size: 0.85rem; color: #888;">
                 <i class="fa-solid fa-code" style="color: var(--master-neon); margin-left: 5px;"></i> برمجة وتطوير: <a href="https://mostafa7html7-pixel.github.io/AbuTaleb/" target="_blank" style="color: #fff; font-weight: bold; text-decoration: none;">مصطفى ابوطالب</a>
             </div>
-            <a href="admin.html" style="text-decoration: none; background: rgba(255, 0, 0, 0.1); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(255, 0, 0, 0.3); font-size: 0.85rem; color: var(--neon-red); transition: 0.3s; display: flex; align-items: center; gap: 5px;">
-                <i class="fa-solid fa-user-shield"></i> الأدمن
-            </a>
-            <button onclick="switchRole()" class="btn-clear-cache" style="background: transparent; border: 1px solid #444; color: #666; padding: 8px 20px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; transition: 0.3s; display: flex; align-items: center; gap: 5px;">
-                <i class="fa-solid fa-user-gear"></i> تبديل كمستر
-            </button>
             <button onclick="clearSiteCache()" class="btn-clear-cache" title="حل مشاكل التحميل والبيانات" style="display: inline-flex;">
                 <i class="fa-solid fa-broom"></i> مسح الكاش
             </button>
@@ -450,107 +581,82 @@
 
     <script src="main.js"></script>
 
-    <!-- سكربت التحكم في الواجهة (يعمل بدون سيرفر) -->
-    <script>
-        // --- نظام حفظ الهوية (Persistence System) ---
-        const sessionRole = sessionStorage.getItem('biology_user_role');
-        const localRole = localStorage.getItem('biology_user_role');
-        
-        window.isMaster = sessionRole === 'master';
-
-        if (window.isMaster) {
-            const panel = document.getElementById('master-panel');
-            if(panel) panel.style.display = 'block';
-        }
-
-        window.checkMaster = function() { // يمكن استدعاؤه من الكونسول أو أي مكان
-            if(prompt("كود المستر:") === "222") {
-                sessionStorage.setItem('biology_user_role', 'master'); 
-                location.reload(); 
-            } else alert("خطأ!");
-        }
-
-        window.enterAs = function(role) {
-            if(role === 'student') localStorage.setItem('biology_user_role', 'student');
-            document.getElementById('gate-overlay').style.display = 'none';
-        }
-
-        window.switchRole = function() {
-            const code = prompt("أدخل كود المستر للتبديل:");
-            if(code === "222") {
-                localStorage.removeItem('biology_user_role'); 
-                sessionStorage.setItem('biology_user_role', 'master'); 
-                location.reload();
-            } else if(code !== null) alert("الكود غير صحيح");
-        }
-
-        if(!localRole && !window.isMaster) localStorage.setItem('biology_user_role', 'student');
-    </script>
-
-    <style>
-        /* تحسين مظهر المعاينة المتعددة لتناسب الموبايل وتمنع الخروج عن الإطار */
-        .preview-wrapper { position: relative; display: inline-block; }
-        .preview-img { 
-            display: block !important; margin: 2px; border: 1px solid var(--master-neon); 
-            width: 45px; height: 45px; object-fit: cover; border-radius: 6px; 
-            flex-shrink: 0; background: rgba(0,0,0,0.3);
-        }
-        .remove-preview-btn {
-            position: absolute; top: -5px; right: -5px;
-            background: #ff3366; color: #fff; border: none;
-            border-radius: 50%; width: 18px; height: 18px;
-            font-size: 10px; cursor: pointer; display: flex;
-            align-items: center; justify-content: center;
-            z-index: 5; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-        .remove-preview-btn:hover {
-            background: #ff0000;
-            transform: scale(1.1);
-        }
-    </style>
-
-    <!-- التحكم في تشغيل الفيديو التلقائي عند التحويم -->
-    <script>
-        let videoHoverTimeout;
-        window.handleVideoHover = (video, isEntering) => {
-            if (!video) return;
-            clearTimeout(videoHoverTimeout);
-            
-            if (isEntering) {
-                videoHoverTimeout = setTimeout(() => {
-                    if (video.paused) {
-                        video.muted = true;
-                        video.play().catch(() => {});
-                    }
-                }, 2000); 
-            } else {
-                // لا نقوم بإيقافه فوراً إذا كان المستخدم يشاهده بالفعل، 
-                // ولكن نتركه يعمل إذا أراد ذلك أو نوقفه حسب رغبتك.
-                // لإيقافه عند الخروج تماماً:
-                // video.pause(); 
-            }
-        };
-    </script>
-
     <script type="module">
-        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, push, onChildAdded, onChildRemoved, serverTimestamp, remove, onValue, set, onDisconnect, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
 
         const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
         const db = getDatabase(app);
+        const auth = getAuth(app);
         const messagesRef = ref(db, 'broadcasts');
+        const flow = document.getElementById('messages-flow');
+        const CACHE_KEY = 'biology_contact_messages_v3';
+
+        // --- إظهار فوري للوحة التحكم إذا كان مسجلاً مسبقاً ---
+        const sessionRole = sessionStorage.getItem('biology_user_role');
+        if (sessionRole === 'master') {
+            window.isMaster = true;
+            document.getElementById('master-panel').style.display = 'block';
+        }
+
+        window.isMaster = window.isMaster || false;
+
+        // 2. التحقق من صلاحيات الأدمن لإظهار لوحة التحكم
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const snap = await get(ref(db, `users/${user.uid}`));
+                if (snap.exists() && snap.val().role === 'admin') {
+                    window.isMaster = true;
+                    sessionStorage.setItem('biology_user_role', 'master');
+                    document.getElementById('master-panel').style.display = 'block';
+                    // إعادة رندر الكاش لإظهار أزرار الحذف للأدمن
+                    renderFromCache();
+                } else {
+                    window.isMaster = false;
+                    document.getElementById('master-panel').style.display = 'none';
+                }
+            }
+        });
+
+        // جلب الرسائل المخزنة مسبقاً
+        let messageCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
 
         // مصفوفة لتخزين الملفات المختارة فعلياً
         let selectedFilesArray = [];
         let isUploading = false;
         let uploadAborted = false;
-        let currentXhr = null;
+        let activeXhrs = []; // مصفوفة لتتبع الطلبات النشطة للإلغاء
 
-        window.handleFileSelect = () => {
+        // --- دالة ذكية لتوليد صورة مصغرة للفيديو قبل الرفع ---
+        async function generateVideoThumbnail(file) {
+            return new Promise((resolve) => {
+                const video = document.createElement('video');
+                video.preload = 'metadata';
+                video.src = URL.createObjectURL(file);
+                video.muted = true;
+                video.onloadeddata = () => {
+                    video.currentTime = 0.5; // التقاط كادر بعد نصف ثانية
+                };
+                video.onseeked = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    URL.revokeObjectURL(video.src);
+                    resolve(dataUrl);
+                };
+                video.onerror = () => resolve('');
+            });
+        }
+
+        window.handleFileSelect = async () => {
             const newFiles = Array.from(document.getElementById('fileInput').files);
             selectedFilesArray = [...selectedFilesArray, ...newFiles];
-            renderPreviews();
+            await renderPreviews();
             // تفريغ المدخل للسماح باختيار نفس الملف مرة أخرى إذا حذف
             document.getElementById('fileInput').value = ''; 
         }
@@ -560,51 +666,64 @@
             renderPreviews();
         }
 
-        window.renderPreviews = () => {
+        window.renderPreviews = async () => {
             const container = document.getElementById('previewsContainer');
             const nameSpan = document.getElementById('fileName');
-            const cancelBtn = document.getElementById('cancelUploadBtn');
-
             container.innerHTML = '';
             
-            selectedFilesArray.forEach((file, index) => {
+            for (let i = 0; i < selectedFilesArray.length; i++) {
+                const file = selectedFilesArray[i];
                 const wrapper = document.createElement('div');
                 wrapper.className = 'preview-wrapper';
+                wrapper.style.cursor = 'pointer';
                 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'remove-preview-btn';
                 deleteBtn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-                deleteBtn.onclick = () => removeFile(index);
+                deleteBtn.onclick = (e) => { e.stopPropagation(); removeFile(i); };
                 
+                const fileURL = URL.createObjectURL(file);
+
                 if (file.type.startsWith('image/')) {
                     const img = document.createElement('img');
                     img.className = 'preview-img';
-                    const reader = new FileReader();
-                    reader.onload = (e) => img.src = e.target.result;
-                    reader.readAsDataURL(file);
+                    img.src = fileURL;
+                    img.onclick = () => openLightbox(fileURL, 'image');
                     wrapper.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const thumbUrl = await generateVideoThumbnail(file);
+                    const img = document.createElement('img');
+                    img.className = 'preview-img';
+                    img.src = thumbUrl || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2FhYSIgZD0iTTggNXYxNGwxMS03eiIvPjwvc3ZnPg=='; 
+                    img.onclick = () => openLightbox(fileURL, 'video');
+                    const playOverlay = document.createElement('div');
+                    playOverlay.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
+                    playOverlay.style.cssText = "position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff; pointer-events:none; font-size:1.5rem; text-shadow:0 0 15px rgba(0,0,0,0.8);";
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(playOverlay);
+                } else if (file.type.startsWith('audio/')) {
+                    const iconBox = document.createElement('div');
+                    iconBox.className = 'preview-img';
+                    iconBox.style.cssText = 'display:flex; align-items:center; justify-content:center; background:rgba(162,155,254,0.1); border:1px solid var(--audio-neon);';
+                    iconBox.innerHTML = '<i class="fa-solid fa-microphone-lines" style="color:var(--audio-neon); font-size:1.5rem;"></i>';
+                    iconBox.onclick = () => openLightbox(fileURL, 'audio');
+                    wrapper.appendChild(iconBox);
                 } else {
                     const iconBox = document.createElement('div');
                     iconBox.className = 'preview-img';
-                    iconBox.style.display = 'flex';
-                    iconBox.style.alignItems = 'center';
-                    iconBox.style.justifyContent = 'center';
-                    iconBox.style.background = 'rgba(0,242,255,0.1)';
+                    iconBox.style.cssText = 'display:flex; align-items:center; justify-content:center; background:rgba(0,242,255,0.1);';
                     iconBox.innerHTML = '<i class="fa-solid fa-file" style="font-size: 1rem; color: var(--master-neon);"></i>';
                     wrapper.appendChild(iconBox);
                 }
-                
                 wrapper.appendChild(deleteBtn);
                 container.appendChild(wrapper);
-            });
+            }
 
             if (selectedFilesArray.length > 0) {
-                nameSpan.innerText = `(${selectedFilesArray.length} ملفات جاهزة)`;
-                nameSpan.style.display = 'inline';
-                cancelBtn.style.display = 'inline-block';
+                nameSpan.innerHTML = `<i class="fa-solid fa-paperclip"></i> تم اختيار (${selectedFilesArray.length}) ملفات`;
+                document.getElementById('cancelBar').style.display = 'flex';
             } else {
-                nameSpan.style.display = 'none';
-                cancelBtn.style.display = 'none';
+                document.getElementById('cancelBar').style.display = 'none';
             }
         }
 
@@ -612,7 +731,9 @@
             if (isUploading) {
                 if (confirm("يا دكتور، هل تريد إلغاء عملية الرفع الحالية؟")) {
                     uploadAborted = true;
-                    if (currentXhr) currentXhr.abort();
+                    activeXhrs.forEach(xhr => xhr.abort());
+                    activeXhrs = [];
+                    resetPanelState();
                 }
             } else {
                 selectedFilesArray = [];
@@ -622,86 +743,104 @@
 
         // --- المنطق الجديد لرفع الملفات باستخدام Cloudinary ---
         
-        // إعدادات الرفع (النظام المزدوج)
         const IMGBB_API_KEY = "0385965848fc62374c1c82810ffa7d18"; // للصور فقط
         const CLOUD_NAME = "dzwrz9qzb"; // للفيديوهات والملفات
         const UPLOAD_PRESET = "my_chat_preset";
 
-        // --- دالة مساعدة لرفع جزء واحد (Chunk) أو ملف كامل ---
+        // --- دالة ضغط الصور الصاروخية ---
+        async function compressImage(file) {
+            if (!file.type.startsWith('image/')) return file;
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const scale = Math.min(1600 / img.width, 1);
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+                };
+            });
+        }
 
          window.pushMessage = async function() {
-            const text = document.getElementById('msgInput').value;
+            const textInput = document.getElementById('msgInput');
+            const text = textInput.value;
             const pushBtn = document.getElementById('publishBtn');
-            const progressContainer = document.getElementById('uploadProgressContainer');
-            const progressBar = document.getElementById('uploadProgressBar');
-            const cancelBtn = document.getElementById('cancelUploadBtn');
-            
-            if (!text.trim() && selectedFilesArray.length === 0) return;
 
-            // 1. تحديث الواجهة فوراً لمنع الإحساس بالتجميد
+            if (!text.trim() && selectedFilesArray.length === 0) return;
+            if (!auth.currentUser) return alert("يجب تسجيل الدخول أولاً.");
+
             pushBtn.disabled = true;
             isUploading = true;
             uploadAborted = false;
+            activeXhrs = [];
 
             try {
                 if (selectedFilesArray.length > 0) {
-                    progressContainer.style.display = 'block';
-                    cancelBtn.style.display = 'inline-block';
-                    cancelBtn.innerText = 'إلغاء الرفع';
+                    document.getElementById('uploadProgressContainer').style.display = 'block';
+                    document.getElementById('cancelBar').style.display = 'flex';
+                    pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span style="font-size:0.8rem;">رفع...</span>`;
 
-                    for (let i = 0; i < selectedFilesArray.length; i++) {
-                        if (uploadAborted) break;
+                    // إنشاء وعود الرفع لتعمل بالتوازي (Parallel Execution)
+                    const uploadPromises = selectedFilesArray.map(async (file, i) => {
+                        if (uploadAborted) return;
 
-                        const file = selectedFilesArray[i];
-                        pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> رفع ${i+1}/${selectedFilesArray.length}`;
-                        
                         const formData = new FormData();
                         let uploadURL, mediaType;
                         const isImage = file.type.startsWith('image/');
                         const isVideo = file.type.startsWith('video/');
                         const isAudio = file.type.startsWith('audio/');
 
+                        let processedFile = file;
                         if (isImage) {
-                            formData.append('image', file);
+                            processedFile = await compressImage(file);
+                            formData.append('image', processedFile);
                             uploadURL = `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`;
                             mediaType = 'image';
                         } else {
-                            formData.append('file', file);
+                            formData.append('file', processedFile);
                             formData.append('upload_preset', UPLOAD_PRESET);
                             uploadURL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${isVideo || isAudio ? 'video' : 'auto'}/upload`;
                             mediaType = isVideo ? 'video' : (isAudio ? 'audio' : 'file');
                         }
 
                         const responseData = await new Promise((resolve, reject) => {
-                            currentXhr = new XMLHttpRequest();
-                            currentXhr.open('POST', uploadURL, true);
-                            currentXhr.upload.onprogress = (e) => { if(e.lengthComputable) progressBar.style.width = (e.loaded / e.total) * 100 + '%'; };
-                            currentXhr.onload = () => {
-                                if (currentXhr.status === 200) resolve(JSON.parse(currentXhr.responseText));
-                                else reject(new Error('فشل الرفع للسيرفر'));
+                            const xhr = new XMLHttpRequest();
+                            activeXhrs.push(xhr);
+                            xhr.open('POST', uploadURL, true);
+                            xhr.upload.onprogress = (e) => { 
+                                if(e.lengthComputable) document.getElementById('uploadProgressBar').style.width = (e.loaded / e.total) * 100 + '%'; 
                             };
-                            currentXhr.onerror = () => reject(new Error('خطأ في الاتصال'));
-                            currentXhr.onabort = () => reject(new Error('aborted'));
-                            currentXhr.send(formData);
+                            xhr.onload = () => {
+                                if (xhr.status === 200) resolve(JSON.parse(xhr.responseText));
+                                else reject(new Error('فشل الرفع'));
+                            };
+                            xhr.onerror = () => reject(new Error('خطأ اتصال'));
+                            xhr.onabort = () => reject(new Error('aborted'));
+                            xhr.send(formData);
                         });
 
                         const mediaURL = mediaType === 'image' ? responseData.data.url : responseData.secure_url;
-                        // في الرفع المتعدد، نربط النص فقط مع أول ملف لضمان الترتيب
-                        await push(messagesRef, { 
-                            text: (i === 0) ? text : "", 
-                            mediaURL, 
-                            mediaType, 
-                            fileName: file.name, 
-                            timestamp: serverTimestamp() 
+                        return push(messagesRef, {
+                            text: (i === 0) ? text : "",
+                            mediaURL,
+                            mediaType,
+                            fileName: file.name,
+                            timestamp: serverTimestamp()
                         });
-                    }
+                    });
+
+                    await Promise.all(uploadPromises);
                 } else if (text.trim()) {
                     await push(messagesRef, { text: text, timestamp: serverTimestamp() });
                 }
 
                 if (!uploadAborted) {
-                    pushBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> تم النشر بنجاح';
-                    setTimeout(() => { pushBtn.innerText = 'نشر التعليمات'; }, 3000);
+                    pushBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> <span>تم!</span>';
+                    setTimeout(() => { pushBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>نشر</span>'; }, 3000);
                 }
             } catch (error) {
                 if (error.message !== 'aborted') alert("حدث خطأ: " + error.message);
@@ -716,8 +855,10 @@
             isUploading = false;
             document.getElementById('uploadProgressContainer').style.display = 'none';
             document.getElementById('uploadProgressBar').style.width = '0%';
-            document.getElementById('cancelUploadBtn').style.display = 'none';
+            document.getElementById('cancelBar').style.display = 'none';
             document.getElementById('msgInput').value = '';
+            document.getElementById('msgInput').style.height = '';
+            document.getElementById('publishBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
             selectedFilesArray = [];
             renderPreviews();
         };
@@ -742,19 +883,28 @@
                     const group = card.groups[gKey];
                     groupsInputs += `
                         <div class="group-edit-row">
-                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="name" value="${group.name}" placeholder="اسم المجموعة">
-                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="time" value="${group.time}" placeholder="الوقت">
-                            <select class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="status">
-                                <option value="متاح" ${group.status === 'متاح' ? 'selected' : ''}>متاح</option>
-                                <option value="مكتمل" ${group.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
-                            </select>
+                            <div style="position:relative;">
+                                <i class="fa-solid fa-users" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.2); font-size:0.8rem;"></i>
+                                <input type="text" class="sch-in" style="padding-right:30px;" data-card="${cardKey}" data-group="${gKey}" data-field="name" value="${group.name}" placeholder="اسم المجموعة">
+                            </div>
+                            <div style="position:relative;">
+                                <i class="fa-solid fa-clock" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.2); font-size:0.8rem;"></i>
+                                <input type="text" class="sch-in" style="padding-right:30px;" data-card="${cardKey}" data-group="${gKey}" data-field="time" value="${group.time}" placeholder="الوقت">
+                            </div>
+                            <div>
+                                <select class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="status">
+                                    <option value="متاح" ${group.status === 'متاح' ? 'selected' : ''}>✅ متاح</option>
+                                    <option value="مكتمل" ${group.status === 'مكتمل' ? 'selected' : ''}>❌ مكتمل</option>
+                                </select>
+                            </div>
                         </div>
                     `;
                 });
 
                 content.innerHTML += `
-                    <div style="margin-bottom: 30px; border: 1px solid #333; padding: 15px; border-radius: 12px;">
-                        <h4 style="margin-bottom: 15px; color: var(--master-neon);">${card.days}</h4>
+                    <div style="margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.01);">
+                        <label style="display:block; margin-bottom:10px; font-size:0.8rem; color:#888;">أيام المجموعات:</label>
+                        <input type="text" class="sch-days-in" data-card="${cardKey}" value="${card.days}" style="width:100%; background:#000; border:1px solid var(--master-neon); color:var(--master-neon); padding:10px; border-radius:10px; margin-bottom:20px; font-weight:bold; font-family:inherit;">
                         ${groupsInputs}
                     </div>
                 `;
@@ -766,12 +916,26 @@
             const snapshot = await get(ref(db, 'schedule'));
             let scheduleData = snapshot.val() || {};
 
+            // تحديث نص الأيام أولاً
+            document.querySelectorAll('.sch-days-in').forEach(dayIn => {
+                const c = dayIn.dataset.card;
+                if(!scheduleData[c]) scheduleData[c] = { groups: {} };
+                scheduleData[c].days = dayIn.value;
+            });
+
             inputs.forEach(input => {
                 const card = input.getAttribute('data-card');
                 const group = input.getAttribute('data-group');
                 const field = input.getAttribute('data-field');
                 
-                if (!scheduleData[card]) scheduleData[card] = { days: card === 'card1' ? "الأحد والأربعاء" : "الاثنين والخميس", groups: {} };
+                if (!scheduleData[card]) {
+                    let defaultDays = "السبت والثلاثاء";
+                    if (card === 'card2') defaultDays = "الأحد والأربعاء";
+                    if (card === 'card3') defaultDays = "الاثنين والخميس";
+                    
+                    scheduleData[card] = { days: defaultDays, groups: {} };
+                }
+                
                 if (!scheduleData[card].groups[group]) scheduleData[card].groups[group] = {};
                 
                 scheduleData[card].groups[group][field] = input.value;
@@ -788,16 +952,8 @@
             closeModal('scheduleModal');
         };
 
-        // --- نظام التخزين المحلي والتحميل اللحظي (Persistence System) ---
-        const flow = document.getElementById('messages-flow');
-        const CACHE_KEY = 'biology_contact_messages_v3';
-        
-        // جلب الرسائل المخزنة مسبقاً من الذاكرة المحلية
-        let messageCache = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}');
-
-        // دالة موحدة لإنشاء هيكل الرسالة (لضمان تطابق الكاش مع السيرفر)
         function getMessageHTML(id, m) {
-            const date = m.timestamp ? new Date(m.timestamp).toLocaleString('ar-EG', { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }) : 'الآن';
+            const date = m.timestamp ? new Date(m.timestamp).toLocaleString('ar-EG', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'الآن';
             
             const isImageOnly = !m.text && m.mediaType === 'image';
             const isAudio = m.mediaType === 'audio';
@@ -806,14 +962,13 @@
 
             let mediaHtml = '';
             if(m.mediaURL) {
-                let content = '';
-                let typeClass = '';
+                let content = '', typeClass = '';
                 
                 if (m.mediaType === 'image') {
-                    content = `<img src="${m.mediaURL}" class="msg-media-img" style="opacity:1 !important; visibility:visible !important;" onclick="openLightbox('${m.mediaURL}', 'image')"><div class="media-date-overlay">${date}</div>`;
+                    content = `<img src="${m.mediaURL}" class="msg-media-img" style="display:block; opacity:1;" onclick="openLightbox('${m.mediaURL}', 'image')">`;
                     typeClass = 'square-media';
                 } else if (m.mediaType === 'video') {
-                    content = `<video src="${m.mediaURL}" controls class="msg-video" onmouseenter="handleVideoHover(this, true)" onmouseleave="handleVideoHover(this, false)"></video>`;
+                    content = `<video src="${m.mediaURL}" controls class="msg-video"></video>`;
                     typeClass = 'video-context';
                 } else if (isAudio) {
                     content = `<audio src="${m.mediaURL}" controls class="msg-audio"></audio>`;
@@ -821,50 +976,45 @@
                 } else {
                     content = `<div style="background:rgba(255,255,255,0.05); padding:15px; border:1px dashed #444; border-radius:8px; display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-file-lines"></i> ${m.fileName || 'ملف مرفق'}</div>`;
                 }
-
                 mediaHtml = `
                     <div class="media-wrapper ${typeClass}">
-                        ${!isAudio ? `
-                        <div class="msg-actions-bar">
-                            ${m.mediaType === 'video' ? `<button onclick="openLightbox('${m.mediaURL}', 'video')" class="btn-mini-action zoom" title="تكبير"><i class="fa-solid fa-expand"></i></button>` : ''}
-                            <a href="${m.mediaURL}" download="${m.fileName || 'file'}" target="_blank" class="btn-mini-action download" title="تحميل"><i class="fa-solid fa-download"></i></a>
-                            ${window.isMaster ? `<div onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف"><i class="fa-solid fa-trash-can"></i></div>` : ''}
-                        </div>` : ''}
                         ${content}
                     </div>`;
             }
 
-            let headerContent;
-            if (isAudio) {
-                headerContent = `<span><i class="fa-solid fa-microphone" style="color:var(--audio-neon)"></i> تسجيل صوتي</span><div class="audio-header-actions">${window.isMaster ? `<div onclick="deleteMsg('${id}')" class="btn-mini-action delete"><i class="fa-solid fa-trash-can"></i></div>` : ''}</div><span>${date}</span>`;
-            } else {
-                headerContent = `<span><i class="fa-solid fa-bullhorn" style="color:var(--master-neon)"></i> توجيه رسمي</span><span>${date}</span>`;
-            }
+            const actionsHtml = `
+                <div class="msg-footer-actions">
+                    ${m.mediaURL ? `<a href="${m.mediaURL}" download="${m.fileName || 'file'}" target="_blank" class="btn-mini-action download" title="تحميل الملف"><i class="fa-solid fa-download"></i></a>` : ''}
+                    ${m.mediaType === 'video' ? `<button onclick="openLightbox('${m.mediaURL}', 'video')" class="btn-mini-action zoom" title="تكبير"><i class="fa-solid fa-expand"></i></button>` : ''}
+                    ${window.isMaster ? `<button onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف الرسالة"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                </div>`;
 
             return `
                 <div class="msg-block ${isImageOnly ? 'image-only' : ''} ${isAudio ? 'audio-type' : ''} ${isVideoOnly ? 'video-only' : ''}" id="msg-${id}">
-                    ${window.isMaster && !m.mediaURL ? `<div class="msg-actions-bar"><div onclick="deleteMsg('${id}')" class="btn-mini-action delete" title="حذف"><i class="fa-solid fa-trash-can"></i></div></div>` : ''}
-                    ${!isImageOnly && !isVideoOnly ? `<div class="msg-header" style="${isAudio ? 'display:flex; justify-content:space-between; width:100%; border-bottom:none;' : ''}">${headerContent}</div>` : ''}
+                    <div class="msg-top-bar">
+                        <span class="msg-date">${date}</span>
+                    </div>
+                    ${!isImageOnly && !isVideoOnly ? `
+                        <div class="msg-header">
+                            <span><i class="fa-solid ${isAudio ? 'fa-microphone' : 'fa-bullhorn'}" style="color:${isAudio ? 'var(--audio-neon)' : 'var(--master-neon)'}"></i> ${isAudio ? 'تسجيل صوتي' : 'توجيه رسمي'}</span>
+                        </div>` : ''}
                     ${m.text ? `<div class="msg-content">${m.text}</div>` : ''}
                     ${mediaHtml}
+                    ${actionsHtml}
                 </div>`;
         }
 
-        // عرض المحتوى من الكاش فوراً
         function renderFromCache() {
-            // إذا كانت الجلسة جديدة، نفضل جلب البيانات الطازجة من السيرفر مباشرة
-            if (!sessionStorage.getItem('opened_this_session')) return;
-
             const sortedIds = Object.keys(messageCache).sort((a, b) => (messageCache[a].timestamp || 0) - (messageCache[b].timestamp || 0));
+            flow.innerHTML = '';
             if (sortedIds.length > 0) {
-                flow.innerHTML = '';
                 sortedIds.forEach(id => flow.insertAdjacentHTML('afterbegin', getMessageHTML(id, messageCache[id])));
             }
         }
 
+        // تحميل أولي للكاش
         renderFromCache();
 
-        // تحديث الكاش المحلي وحفظه
         function updateLocalCache(id, m) {
             messageCache[id] = m;
             const keys = Object.keys(messageCache);
@@ -878,13 +1028,9 @@
         onChildAdded(messagesRef, (snapshot) => {
             const m = snapshot.val();
             const id = snapshot.key;
-
-            // منع التكرار إذا كانت الرسالة معروضة بالفعل من الكاش
             if (document.getElementById(`msg-${id}`)) return;
             
-            // تنظيف واجهة "جاري التحميل" عند وصول أول رسالة حقيقية
             if (flow.innerHTML.includes('جاري')) flow.innerHTML = '';
-
             updateLocalCache(id, m);
             
             // تحديث حالة القراءة (آخر ظهور) تلقائياً عند رؤية الرسائل
@@ -935,6 +1081,8 @@
             
             if (type === 'video') {
                 container.innerHTML = `<video src="${src}" controls autoplay style="max-width:100%; max-height:90vh; border-radius:10px; box-shadow:0 0 50px rgba(0,255,65,0.2);"></video>`;
+            } else if (type === 'audio') {
+                container.innerHTML = `<audio src="${src}" controls autoplay style="width:300px; filter: drop-shadow(0 0 20px var(--audio-neon));"></audio>`;
             } else { // image
                 const img = document.createElement('img');
                 img.src = src;
@@ -982,9 +1130,7 @@
         // Count online users
         onValue(presenceRef, (snap) => {
             const onlineCount = snap.exists() ? snap.size : 0;
-            const baseCount = 150; // رقم أساسي لضمان عدم ظهور أرقام صغيرة
-            const randomFuzz = Math.floor(Math.random() * 20); // رقم عشوائي بسيط
-            userCountEl.innerText = onlineCount + baseCount + randomFuzz;
+            userCountEl.innerText = onlineCount;
         });
     </script>
 

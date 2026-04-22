@@ -260,8 +260,9 @@
                         <tr>
                             <th style="width: 60px;">الترتيب</th>
                             <th>اسم الطالب</th>
-                            <th style="text-align:center;">الدرجة</th>
-                            <th>النسبة المئوية</th>
+                            <th style="text-align:center;">آخر محاولة</th>
+                            <th style="text-align:center; color: var(--neon-gold);">أعلى نتيجة</th>
+                            <th style="text-align:center; color: var(--neon-red);">أقل نتيجة</th>
                             <th style="text-align:left;">تاريخ التسليم</th>
                         </tr>
                     </thead>
@@ -350,6 +351,16 @@
                     let sumPercentages = 0;
                     let maxScore = 0;
                     resultsArray.forEach((result, index) => {
+                        // حساب أعلى وأقل نتيجة من سجل محاولات الطالب
+                        let highest = result.percentage || 0;
+                        let lowest = result.percentage || 0;
+                        
+                        if (result.history) {
+                            const historyArray = Object.values(result.history);
+                            highest = Math.max(...historyArray.map(h => h.percentage));
+                            lowest = Math.min(...historyArray.map(h => h.percentage));
+                        }
+
                         const percentageColor = result.percentage >= 80 ? 'var(--neon-green)' : result.percentage >= 50 ? 'var(--neon-gold)' : 'var(--neon-red)';
                         const date = new Date(result.submittedAt).toLocaleString('ar-EG', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
                         
@@ -363,8 +374,9 @@
                             <tr style="animation: fadeInUp 0.3s ease forwards;">
                                 <td>${rankHtml}</td>
                                 <td data-label="اسم الطالب" style="font-weight:bold;">${result.username}</td>
-                                <td data-label="النتيجة" style="text-align:center;">${result.score} / ${result.total}</td>
-                                <td data-label="النسبة المئوية"><span class="score-percentage" style="color: ${percentageColor}; background: ${percentageColor}20;">${result.percentage}%</span></td>
+                                <td data-label="آخر محاولة" style="text-align:center;"><span class="score-percentage" style="color: ${percentageColor}; background: ${percentageColor}20;">${result.percentage}%</span> <small style="display:block; font-size:0.7rem; color:#666; margin-top:4px;">(${result.score}/${result.total})</small></td>
+                                <td data-label="أعلى نتيجة" style="text-align:center; color: var(--neon-gold); font-weight:900;">${highest}%</td>
+                                <td data-label="أقل نتيجة" style="text-align:center; color: var(--neon-red); font-weight:900;">${lowest}%</td>
                                 <td data-label="تاريخ التسليم" style="text-align:left; font-size:0.8rem; color:var(--admin-text-secondary);">${date}</td>
                             </tr>`;
                     });

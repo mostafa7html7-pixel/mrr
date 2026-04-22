@@ -9,20 +9,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Reem+Kufi:wght@700&display=swap" rel="stylesheet">
     <style>
         /* تحسينات التصميم للداشبورد الجانبي */
-        .quiz-layout { display: flex; gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto; }
+        .quiz-layout { display: flex; gap: 20px; width: 100%; max-width: 1000px; margin: 0 auto; align-items: flex-start; }
         .quiz-main-area { flex: 1; min-width: 0; }
         .quiz-sidebar { 
-            width: 240px; /* تصغير العرض وتثبيته على الشاشات الكبيرة */
-            background: rgba(255, 255, 255, 0.03); 
-            border-radius: 24px; 
-            padding: 20px; 
+            width: 200px; /* تصغير العرض ليكون أكثر تناسقاً */
+            background: rgba(15, 15, 25, 0.7); 
+            border-radius: 20px; 
+            padding: 15px; 
             border: 1px solid rgba(255,255,255,0.05); 
             height: fit-content;
             position: sticky; top: 100px;
             backdrop-filter: blur(15px); 
         }
         @media (max-width: 1024px) { 
-            .quiz-layout { flex-direction: column; align-items: stretch; gap: 20px; } 
+            .quiz-layout { flex-direction: column; align-items: center; gap: 20px; } 
             .quiz-sidebar { width: 100%; max-width: 100%; position: static; order: 2; } 
         }
 
@@ -66,11 +66,12 @@
 
         /* تحسينات السؤال في الموبايل */
         .quiz-q-img { max-width: 100%; max-height: 38vh; /* min-height: 150px; */ object-fit: contain; display: block; margin: 0 auto clamp(10px, 3vw, 15px); border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); cursor: zoom-in; background: rgba(0,0,0,0.3); transition: 0.3s; }
-        .quiz-q-text { font-size: clamp(1rem, 2.8vw, 1.35rem); line-height: 1.6; color: #fff; font-weight: 700; word-wrap: break-word; overflow-wrap: anywhere; text-align: center; margin-bottom: clamp(15px, 4vw, 25px); }
+        .quiz-q-text { font-size: clamp(1.1rem, 3vw, 1.4rem); line-height: 1.5; color: #fff; font-weight: 700; text-align: center; margin-bottom: 20px; }
         @media (max-width: 768px) {
             .quiz-card-player { padding: clamp(15px, 4vw, 25px) !important; min-height: auto !important; border-radius: clamp(15px, 3vw, 20px); width: 100%; } /* إزالة !important من width */
             .question-text { margin-bottom: 20px; }
             .options-grid { grid-template-columns: 1fr !important; }
+            .quiz-layout { padding: 10px; }
         }
 
         /* --- تحسين أزرار التحكم في الموبايل --- */
@@ -153,6 +154,31 @@
             display: flex; flex-direction: column; 
             gap: clamp(10px, 3vw, 15px); 
             max-width: 300px; margin: 0 auto; 
+        }
+
+        /* تعديلات الحاوية لتصبح ثابتة، صغيرة ومنظمة */
+        .quiz-card-player {
+            width: 500px !important; /* عرض ثابت وأنيق للشاشات الكبيرة */
+            max-width: 95vw !important; /* لضمان عدم الخروج عن الشاشة في أحجام معينة */
+            margin: 50px auto !important;
+            background: linear-gradient(165deg, rgba(20, 20, 35, 0.9), rgba(10, 10, 15, 0.95)) !important;
+            border: 1px solid rgba(0, 255, 65, 0.2) !important;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 30px rgba(0, 255, 65, 0.05) !important;
+        }
+        
+        .option-btn {
+            padding: 14px 18px !important;
+            font-size: 0.95rem !important;
+            border-radius: 12px !important;
+        }
+
+        /* تعديلات الموبايل فقط */
+        @media (max-width: 768px) {
+            .quiz-card-player {
+                width: 100% !important; /* تعود لتأخذ العرض المتاح في الموبايل */
+                margin: 10px auto !important;
+                border-radius: 20px !important;
+            }
         }
     </style>
 </head>
@@ -323,7 +349,7 @@
         const auth = getAuth(app);
 
         let quizData = null;
-        let questions = [];
+        let questions = null; // نغيرها لـ null عشان نفرق بين "جاري التحميل" و "مفيش أسئلة فعلاً"
         let currentIndex = 0;
         let userAnswers = {};
         let markedQuestions = new Set();
@@ -344,6 +370,14 @@
 
         async function loadQuizInfo() {
             if (!quizId) return alert("خطأ في معرف الاختبار");
+            
+            // تعطيل الزر وإظهار حالة التحميل فوراً
+            const startBtn = document.querySelector('.btn-confirm-start');
+            if (startBtn && !isReviewMode) {
+                startBtn.disabled = true;
+                startBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري تجهيز الأسئلة...';
+            }
+
             const snapshot = await get(ref(db, `quizzes/${quizId}`));
             if (snapshot.exists()) {
                 quizData = snapshot.val();
@@ -373,10 +407,7 @@
                 }
 
                 questions = quizData.questions ? Object.values(quizData.questions).sort((a,b) => (a.order || 0) - (b.order || 0)) : [];
-
-                // إذا كنا في وضع المراجعة، جلب نتائج الطالب السابقة
                 if (isReviewMode) {
-                    const resultSnap = await get(ref(db, `quiz_results/${quizId}/${currentUser.uid}`));
                     if (resultSnap.exists()) {
                         userAnswers = resultSnap.val().userAnswers || {};
                     } else {
@@ -386,18 +417,25 @@
                     }
                 }
                 
-                document.getElementById('quizTitle').innerText = quizData.title;
+                if (quizData.title) document.getElementById('quizTitle').innerText = quizData.title;
                 document.getElementById('qCount').innerText = questions.length;
                 document.getElementById('qTime').innerText = quizData.timeLimit;
-                document.getElementById('questionNumber').innerText = `السؤال 1 من ${questions.length}`;
+                if (questions.length > 0) document.getElementById('questionNumber').innerText = `السؤال 1 من ${questions.length}`;
                 
+                // تفعيل الزر بعد اكتمال التحميل
+                if (startBtn && !isReviewMode) {
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '<i class="fa-solid fa-play"></i> تأكيد الانطلاق';
+                }
+
                 // تشغيل الاختبار تلقائياً في وضع المراجعة
                 if (isReviewMode) startQuiz();
             }
         }
 
         window.startQuiz = function() {
-            if (questions.length === 0) return alert("هذا الاختبار لا يحتوي على أسئلة حالياً.");
+            if (questions === null) return; // منع البدء إذا كانت البيانات لم تصل بعد
+            if (questions.length === 0) return alert("عذراً يا دكتور، هذا الاختبار لا يحتوي على أسئلة حالياً.");
             
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('questionScreen').style.display = 'block';

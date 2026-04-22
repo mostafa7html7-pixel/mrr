@@ -107,11 +107,6 @@
                     return;
                 }
 
-                if (activeDeviceId && activeDeviceId !== currentDeviceId) {
-                    alert("تنبيه أمني: لا يمكنك فتح الباكيدج إلا من جهاز التفعيل الأساسي.");
-                    signOut(auth);
-                    window.location.href = 'auth.html';
-                }
             } catch (e) { console.error("Security check failed"); }
         });
     </script>

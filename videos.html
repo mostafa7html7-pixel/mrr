@@ -204,6 +204,21 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
+        // فحص فوري وسريع قبل تحميل أي شيء
+        if (localStorage.getItem('isRegistered') === 'true') {
+            const loginBtn = document.getElementById('headerLoginBtn');
+            if (loginBtn) loginBtn.style.display = 'none';
+        }
+
+        let isAuthReady = false;
+        onAuthStateChanged(auth, (user) => {
+            isAuthReady = true;
+            // تحديث الهيدر تلقائياً
+            if (user && localStorage.getItem('isRegistered') === 'true') {
+                if(document.getElementById('headerLoginBtn')) document.getElementById('headerLoginBtn').style.display = 'none';
+            }
+        });
+
         const getDeviceId = () => {
             let id = localStorage.getItem('biology_device_id');
             if (!id) {
@@ -234,6 +249,9 @@
 
         // نفس المنطق المستخدم في الصفحة الرئيسية للربط الكامل
         window.openPackage = async (num) => {
+            // انتظار بسيط للتأكد من حالة الدخول إذا كان المتصفح بطيئاً
+            if (!isAuthReady) await new Promise(r => setTimeout(r, 500));
+
             if (!auth.currentUser) {
                 showProNotify("يا بطل، سجل دخولك أولاً من هنا!", "error");
                 const loginBtn = document.getElementById('headerLoginBtn');
@@ -256,11 +274,6 @@
                 const activeDeviceId = userData.active_device_id;
 
                 if (unlockedPackages[num] === true) {
-                    if (activeDeviceId && activeDeviceId !== currentDeviceId) {
-                        showProNotify("عذراً، الحساب مرتبط بجهاز آخر. تواصل مع السكرتارية.", "error");
-                        document.getElementById('app-content').classList.remove('loading');
-                        return;
-                    }
                     handleNavigation(`video-package-${num}.html`);
                     return;
                 }

@@ -189,6 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const newAnimated = appContent.querySelectorAll('.scroll-animate');
             newAnimated.forEach((el) => observer.observe(el));
+
+            // تحديث فوري للهيدر عند التنقل لإخفاء أزرار الدخول للمسجلين
+            if (localStorage.getItem('isRegistered') === 'true') {
+                const loginBtn = document.getElementById('headerLoginBtn');
+                if (loginBtn) loginBtn.style.display = 'none';
+            }
             
             if (navLinks) navLinks.classList.remove('active');
             if (menuBtn) {
@@ -348,6 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- نظام شات عبقرينو المنبثق ---
     window.toggleAbqarienoChat = function(mode = 'side') {
         const win = document.getElementById('abqarienoWindow');
+        const widget = document.querySelector('.ai-floating-widget');
         if(!win) return;
         
         // تحديد وضعية الفتح
@@ -359,8 +366,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         win.classList.toggle('active');
         if(win.classList.contains('active')) {
+            if(widget) widget.style.display = 'none'; // إخفاء الزر عند فتح الشات
             loadAbqarienoChatHistory(); // Re-render messages when opening to ensure sync
             document.getElementById('ai-user-input').focus();
+        } else {
+            if(widget) widget.style.display = 'flex'; // إظهار الزر عند إغلاق الشات
         }
     };
 
@@ -406,14 +416,23 @@ document.addEventListener('DOMContentLoaded', () => {
         let apiKey = window.GROQ_API_KEY;
         if (!apiKey || apiKey === "PLACEHOLDER_KEY") {
             try {
-                const { getDatabase, ref, get } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js");
-                const db = getDatabase(getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]);
-                const snap = await get(ref(db, 'system_config/groq_key'));
-                if (snap.exists()) apiKey = snap.val();
-                else throw new Error("Key not found in DB");
+                const fbDb = await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js");
+                const fbApp = await import("https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js");
+                const { firebaseConfig } = await import("./firebase-config.js");
+                
+                const app = fbApp.getApps().length === 0 ? fbApp.initializeApp(firebaseConfig) : fbApp.getApps()[0];
+                const db = fbDb.getDatabase(app);
+                const snap = await fbDb.get(fbDb.ref(db, 'system_config/groq_key'));
+                if (snap.exists() && snap.val()) apiKey = snap.val();
             } catch (e) {
                 console.error("Security Fetch Error:", e);
             }
+        }
+
+        if (!apiKey || apiKey === "PLACEHOLDER_KEY") {
+            box.innerHTML += `<div class="ai-msg" style="color:var(--neon-red)">عذراً يا بطل، لا يمكنني الاتصال بالسيرفر الآن (مفتاح الـ API مفقود). يرجى التواصل مع الإدارة.</div>`;
+            input.value = text; // إعادة النص للمدخل
+            return;
         }
 
         // إضافة رسالة المستخدم
@@ -449,12 +468,43 @@ document.addEventListener('DOMContentLoaded', () => {
                     model: "llama-3.3-70b-versatile",
                     stream: true, // تفعيل البث المباشر كما في Gemini
                     messages: [
-                        { role: "system", content: "أنت المساعد الذكي عبقرينو لمنصة الدكتور عبدالله. مطورك هو مصطفى أبو طالب (2009) من بني سويف، طالب متميز وخبير برمجة. أجب عن منهج العلوم المتكاملة بذكاء وفخر بمطورك." },
+                        { role: "system", content: `أنت عبقرينو، المساعد الذكي المتخصص لمنصة الدكتور عبدالله فتحي. مطورك هو مصطفى أبو طالب (Abqarieno).
+
+أنت الآن خبير في منهج العلوم المتكاملة للصف الأول الثانوي (الترم الثاني) لعام 2026. إليك تفاصيل المنهج التي يجب أن تجيب بناءً عليها:
+
+### الوحدة الثالثة: الغلاف الحيوي
+1. الغلاف الحيوي واستقراره: يبدأ من أعمق نقطة في المحيط لأعلى قمة جبل. يضم مستويات (فرد، جماعة، مجتمع، نظام بيئي، منطقة حيوية).
+2. تدفق الطاقة: فقد 90% كحرارة وانتقال 10% فقط. الأهرامات تشمل (طاقة، أعداد، كتلة).
+3. المركبات العضوية: 
+   - الكربوهيدرات: طاقة سريعة (سكريات، نشا، سليلوز).
+   - البروتينات: أحماض أمينية لتركيب العضلات والإنزيمات.
+   - الليبيدات: طاقة عالية وعازل حراري.
+   - الأحماض النووية: DNA للمعلومات و RNA للبروتين.
+4. ATP: عملة الطاقة الناتجة من التنفس الخلوي.
+5. تقنية CRISPR: تعديل الجينات بدقة.
+6. العمليات الحيوية: صعود الماء (تماسك وتلاصق ونتح)، ضغط الدم (120/80)، تنفس هوائي (36 ATP) ولا هوائي (2 ATP).
+7. الإخراج: الكليتان (نفرونات)، الجلد (عرق)، الكبد (سموم)، الرئتان (CO2). دورات العناصر (كربون، نيتروجين، فوسفور).
+8. الإحساس: السيال العصبي (استقطاب وراحة)، ناقلات كيميائية (أستيل كولين).
+9. النانو تكنولوجي: علاج السرطان بجسيمات الذهب، إصلاح الأعصاب بأنابيب الكربون، وخلايا الوقود الحيوي.
+
+### الوحدة الرابعة: الغلاف الصخري
+1. تركيب الأرض: قشرة، وشاح (أسينوسفير مائع)، لب (خارجي سائل وداخلي صلب).
+2. الصفائح التكتونية: حركات تباعدية (محيطات)، تقاربية (جبال)، انزلاقية (زلازل).
+3. التجوية الكيميائية: تفاعل الصخور مع CO2 لتقليل الاحتباس الحراري.
+4. الصخور والمعادن: نارية، رسوبية، ومتحولة. مقياس موهس للصلادة (1-10).
+5. موارد الطاقة: تقطير تجزيئي للبترول، طاقة نووية (انشطار يورانيوم)، طاقة حرارية أرضية، وكهربية انضغاطية (كوارتز). الهيدروجين الأبيض وقود نظيف.
+
+معلومات عن مطورك مصطفى أبو طالب (Abqarieno):
+أنت مصطفى محمد أبو طالب، المعروف رقمياً بلقب "Abqarieno". طالب في الصف الأول الثانوي من بني سويف، مدير الدفعة، ومبرمج Full-Stack متميز تستخدم HTML, CSS, JS, Firebase, و Three.js. قمت بتطوير منصة Biology Master وتطبيق Al-Doctor. تهدف لتقديم تعليم منظم واحترافي لزملائك.` },
                         ...messagesForApi
                     ],
                     temperature: 0.7
                 })
             });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
 
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
@@ -504,6 +554,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 }); 
+
+// --- نظام التحكم الموحد في الميديا (منع التشغيل المتعدد) ---
+document.addEventListener('play', (e) => {
+    // جلب جميع عناصر الصوت والفيديو في الصفحة
+    const allMedia = document.querySelectorAll('audio, video');
+    allMedia.forEach(media => {
+        // إذا كان العنصر ليس هو الذي بدأ التشغيل الآن، قم بإيقافه
+        if (media !== e.target) {
+            media.pause();
+        }
+    });
+}, true); // استخدام خاصية الـ capture لأن حدث play لا ينتشر (bubble) بطبيعته
 
 // Toggle Features Modal
 window.toggleFeaturesModal = function() {

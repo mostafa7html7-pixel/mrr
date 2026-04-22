@@ -348,28 +348,35 @@
                 if (phone.length < 11) throw new Error("رقم الهاتف غير صحيح");
 
                 let restoredData = {};
-                const recoveryTask = (async () => {
-                    try {
-                        // الفحص الصامت: إذا كان الفهرس مفقوداً سيتجاهل الخطأ ويكمل
-                        const usersRef = ref(db, 'users');
-                        // فحص ذكي: إذا لم يوجد فهرس، سيتم تخطي عملية استعادة الحساب القديم بدلاً من إيقاف التسجيل
-                        const phoneQuery = query(usersRef, orderByChild('phone'), equalTo(phone));
-                        const querySnap = await get(phoneQuery);
-                        if (querySnap.exists()) {
-                            const results = querySnap.val();
-                            const match = Object.entries(results).find(([_, data]) => (data.name || data.username || "").trim().toLowerCase() === name.toLowerCase());
-                            if (match) {
-                                const [oldUid, oldData] = match;
-                                restoredData = { unlocked_packages: oldData.unlocked_packages || {}, joinedAt: oldData.joinedAt || new Date().toISOString(), active_device_id: oldData.active_device_id || null };
-                                await Promise.all([ remove(ref(db, 'users/' + oldUid)), remove(ref(db, 'students_registry/' + oldUid)) ]);
-                            }
-                        }
-                    } catch (e) { console.warn("Index not defined yet, skipping recovery."); }
-                })();
+                let foundMatch = false;
 
-                let photoURL = "212.png"; 
-                const uploadTask = (async () => {
-                    if (!selectedFile) return;
+                // 1. البحث عن حساب سابق (تطابق الاسم والرقم)
+                try {
+                    const usersRef = ref(db, 'users');
+                    const phoneQuery = query(usersRef, orderByChild('phone'), equalTo(phone));
+                    const querySnap = await get(phoneQuery);
+                    if (querySnap.exists()) {
+                        const results = querySnap.val();
+                        const match = Object.entries(results).find(([_, data]) => (data.name || data.username || "").trim().toLowerCase() === name.toLowerCase());
+                        if (match) {
+                            const [oldUid, oldData] = match;
+                            foundMatch = true;
+                            // استعادة البيانات بما فيها الصورة القديمة
+                            restoredData = { 
+                                unlocked_packages: oldData.unlocked_packages || {}, 
+                                joinedAt: oldData.joinedAt || new Date().toISOString(), 
+                                active_device_id: oldData.active_device_id || null,
+                                photoURL: oldData.photoURL || "212.png" 
+                            };
+                            await Promise.all([ remove(ref(db, 'users/' + oldUid)), remove(ref(db, 'students_registry/' + oldUid)) ]);
+                        }
+                    }
+                } catch (e) { console.warn("Recovery check failed", e); }
+
+                let photoURL = restoredData.photoURL || "212.png"; 
+
+                // 2. رفع صورة جديدة فقط إذا لم نجد حساباً قديماً (للالتزام بشرط الصورة القديمة)
+                if (!foundMatch && selectedFile) {
                     try {
                         const compressedBlob = await compressImage(selectedFile);
                         const formData = new FormData();
@@ -379,11 +386,8 @@
                             const data = await response.json();
                             photoURL = data.data.url;
                         }
-                    } catch (e) { console.error("Image upload failed, using default."); }
-                })();
-
-                // انتظار كل المهام معاً (Parallelism)
-                await Promise.all([recoveryTask, uploadTask]);
+                    } catch (e) { console.error("Image upload failed"); }
+                }
 
                 const registrationData = {
                     username: name,

@@ -238,7 +238,7 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 /* الأيقونة المتطايرة (Floating AI Widget) */
 .ai-floating-widget {
     position: fixed;
-    bottom: 30px;
+    bottom: 40px; /* رفع الأيقونة قليلاً */
     left: 30px; /* تظهر في اليسار لتجنب تعارضها مع أزرار الموبايل الشائعة في اليمين */
     width: 55px; 
     height: 55px;
@@ -320,37 +320,39 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 /* --- حاوية شات عبقرينو الاحترافية --- */
 .abqarieno-chat-window {
     position: fixed;
-    bottom: 100px;
-    left: 30px;
-    width: 380px; /* Default side mode width */
-    height: 550px; /* Default side mode height */
-    background: linear-gradient(165deg, rgba(8, 10, 15, 0.98), rgba(2, 3, 5, 0.99));
-    backdrop-filter: blur(50px);
-    -webkit-backdrop-filter: blur(25px);
+    bottom: 110px; /* رفع النافذة لتبتعد عن حواف الشاشة وأزرار الموبايل */
+    left: 20px;
+    width: 400px;
+    height: 600px;
+    max-width: calc(100vw - 40px); /* ضمان عدم الخروج عن الشاشة أفقياً */
+    max-height: calc(100vh - 120px); /* ضمان عدم الخروج عن الشاشة رأسياً */
+    background: rgba(10, 12, 18, 0.95);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 30px;
+    border-radius: 24px;
     display: none; /* مخفية افتراضياً */
     flex-direction: column;
     z-index: 1000000;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(255, 215, 0, 0.02);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     overflow: hidden;
-    animation: chat-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    animation: chat-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 /* وضعية الفتح في منتصف الصفحة (عند الضغط من الهيدر) */
 .abqarieno-chat-window.center-mode {
-    bottom: auto; /* Remove fixed bottom */
-    top: 50%; /* Center vertically */
+    bottom: auto;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* تم التعديل: لتمركز النافذة تماماً في المنتصف */
-    width: 95vw;
-    max-width: 800px; /* جعلها أعرض لتشبه لوحة التحكم */
-    height: 80vh;
-    max-height: 750px;
-    border: 1px solid rgba(0, 255, 65, 0.2);
-    box-shadow: 0 0 0 100vw rgba(0,0,0,0.8), 0 30px 100px rgba(0,0,0,1);
-    border-radius: 40px;
-    animation: chat-fade-up 0.4s ease forwards;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 900px;
+    height: 85vh;
+    max-height: 850px;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    box-shadow: 0 0 0 200vw rgba(0,0,0,0.85), 0 30px 100px rgba(0,0,0,1);
+    border-radius: 32px;
+    animation: chat-center-entrance 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 .abqarieno-chat-window.active { display: flex; }
@@ -360,13 +362,13 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
     to { opacity: 1; transform: translateY(0) scale(1); } /* هذا خاص بوضع الفتح الجانبي */
 }
 
-@keyframes chat-fade-up {
-    from { opacity: 0; transform: translate(-50%, -60%) scale(0.95); } /* تم التعديل: لتبدأ من أعلى قليلاً */
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); } /* تم التعديل: لتنتهي في المنتصف تماماً */
+@keyframes chat-center-entrance {
+    from { opacity: 0; transform: translate(-50%, -45%) scale(0.9); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 .chat-header-pro {
-    padding: 25px 30px;
+    padding: 15px 20px;
     background: rgba(255, 255, 255, 0.02);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
@@ -440,22 +442,20 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 
 .ai-msg, .user-msg {
     max-width: 85%;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-radius: 18px;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.6;
     position: relative;
+    word-break: break-word;
 }
 
 .ai-msg {
     align-self: flex-start;
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 215, 0, 0.15);
     border-radius: 25px 25px 25px 8px;
     color: #f0f0f0;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    padding: 18px 22px;
-    position: relative;
     transition: all 0.3s ease;
 }
 
@@ -475,12 +475,20 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 .ai-msg strong { color: var(--neon-gold); }
 .ai-msg ul, .ai-msg ol { padding-right: 20px; margin: 10px 0; }
 .ai-msg li { margin-bottom: 5px; color: #ddd; }
-.ai-msg h1, .ai-msg h2, .ai-msg h3 { 
-    color: var(--neon-green); 
+.ai-msg h1, .ai-msg h2 { 
+    color: var(--neon-red); 
     font-family: 'Reem Kufi', sans-serif; 
-    margin: 15px 0 10px;
-    border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+    margin: 20px 0 10px;
+    border-bottom: 1px solid rgba(255, 0, 60, 0.2);
     padding-bottom: 5px;
+    font-size: 1.4rem;
+}
+
+.ai-msg h3 {
+    color: var(--neon-green);
+    font-family: 'Reem Kufi', sans-serif;
+    margin: 15px 0 8px;
+    font-size: 1.15rem;
 }
 
 /* ميزة زر النسخ الاحترافي */
@@ -502,28 +510,28 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 
 .user-msg {
     align-self: flex-end;
-    background: linear-gradient(135deg, var(--neon-green), #00cc33);
+    background: linear-gradient(135deg, #00ff88, #00bd68);
     color: #000;
     font-weight: 800;
     border-radius: 25px 25px 8px 25px;
-    box-shadow: 0 10px 25px rgba(0, 255, 65, 0.2);
-    padding: 15px 20px;
+    box-shadow: 0 4px 12px rgba(0, 255, 136, 0.2);
 }
 
 .ai-input-area {
-    padding: 20px 30px;
-    background: rgba(0, 0, 0, 0.5);
+    padding: 12px 15px;
+    background: rgba(5, 7, 12, 0.8);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     display: flex;
     gap: 10px;
+    align-items: center;
 }
 
 .ai-input-area input {
     flex: 1;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 18px;
-    padding: 15px 25px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 10px 15px;
     color: #fff;
     outline: none;
     transition: 0.3s;
@@ -531,34 +539,42 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
 }
 .ai-input-area input:focus { 
     border-color: var(--neon-green); 
-    background: rgba(0, 255, 65, 0.05);
-    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1); 
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .ai-send-btn {
     background: var(--neon-gold);
     border: none;
-    width: 40px; height: 40px;
-    border-radius: 12px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     color: #000; transition: 0.3s;
 }
 .ai-send-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .abqarieno-chat-window {
-        width: calc(100% - 20px);
-        left: 10px;
-        bottom: 90px;
-        height: 70vh;
+        width: calc(100% - 20px) !important;
+        max-width: calc(100% - 20px) !important;
+        height: calc(100% - 100px) !important;
+        max-height: calc(100% - 100px) !important;
+        bottom: 20px !important;
+        left: 10px !important;
+        border-radius: 25px !important;
+        z-index: 2000000;
     }
+    .abqarieno-chat-window.active { animation: chat-mobile-up 0.4s ease forwards; }
     .abqarieno-chat-window.center-mode {
-        width: 95vw;
-        height: 95vh;
-        max-width: none;
-        max-height: none;
-        border-radius: 15px; /* Smaller border-radius for mobile */
+        transform: none;
+        animation: chat-mobile-up 0.4s ease forwards;
+    }
+    .ai-input-area {
+        padding-bottom: calc(25px + env(safe-area-inset-bottom, 15px)); /* رفع علبة الإرسال أكثر لتجنب الاختفاء */
+    }
+    @keyframes chat-mobile-up {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     .chat-clear-history-btn { padding: 6px 10px; font-size: 0.7rem; }
     .chat-close-btn-pro { width: 30px; height: 30px; font-size: 1rem; }
@@ -655,7 +671,7 @@ body.light-mode .navbar:hover { background-color: rgba(255, 255, 255, 0.95); }
     display: flex; flex-direction: column; justify-content: flex-start; align-items: center; text-align: center;
     position: relative;
     overflow: hidden;
-    padding: clamp(80px, 15vh, 120px) 0 clamp(40px, 8vh, 80px);
+    padding: clamp(30px, 6vh, 50px) 0 clamp(40px, 8vh, 80px);
 }
 .hero::before {
     display: none;

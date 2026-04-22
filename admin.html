@@ -201,22 +201,49 @@
             animation: fadeInUp 0.4s ease;
         }
 
+        /* تحسينات المودال للمستر */
+        .schedule-modal-content {
+            max-width: 800px;
+            margin: 5vh auto;
+            background: var(--admin-surface);
+            border: 1px solid var(--admin-accent);
+            padding: 0;
+            border-radius: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            width: 95%;
+            animation: fadeInUp 0.4s ease;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .modal-header-pro {
+            padding: 20px 25px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body-pro { padding: 25px; }
+
         .group-edit-row {
             display: grid;
-            grid-template-columns: 1.5fr 1.2fr 100px;
+            grid-template-columns: 1fr 1fr 120px;
             gap: 10px;
             margin-bottom: 15px;
             background: rgba(255,255,255,0.02);
             padding: 12px;
             border-radius: 12px;
             border: 1px solid var(--admin-border);
+            transition: 0.3s;
         }
+        .group-edit-row:hover { border-color: var(--admin-accent); background: rgba(0,255,136,0.03); }
 
         .sch-in {
             background: #000;
             border: 1px solid #333;
             color: #fff;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             width: 100%;
             outline: none;
@@ -224,12 +251,6 @@
             font-family: inherit;
         }
         .sch-in:focus { border-color: var(--admin-accent); }
-
-        @media (max-width: 768px) {
-            .schedule-modal-content { padding: 25px 15px; }
-            .group-edit-row { grid-template-columns: 1fr; gap: 8px; }
-            .modal-footer-btns { flex-direction: column; }
-        }
 
         @media (max-width: 768px) {
             .admin-content { padding: 20px 15px; }
@@ -316,6 +337,25 @@
         </div>
     </nav>
 
+    <!-- Schedule Editor Modal -->
+    <div id="scheduleModal" class="modal" style="display: none;">
+        <div class="modal-content schedule-modal-content">
+            <div class="modal-header-pro">
+                <h2 style="margin: 0; color: var(--admin-accent); font-family: 'Reem Kufi', sans-serif;"><i class="fa-solid fa-calendar-pen"></i> إدارة جداول المواعيد</h2>
+                <span class="close-modal" onclick="closeModal('scheduleModal')" style="cursor:pointer; font-size:1.5rem; color: #888;">&times;</span>
+            </div>
+            <div class="modal-body-pro">
+                <div id="scheduleEditorContent" style="text-align:right;">
+                    <p style="text-align: center;">جاري تحميل بيانات الجدول...</p>
+                </div>
+            </div>
+            <div class="modal-footer-btns" style="padding: 20px 25px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 10px;">
+                <button class="auth-btn" style="flex: 2; padding:15px; border-radius:10px; cursor:pointer;" onclick="saveScheduleChanges()">حفظ المواعيد ونشر خبر</button>
+                <button style="flex: 1; background:transparent; border:1px solid #444; color:#888; border-radius:10px; cursor:pointer;" onclick="closeModal('scheduleModal')">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <div id="app-content">
     <div class="admin-container" id="adminPanel" style="opacity:1;">
         <!-- Main Content -->
@@ -336,9 +376,12 @@
             <div class="panel-section">
                 <div class="panel-header">
                     <h2 class="panel-title">الطلاب المنضمين حديثاً</h2>
-                    <div class="search-box">
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <button class="btn-action unban" onclick="openScheduleEditor()"><i class="fa-solid fa-calendar-days"></i> تعديل الجدول</button>
+                        <div class="search-box">
                         <i class="fa-solid fa-search"></i>
                         <input type="text" id="searchInput" placeholder="بحث بالاسم أو الرقم..." onkeyup="filterUsers()">
+                        </div>
                     </div>
                 </div>
                 <div class="admin-users-grid" id="usersGridContainer">
@@ -528,19 +571,28 @@
                     const group = card.groups[gKey];
                     groupsInputs += `
                         <div class="group-edit-row">
-                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="name" value="${group.name}" placeholder="اسم المجموعة">
-                            <input type="text" class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="time" value="${group.time}" placeholder="الوقت">
-                            <select class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="status">
-                                <option value="متاح" ${group.status === 'متاح' ? 'selected' : ''}>متاح</option>
-                                <option value="مكتمل" ${group.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
-                            </select>
+                            <div style="position:relative;">
+                                <i class="fa-solid fa-users" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.2); font-size:0.8rem;"></i>
+                                <input type="text" class="sch-in" style="padding-right:30px;" data-card="${cardKey}" data-group="${gKey}" data-field="name" value="${group.name}" placeholder="اسم المجموعة">
+                            </div>
+                            <div style="position:relative;">
+                                <i class="fa-solid fa-clock" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.2); font-size:0.8rem;"></i>
+                                <input type="text" class="sch-in" style="padding-right:30px;" data-card="${cardKey}" data-group="${gKey}" data-field="time" value="${group.time}" placeholder="الوقت">
+                            </div>
+                            <div>
+                                <select class="sch-in" data-card="${cardKey}" data-group="${gKey}" data-field="status">
+                                    <option value="متاح" ${group.status === 'متاح' ? 'selected' : ''}>✅ متاح</option>
+                                    <option value="مكتمل" ${group.status === 'مكتمل' ? 'selected' : ''}>❌ مكتمل</option>
+                                </select>
+                            </div>
                         </div>
                     `;
                 });
 
                 content.innerHTML += `
-                    <div style="margin-bottom: 30px; border: 1px solid #333; padding: 15px; border-radius: 12px;">
-                        <h4 style="margin-bottom: 15px; color: var(--admin-accent);">${card.days}</h4>
+                    <div style="margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; background: rgba(255,255,255,0.01);">
+                        <label style="display:block; margin-bottom:10px; font-size:0.8rem; color:#888;">أيام المجموعات:</label>
+                        <input type="text" class="sch-days-in" data-card="${cardKey}" value="${card.days}" style="width:100%; background:#000; border:1px solid var(--admin-accent); color:var(--admin-accent); padding:12px; border-radius:10px; margin-bottom:20px; font-weight:bold; font-family:inherit;">
                         ${groupsInputs}
                     </div>
                 `;
@@ -552,12 +604,25 @@
             const snapshot = await get(ref(db, 'schedule'));
             let scheduleData = snapshot.val() || {};
 
+            // تحديث نص الأيام أولاً
+            document.querySelectorAll('.sch-days-in').forEach(dayIn => {
+                const c = dayIn.dataset.card;
+                if(!scheduleData[c]) scheduleData[c] = { groups: {} };
+                scheduleData[c].days = dayIn.value;
+            });
+
             inputs.forEach(input => {
                 const card = input.getAttribute('data-card');
                 const group = input.getAttribute('data-group');
                 const field = input.getAttribute('data-field');
                 
-                if (!scheduleData[card]) scheduleData[card] = { days: card === 'card1' ? "الأحد والأربعاء" : "الاثنين والخميس", groups: {} };
+                if (!scheduleData[card]) {
+                    let defaultDays = "السبت والثلاثاء";
+                    if (card === 'card2') defaultDays = "الأحد والأربعاء";
+                    if (card === 'card3') defaultDays = "الاثنين والخميس";
+                    scheduleData[card] = { days: defaultDays, groups: {} };
+                }
+
                 if (!scheduleData[card].groups[group]) scheduleData[card].groups[group] = {};
                 
                 scheduleData[card].groups[group][field] = input.value;
