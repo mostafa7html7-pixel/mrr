@@ -126,15 +126,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     window.handleNavigation = async (url, pushState = true) => {
         if (!appContent) return;
+        
+        const loader = document.getElementById('top-loader');
+        if (loader) {
+            loader.style.opacity = '1';
+            loader.style.width = '30%';
+        }
+
         appContent.classList.add('page-fade-out');
-        const startTime = Date.now();
 
         if (pageCache.has(url)) {
-            setTimeout(() => renderPage(pageCache.get(url), url, pushState), Math.max(0, 50 - (Date.now() - startTime)));
+            if (loader) loader.style.width = '100%';
+            renderPage(pageCache.get(url), url, pushState);
             return;
         }
         
         try {
+            if (loader) loader.style.width = '60%';
             const response = await fetch(url);
             const html = await response.text();
             const parser = new DOMParser();
@@ -146,7 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const pageData = { content: newContent, title: newTitle };
             pageCache.set(url, pageData);
             
-            setTimeout(() => renderPage(pageData, url, pushState), Math.max(0, 50 - (Date.now() - startTime)));
+            if (loader) loader.style.width = '100%';
+            renderPage(pageData, url, pushState);
             
             const scripts = doc.querySelectorAll('script');
             scripts.forEach(oldScript => {
@@ -169,9 +178,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPage(pageData, url, pushState) {
         window.activeModelId = null;
-        setTimeout(() => {
+        const loader = document.getElementById('top-loader');
+        
             appContent.innerHTML = pageData.content;
             document.title = pageData.title;
+
+        if (loader) {
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.width = '0', 300);
+            }, 200);
+        }
             
             document.querySelectorAll('.nav-links a').forEach(link => {
                 link.classList.remove('active');
@@ -204,7 +221,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             appContent.classList.remove('page-fade-out');
             window.scrollTo(0, 0);
-        }, 50); // تقليل وقت الانتظار ليكون الانتقال فورياً
     };
 
     // اعتراض جميع الضغطات على الروابط الداخلية

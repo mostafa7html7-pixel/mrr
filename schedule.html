@@ -399,9 +399,20 @@
             renderScheduleUI();
         });
 
-        // --- تحديث الجدول لحظياً من قاعدة البيانات (Hydration) ---
+        // --- نظام التخزين المؤقت للسرعة الفائقة (Instant Hydration) ---
+        const SCHEDULE_CACHE_KEY = 'biology_schedule_data_v1';
+        const cachedData = localStorage.getItem(SCHEDULE_CACHE_KEY);
+        if (cachedData) {
+            try {
+                localScheduleData = JSON.parse(cachedData);
+                // عرض البيانات فوراً دون انتظار السيرفر
+                setTimeout(() => renderScheduleUI(), 0);
+            } catch(e) { console.error("Schedule cache error", e); }
+        }
+
         onValue(ref(db, 'schedule'), (snapshot) => {
             localScheduleData = snapshot.exists() ? snapshot.val() : {};
+            localStorage.setItem(SCHEDULE_CACHE_KEY, JSON.stringify(localScheduleData));
             renderScheduleUI();
         });
 

@@ -1565,13 +1565,28 @@ footer {
 .option-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--neon-gold); color: #fff; }
 .option-btn.selected { background: rgba(0, 255, 65, 0.1); border-color: var(--neon-green); color: var(--neon-green); box-shadow: 0 0 20px rgba(0,255,65,0.1); }
 
-/* --- تأثيرات انتقال الصفحات (SPA Transition) --- */
-#app-content {
-    transition: opacity 0.3s ease, transform 0.3s ease;
+/* --- نظام التنقل الاحترافي (Native App Transitions) --- */
+#top-loader {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--neon-green), var(--neon-gold), var(--neon-red));
+    z-index: 100001;
+    width: 0;
+    transition: width 0.4s cubic-bezier(0.1, 0.7, 0.1, 1), opacity 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 0 10px var(--neon-green);
 }
+
+#app-content {
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+}
+
 .page-fade-out {
     opacity: 0;
-    transform: translateY(10px);
+    transform: scale(0.98); /* تصغير خفيف جداً بدلاً من الإزاحة ليعطي شعور العمق */
 }
 
 /* --- نقل أنماط المعمل لتكون عالمية (لضمان عملها عند التنقل السلس) --- */
